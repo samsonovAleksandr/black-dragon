@@ -37,7 +37,7 @@ body{background:radial-gradient(ellipse at 50% 0%,#1b1331 0%,#0b0813 65%) fixed;
 #stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);background:#05030a;position:relative;box-shadow:inset 0 0 0 1px #0a0714,0 3px 0 #05030a}
 canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;cursor:crosshair}
 #stage canvas{touch-action:none}
-#info{padding:6px 10px;min-height:62px;color:var(--fg);font-size:13.5px;line-height:1.35}
+#info{padding:6px 10px;height:84px;overflow-y:auto;flex:none;color:var(--fg);font-size:13.5px;line-height:1.35}
 #info b{font-family:var(--pf);font-size:9px;color:var(--gold)}
 #logbar{display:flex;justify-content:space-between;align-items:center;color:var(--mid);font-family:var(--pf);font-size:7px;margin-bottom:-4px}
 #log{padding:5px 10px;height:118px;overflow-y:auto;color:#b9b0d6;position:relative;font-size:12.5px;line-height:1.3}
@@ -142,7 +142,7 @@ body.lost #stage{filter:grayscale(.9) brightness(.65);transition:filter 1.6s}
 .item .ds{color:#c3b9e0;font-size:12px;line-height:1.25}.item .row{margin-top:0}.item .pr{font-size:8px}
 body.big{font-size:16px}
 body.big #app{grid-template-columns:minmax(0,1fr) 430px}
-body.big #info{font-size:16.5px}body.big #log{font-size:15px;height:150px}
+body.big #info{font-size:16.5px;height:104px}body.big #log{font-size:15px;height:150px}
 body.big .btn{font-size:15px}body.big #top .btn,body.big #zoombtns .btn{font-size:14px}
 body.big .chip{font-size:10px}body.big #top{font-size:10px}body.big #top .loc{font-size:12px}
 body.big .card .role,body.big .next,body.big .xpl,body.big .perks,body.big .st{font-size:14px}
@@ -154,6 +154,15 @@ body.cb .hp i.r{background:linear-gradient(#f0a8f0,#c030b8 60%,#7a1a78)}
 body.calm .hurtflash{display:none}body.calm #banner.show{animation:none;opacity:1}
 body.calm *{transition:none!important}
 input[type=range]{padding:0!important;height:26px;accent-color:#ffd23f}
+#dock{display:none}
+@media(max-width:900px){
+  #dock{display:block;position:fixed;left:0;right:0;bottom:0;max-height:46vh;overflow-y:auto;z-index:6;background:#0b0813;border-top:2px solid var(--gold2);padding:5px 6px calc(5px + env(safe-area-inset-bottom));box-shadow:0 -4px 12px rgba(0,0,0,.6)}
+  #dock:empty{display:none}
+  #dock .card{margin:0}
+  #dock .role,#dock .next,#dock .xpl,#dock .perks,#dock .xpb{display:none}
+  #dock .row{margin-top:4px}
+  #heroes .card.indock{display:none}
+}
 @media(max-width:900px){
   #app{grid-template-columns:1fr;height:auto;overflow:visible;padding:6px;gap:6px}
   body{overflow:auto;font-size:12.5px}
@@ -184,6 +193,7 @@ input[type=range]{padding:0!important;height:26px;accent-color:#ffd23f}
   </div>
   <div id="heroes"></div>
 </div>
+<div id="dock"></div>
 <div id="modal"><div class="box" id="mbox"></div></div>
 <div id="tip"></div>
 <div class="hurtflash" id="hurtflash"></div>
@@ -1694,7 +1704,7 @@ function genField(n){
       const cand=G.grid.flat().filter(x=>free(x.c,x.r)).sort((a,b)=>dist(a.c,a.r,c,r)-dist(b.c,b.r,c,r));
       ({c,r}=cand[0]);
     }
-    const cell=cellOf(c,r);cell.block=false;cell.poi=p;cell.token=p.tok?Object.assign({},p.tok):null;poiTokens.push(cell);
+    const cell=cellOf(c,r);cell.block=false;cell.poi=p;if(p.tok&&p.tok.t==='portal'){cell.portal=true;cell.token=null;}else cell.token=p.tok?Object.assign({},p.tok):null;poiTokens.push(cell);
   }
   // случайные фишки
   const c1=pick(CLASS1),c2=pick(CLASS2);
@@ -1792,18 +1802,25 @@ function genMini(L,M){
   G.startCells=startCells;G.exitCells=exitCells;
   placeTerrain({terr:Object.assign({barrel:2},M.terr||{})});
 }
-function enterMini(cell){
-  const L=LOCS[G.loc],M=L.mini;if(!M||G.mini)return;
+function promptMini(h,cell){
+  const M=LOCS[G.loc].mini;if(!M||G.mini||G.over)return;
+  openModal('<h1>'+(cell.poi?cell.poi.n:M.n)+'</h1><p>'+M.d+'</p><p>Войти может только <b>'+h.d.n+'</b> — тот, кто встал на этот гекс. Остальные герои подождут снаружи.</p><p>Внутри ждут <b style="color:#ff9a8a">сильные враги</b> (на 50% крепче и злее обычных; чем меньше героев входит, тем меньше врагов). Награда: реликвия, золото, редкий предмет и опыт. Отступить можно с «светлых» гексов выхода — прогресс боя не сохранится. Если герой падёт, комната останется открытой.</p>',
+    [{t:'Войти ▶',fn:()=>{closeModal();enterMini(cell,h);}},{t:'Не сейчас',fn:()=>{closeModal();log('Вы решаете пока не заходить внутрь.');ui();}}]);
+}
+function enterMini(cell,hero){
+  const L=LOCS[G.loc],M=L.mini;if(!M||G.mini||!hero||!hero.alive)return;
+  const away=G.heroes.filter(x=>x!==hero).map(x=>{const {d,...r}=x;return r;});
   G.mini={n:M.n,won:false,st:{grid:G.grid,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,monsters:G.monsters.map(stripHit),exitCells:G.exitCells,startCells:G.startCells,
-    cell:[cell.c,cell.r],pos:G.heroes.map(h=>[h.c,h.r])}};
+    cell:[cell.c,cell.r],order:G.heroes.map(x=>x.id),away}};
+  G.heroes=[hero];G.sel=hero.id;
   G.tele=null;G.mode=null;G.undo=null;G.monsters=[];genMini(L,M);
-  G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i%G.startCells.length];h.c=c;h.r=r;h.block=h.guard=h.taunt=false;});
-  const want=5+(D().mon>=2?1:0)+Math.floor(DS().cnt/2);
+  const [sc,sr]=G.startCells[0];hero.c=sc;hero.r=sr;hero.block=hero.guard=hero.taunt=false;
+  const want=Math.min(6,Math.round(1.6*G.heroes.length)+1)+(D().mon>=2?1:0)+Math.floor(DS().cnt/2);
   let mons=shuffle(M.mon.slice());while(mons.length<want)mons.push(pick(M.mon));mons=mons.slice(0,want);
-  const spots=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.terr&&!c.barrel&&dist(c.c,c.r,G.startCells[0][0],G.startCells[0][1])>=5));
+  const spots=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.terr&&!c.barrel&&dist(c.c,c.r,sc,sr)>=5));
   mons.forEach((id,i)=>{const c=spots[i];if(!c)return;const m=spawnMon(id,c.c,c.r);
     m.hp=m.max=Math.round(m.hp*1.5);m.atk+=2;m.def+=1;m.n='Свирепый: '+m.n;m.strong=true;});
-  log('=== '+M.n+' ===');showBanner(M.n,'Сильные враги. Победите всех — или отступите на светлые гексы.');sfx('roar');ui();
+  log('=== '+M.n+': входит '+hero.d.n+' ===');showBanner(M.n,hero.d.n+' идёт внутрь один. Победите всех — или отступите на светлые гексы.');sfx('roar');ui();
 }
 function winMini(){
   const M=G.mini;if(!M||M.won)return;M.won=true;ach('mini');G.stats.minis=(G.stats.minis||0)+1;if(G.stats.minis>=3)ach('mini3');
@@ -1811,7 +1828,7 @@ function winMini(){
   G.heroes.forEach(h=>{if(h.alive)gainXP(h,3);});
   const al=G.heroes.filter(h=>h.alive);const rare=pick(['amulet','trollheart','vampring','chain','axe','elixir']);
   const hh=al.find(h=>canUse(h,rare))||al[0];if(hh)giveItem(hh,rare,cellOf(hh.c,hh.r));
-  log('★ '+M.n+' зачищено! +'+g+' золота, +3 опыта каждому, награда: '+ITEMS[rare].n+'.');
+  log('★ '+M.n+' зачищено! +'+g+' золота, +3 опыта, награда: '+ITEMS[rare].n+'.');
   const ids=pickRelics(3);
   const back=()=>{closeModal();leaveMini(true);};
   if(!ids.length){openModal('<h1>'+M.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'.</p>',[{t:'Вернуться на карту',fn:back}]);return;}
@@ -1820,11 +1837,18 @@ function winMini(){
 }
 function leaveMini(won){
   const M=G.mini;if(!M)return;const s=M.st;
+  const inside=G.heroes;
   G.grid=s.grid;G.cols=s.cols;G.rows=s.rows;G.ox=s.ox;G.oy=s.oy;G.exitCells=s.exitCells;G.startCells=s.startCells;
   G.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));G.tele=null;G.mode=null;G.undo=null;
-  G.heroes.forEach((h,i)=>{const p=s.pos[i];if(p){h.c=p[0];h.r=p[1];}});
-  const cell=cellOf(s.cell[0],s.cell[1]);if(won&&cell){cell.token=null;if(cell.poi)cell.poi=Object.assign({},cell.poi,{done:1});}
-  G.mini=null;log(won?'Отряд возвращается на карту с добычей.':'Отряд отступает из подземелья. Вход остаётся открытым.');sfx('travel');ui();
+  const away=s.away.map(r=>Object.assign(r,{d:HDEF[r.id]}));
+  G.heroes=s.order.map(id=>inside.find(h=>h.id===id)||away.find(h=>h.id===id)).filter(Boolean);
+  inside.forEach(h=>{h.c=s.cell[0];h.r=s.cell[1];});
+  const cell=cellOf(s.cell[0],s.cell[1]);if(won&&cell){cell.portal=false;if(cell.poi)cell.poi=Object.assign({},cell.poi,{done:1});}
+  G.sel=(inside.find(h=>h.alive)||G.heroes.find(h=>h.alive)||G.heroes[0]).id;
+  G.mini=null;log(won?'Герой возвращается на карту с добычей.':'Герой выходит из подземелья. Вход остаётся открытым.');sfx('travel');ui();
+}
+function failMini(){
+  const M=G.mini;if(!M)return;log('Герой пал в подземелье «'+M.n+'». Отряд отступает без добычи.');showBanner('Герой пал','Вход остаётся открытым');leaveMini(false);
 }
 function placeTerrain(L){
   const T=L.terr||{};
@@ -2176,6 +2200,7 @@ function moveHero(h,c,r,noFree){
 }
 function enterCell(u,hero){
   const cl=cellOf(u.c,u.r);if(!cl)return;
+  if(hero&&cl.portal&&!G.mini&&u.alive&&!G.over&&!isAI(u)&&LOCS[G.loc]&&LOCS[G.loc].mini)promptMini(u,cl);
   if(cl.terr==='acid'&&hero){u.poison=Math.max(u.poison||0,2);pop(u,'ЯД','#8ae850');sfx('poison');log(u.d.n+' ступает в кислоту и отравляется!');}
   if(cl.terr==='lava'&&!u.boss){u.burn=Math.max(u.burn||0,2);pop(u,'ГОРИТ','#f80');sfx('fire');log((hero?u.d.n:u.n)+' ступает в лаву и загорается!');}
   if(hero&&cl.trap&&!cl.trap.seen){cl.trap=null;sfx('trap');pop(u,'ЛОВУШКА','#f55');log('Скрытая ловушка! '+u.d.n+' получает 4 урона и кровотечение.');hitHero(u,4,null,{pierce:true});if(u.alive)u.bleed=Math.max(u.bleed||0,2);}
@@ -2221,9 +2246,6 @@ function revealToken(h,cell){
   if(cell.poi)log('Осматриваем: '+cell.poi.n+'...');
   switch(t.t){
     case 'monster':{const m=spawnMon(t.m,cell.c,cell.r);log('Из фишки выходит: '+m.n+'!');sfx('spawn');fxQ({burst:'spawn',c:cell.c,r:cell.r});pop(m,'!');break;}
-    case 'portal':{cell.token=t;const M=LOCS[G.loc].mini;if(!M||G.mini)break;
-      openModal('<h1>'+M.n+'</h1><p>'+M.d+'</p><p>Внутри ждут <b style="color:#ff9a8a">сильные враги</b> (на 50% крепче и злее обычных). Награда: реликвия, золото, редкий предмет и опыт. Отступить можно с «светлых» гексов выхода — прогресс боя не сохранится.</p><p style="color:var(--mid)">Герои войдут все вместе.</p>',
-        [{t:'Войти ▶',fn:()=>{closeModal();enterMini(cell);}},{t:'Не сейчас',fn:()=>{closeModal();log('Вы решаете пока не соваться внутрь.');ui();}}]);break;}
     case 'item':giveItem(h,t.it,cell);break;
     case 'key':{if(G.endless){const g=evGold(18+G.depth*2);sfx('key');log('Тайник! Найдено '+g+' золота.');pop(pos,'+'+g+' з','#ffd23f');G.heroes.forEach(x=>{if(x.alive)gainXP(x,1);});}else{G.keys++;sfx('key');log('КЛЮЧ найден! Ключей: '+G.keys+'/'+KEYS_NEEDED+'. Печать Дракона ослабла.');pop(pos,'КЛЮЧ');}
       if(t.guard){const f=freeNear(cell.c,cell.r);if(f){const m=spawnMon(t.guard,f[0],f[1]);log('Хранитель пробуждается: '+m.n+'!');sfx('spawn');}}
@@ -2737,6 +2759,7 @@ function checkEnd(){
   if(G.over)return true;
   if(G.horde&&G.horde.state==='fight'&&!G.camp&&G.heroes.some(h=>h.alive)&&!G.monsters.some(m=>m.alive))waveClear();
   if(G.mini&&!G.mini.won&&G.heroes.some(h=>h.alive)&&!G.monsters.some(m=>m.alive))winMini();
+  if(G.mini&&!G.mini.won&&!G.heroes.some(h=>h.alive)&&G.mini.st.away.some(h=>h.alive)){failMini();return false;}
   if(!G.heroes.some(h=>h.alive)){
     G.over=true;G.busy=true;sfx('defeat');document.body.classList.add('lost');hurtFlash();
     if(G.horde){
@@ -2865,7 +2888,7 @@ function showIntro(){
   openModal(`<h1>ЧЁРНЫЙ ДРАКОН</h1>
   <p>Кооперативный данж-краулер. Вы ведёте отряд из четырёх героев. Классов семь: <b>Танк, Мечник, Лучник, Маг, Жрец, Разбойник и Паладин</b> — отряд выбираете перед игрой (по умолчанию классический: Танк, Мечник, Лучник, Маг).</p>
   <h2>Цель</h2>
-  <ul><li>Пройдите три локации (гекс-поля с закрытыми фишками) и найдите <b>5 ключей</b>: 2 в Тёмном лесу, 2 во второй локации (<b>Мёртвые земли</b> или <b>Гиблые топи</b> — путь выбирает хост на привале), последний хранит мини-босс третьей: <b>Ледяная королева</b> (Ледяные пещеры) или <b>Королева пауков</b> (Ядовитые катакомбы).</li><li>Фишки-порталы («Звериное логово», «Склеп», «Алхимический погреб»…) ведут в <b>малые локации</b> с сильными врагами и щедрой наградой.</li>
+  <ul><li>Пройдите три локации (гекс-поля с закрытыми фишками) и найдите <b>5 ключей</b>: 2 в Тёмном лесу, 2 во второй локации (<b>Мёртвые земли</b> или <b>Гиблые топи</b> — путь выбирает хост на привале), последний хранит мини-босс третьей: <b>Ледяная королева</b> (Ледяные пещеры) или <b>Королева пауков</b> (Ядовитые катакомбы).</li><li>Особые гексы-входы («Звериное логово», «Склеп», «Алхимический погреб»…) ведут в <b>малые локации</b> с сильными врагами и щедрой наградой: входит только тот герой, кто встал на гекс.</li>
   <li>Каждый ключ ломает одну печать Дракона. Можно прийти к нему раньше, но он будет сильнее.</li>
   <li>Победите Дракона в финальной битве. Если пали все герои — поражение.</li></ul>
   <h2>Ход</h2>
@@ -3554,7 +3577,9 @@ function autoPick(){
 }
 function renderHeroes(){
   const el=$('#heroes');
-  el.innerHTML=G.heroes.map((h,i)=>{
+  const dh=(()=>{const sel=G.heroes.find(x=>x.id===G.sel);return (sel&&sel.alive&&mine(sel))?sel:G.heroes.find(x=>x.alive&&mine(x));})();
+  const dockOn=!!dh&&window.matchMedia('(max-width:900px)').matches;
+  const card=(h,i)=>{
     const mx=st(h,'maxhp'),nx=h.lv<5?XPT[h.lv-1]:null;const fr=Math.max(0,h.hp)/mx;
     let gems='';const apMax=st(h,'ap');for(let a=0;a<Math.max(apMax,h.ap);a++)gems+='<i class="g'+(a<h.ap?' on':'')+'"></i>';
     const abils=habils(h).map(id=>{const a=ABIL[id];const dis=!h.alive||G.busy||!mine(h)||h.ap<a.cost||(a.once&&h.reviveUsed);const act=G.mode&&G.mode.h===h&&G.mode.spec===a;
@@ -3581,7 +3606,14 @@ function renderHeroes(){
      (pend&&!mine(h)?'<span class="st" style="color:var(--gold)">ждёт выбора улучшения</span>':'')+
      '<button class="btn" data-act="path" data-h="'+h.id+'">Путь героя</button></div>'+
      '<div class="row">'+abils+'</div><div class="row">'+items+'</div>'+(takes?'<div class="row">'+takes+'</div>':'')+'</div>';
-  }).join('');
+  };
+  el.innerHTML=G.heroes.map((h,i)=>card(h,i)).join('');
+  const dk=$('#dock');
+  if(dockOn){
+    dk.innerHTML=card(dh,G.heroes.indexOf(dh));
+    const idx=G.heroes.indexOf(dh);const lc=el.children[idx];if(lc)lc.classList.add('indock');
+    document.body.style.paddingBottom=dk.offsetHeight+'px';
+  }else{dk.innerHTML='';document.body.style.paddingBottom='';}
 }
 /* --- подсказки --- */
 const TIP=$('#tip');
@@ -3616,6 +3648,7 @@ function describe(cell){
   const h=heroAt(cell.c,cell.r);
   if(h){inf.innerHTML='<b>'+h.d.n+'</b> ур.'+h.lv+' · HP '+h.hp+'/'+st(h,'maxhp')+' · АТК '+st(h,'atk')+' · ЗАЩ '+st(h,'def')+lootTxt;return;}
   if(lootTxt){inf.innerHTML='<b>Предметы на земле</b>'+lootTxt+'<br><span style="color:var(--mid)">Встаньте на гекс — подходящий предмет подберётся сам (если есть место).</span>';return;}
+  if(cell.portal&&!G.mini){inf.innerHTML='<b>Вход: '+(cell.poi?cell.poi.n:'подземелье')+'</b><br><span style="color:var(--mid)">Встаньте на этот гекс — войдёт только тот герой, кто на него встал. Внутри сильные враги и щедрая награда.</span>';return;}
   if(cell.token){inf.innerHTML='<b>Скрытая фишка'+(cell.poi?' — '+cell.poi.n:'')+'</b><br><span style="color:var(--mid)">Может скрывать монстра, предмет, ключ или событие. Откройте, стоя рядом (1 ОД).</span>';return;}
   if(cell.zone==='exit'){inf.innerHTML='<b>Выход</b><br><span style="color:var(--mid)">Все живые герои должны встать на светлые гексы, затем «Дальше».</span>';return;}
   if(cell.zone==='start'){inf.innerHTML='<b>Стартовая зона</b>';return;}
@@ -3693,7 +3726,7 @@ function runCmd(cmd,who){
 function makeSnap(){
   return {
     loc:G.loc,round:G.round,keys:G.keys,busy:G.busy,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,
-    grid:G.grid.map(row=>row.map(c=>({b:c.block,d:c.deco,s:c.seed,z:c.zone,dr:c.dragon,p:c.poi?{n:c.poi.n,spr:c.poi.spr}:null,t:c.token?1:0,lt:c.loot&&c.loot.length?c.loot:undefined,tr:c.terr||undefined,br:c.barrel?1:undefined,tp:c.trap&&c.trap.seen?1:undefined}))),
+    grid:G.grid.map(row=>row.map(c=>({b:c.block,d:c.deco,s:c.seed,z:c.zone,dr:c.dragon,p:c.poi?{n:c.poi.n,spr:c.poi.spr}:null,t:c.token?1:0,lt:c.loot&&c.loot.length?c.loot:undefined,tr:c.terr||undefined,br:c.barrel?1:undefined,pt:c.portal?1:undefined,tp:c.trap&&c.trap.seen?1:undefined}))),
     heroes:G.heroes.map(h=>{const {d,...rest}=h;return rest;}),
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
@@ -3716,7 +3749,7 @@ function applySnap(s){
   const old=G;
   const ng={loc:s.loc,round:s.round,keys:s.keys,busy:s.busy,over:s.over,cols:s.cols,rows:s.rows,ox:s.ox,oy:s.oy,log:s.log,stats:s.stats,ready:s.ready,
     exitCells:s.exitCells,startCells:s.startCells,fx:old.fx||[],hover:old.hover||null,mode:null,sel:old.sel||'sword',tele:null,monsters:[],dragon:null,hl:null};
-  ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,trap:c.tp?{seen:true}:null})));
+  ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,portal:!!c.pt,trap:c.tp?{seen:true}:null})));
   ng.heroes=s.heroes.map(h=>Object.assign(h,{d:HDEF[h.id]}));
   if(!ng.heroes.some(h=>h.id===ng.sel))ng.sel=ng.heroes[0].id;
   ng.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));
@@ -4255,7 +4288,7 @@ VIEW.addEventListener('click',e=>{
   if(hl.exp.has(k)){act({c:'exp',h:h.id,x:cell.c,y:cell.r});return;}
   if(hl.move.has(k)){act({c:'mv',h:h.id,x:cell.c,y:cell.r});return;}
 });
-$('#heroes').addEventListener('click',e=>{
+const heroClick=e=>{
   const b=e.target.closest('[data-act]');if(!b||b.disabled)return;
   const h=G.heroes.find(x=>x.id===b.dataset.h);
   if(b.dataset.act==='sel'){G.sel=h.id;G.mode=null;ui();return;}
@@ -4270,7 +4303,9 @@ $('#heroes').addEventListener('click',e=>{
   if(b.dataset.act==='abil')startSpec(h,ABIL[b.dataset.id],{id:b.dataset.id});
   else if(b.dataset.act==='item'){const s=+b.dataset.slot;startSpec(h,ITEMS[h.items[s]].use,{slot:s});}
   ui();
-});
+};
+$('#heroes').addEventListener('click',heroClick);
+$('#dock').addEventListener('click',heroClick);
 $('#top').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
   if(b.dataset.act==='end')endClick();
