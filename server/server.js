@@ -7,7 +7,7 @@ const {WebSocketServer}=require('ws');
 
 const PORT=+process.env.PORT||8080;
 const HTML=path.join(__dirname,'..','index.html');
-const MAX_GUESTS=6;
+const MAX_GUESTS=12;   // игроки (до 3 гостей) + зрители
 const rooms=new Map(); // code -> {host, guests:Map(id->ws), n}
 
 const server=http.createServer((req,res)=>{
