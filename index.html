@@ -57,6 +57,7 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;curso
 @keyframes bn{0%{opacity:0;transform:scaleY(.2)}12%{opacity:1;transform:scaleY(1)}80%{opacity:1}100%{opacity:0}}
 #heroes{display:flex;flex-direction:column;gap:7px;overflow-y:auto;min-height:0;padding-right:2px}
 .card{--cc:#5a4e86;border:2px solid var(--line);border-left:4px solid var(--cc);background:linear-gradient(180deg,#201638,#150f26);padding:6px 7px 7px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 3px 0 #05030a;transition:border-color .15s,box-shadow .15s}
+.card.cls-priest{--cc:#f0e8a0}.card.cls-rogue{--cc:#8a7ab8}.card.cls-paladin{--cc:#ffd23f}
 .card.cls-tank{--cc:#4283ea}.card.cls-sword{--cc:#e34540}.card.cls-archer{--cc:#52bb4e}.card.cls-mage{--cc:#a95bdc}
 .card:hover{border-color:var(--line2);border-left-color:var(--cc)}
 .card.sel{border-color:var(--gold);border-left-color:var(--cc);box-shadow:0 0 0 1px #6b5514,0 0 14px rgba(255,210,63,.18),0 3px 0 #05030a}
@@ -510,6 +511,7 @@ const ICON_OF={potion:['potion','r'],elixir:['potion','b'],rustsword:['sword','o
  amulet:['amulet','c'],scroll:['scroll','r'],bomb:['bomb'],feather:['feather'],barbed:['arrow','g'],longbow:['bow'],oakstaff:['staff','e'],tome:['tome'],
  duelist:['buckler','r'],claymore:['claymore','l'],spikeshield:['spike','b'],towershield:['tower','b'],
  helmet:['helmet','g'],dagger:['dagger','l'],axe:['axe','g'],cloak:['cloak','E'],vampring:['ring','R'],trollheart:['heart','e'],antidote:['potion','e'],ragepot:['potion','o'],
+ mace:['staff','y'],holysymbol:['amulet','y'],twindagger:['dagger','r'],assassinblade:['dagger','R'],shadowcloak:['cloak','p'],holyshield:['tower','y'],lighthammer:['axe','y'],
  icerune:['rune','c'],stormrune:['rune','y'],blink:['scroll','p'],elvencloak:['cloak','e'],crystal:['staff','p'],bloodblade:['sword','R'],platelegs:['armor','l']};
 const ICA={
  power:a=>{ICN.sword(a,'l');a.put(13,12,'r');a.put(14,13,'r');a.put(12,13,'o');a.rect(1,1,2,1,'y');a.rect(2,0,1,3,'y');},
@@ -531,6 +533,18 @@ const ICA={
  pin:a=>{a.line(2,14,10,6,'n');a.rect(9,4,4,4,'l');a.rect(11,10,4,1,'r');a.rect(12,9,2,3,'r');a.rect(2,13,3,2,'e');},
  volley:a=>{[[2,14,3,1],[5,14,7,1],[8,14,8,1],[11,14,12,1],[14,14,14,1]].forEach(([x0,y0,x1,y1])=>a.line(x0,y0,x1,y1,'n'));[3,7,8,12,14].forEach(x=>a.rect(x-1,0,3,3,'l'));},
  frost:a=>{a.rect(7,1,2,14,'c');a.rect(1,7,14,2,'c');a.line(3,3,12,12,'c');a.line(12,3,3,12,'c');a.rect(6,6,4,4,'w');},
+ smite:a=>{a.rect(7,1,2,14,'y');a.rect(3,5,10,2,'y');a.rect(7,2,2,3,'w');a.rect(4,5,2,1,'w');a.put(2,2,'w');a.put(13,2,'w');a.put(2,12,'w');a.put(13,12,'w');},
+ mend:a=>{a.rect(6,3,4,10,'c');a.rect(3,6,10,4,'c');a.rect(7,4,2,8,'w');a.rect(4,7,8,2,'w');a.put(2,2,'w');a.put(13,13,'w');},
+ cleanse:a=>{a.rect(7,2,2,2,'c');a.rect(6,4,4,2,'c');a.rect(5,6,6,5,'c');a.rect(6,11,4,2,'c');a.rect(7,5,1,5,'w');a.put(2,3,'w');a.put(13,4,'w');a.put(12,12,'w');a.put(3,11,'w');},
+ ward:a=>{ICN.shield(a,'c');a.rect(5,4,2,1,'w');},
+ bless:a=>{a.rect(7,1,2,14,'y');a.rect(1,7,14,2,'y');a.line(3,3,12,12,'Y');a.line(12,3,3,12,'Y');a.rect(6,6,4,4,'w');},
+ backstab:a=>{ICN.dagger(a,'l');a.rect(10,10,4,2,'r');a.rect(11,12,2,2,'r');a.put(14,9,'r');},
+ knives:a=>{a.line(2,12,9,5,'l');a.line(5,14,12,7,'l');a.line(8,15,14,9,'l');a.rect(1,11,2,2,'n');a.rect(4,13,2,2,'n');a.rect(7,14,2,2,'n');a.put(10,4,'w');a.put(13,6,'w');},
+ smoke:a=>{a.rect(3,6,10,6,'g');a.rect(5,4,6,3,'g');a.rect(2,8,3,4,'g');a.rect(11,8,3,4,'g');a.rect(5,6,2,2,'w');a.rect(8,5,2,2,'w');a.rect(4,11,8,1,'d');},
+ holystrike:a=>{ICN.sword(a,'w');a.rect(1,1,3,1,'y');a.rect(2,0,1,3,'y');a.rect(12,10,3,1,'y');a.rect(13,9,1,3,'y');},
+ layhands:a=>{a.rect(4,6,8,7,'s');a.rect(4,3,2,4,'s');a.rect(7,2,2,5,'s');a.rect(10,3,2,4,'s');a.rect(7,8,2,4,'y');a.rect(6,9,4,2,'y');a.put(2,2,'y');a.put(13,2,'y');},
+ judge:a=>{a.line(3,14,10,7,'n');a.rect(8,2,6,5,'l');a.rect(9,3,4,1,'w');a.rect(1,1,3,1,'y');a.rect(2,0,1,3,'y');},
+ rally:a=>{a.rect(3,1,1,14,'n');a.rect(4,2,9,6,'r');a.rect(5,3,7,1,'y');a.rect(7,4,3,3,'y');a.rect(4,7,9,1,'R');},
  massheal:a=>{a.rect(6,4,4,9,'e');a.rect(3,7,10,3,'e');a.rect(7,5,2,7,'G');a.rect(4,8,8,1,'G');a.put(2,2,'w');a.put(13,2,'w');a.put(13,13,'w');a.put(2,13,'w');}
 };
 /*ART-BEGIN*/
@@ -697,6 +711,39 @@ ART.mage=()=>mkArt({parts:[
  {t:'l',x0:31,y0:12,x1:31,y1:29,w:2,m:'wood',k:.6},
  {t:'e',cx:31,cy:9,rx:3.6,ry:3.8,m:'glow'},{t:'e',cx:31,cy:9,rx:1.6,ry:1.8,m:'white'},
  {t:'px',x:27,y:5,c:'#b4f4ff'},{t:'px',x:35,y:7,c:'#b4f4ff'},{t:'px',x:33,y:3,c:'#ffffff'},
+]});
+/* Новые герои: Жрец, Разбойник, Паладин */
+ART.priest=()=>mkArt({parts:[
+ {t:'p',pts:[[13,15],[23,15],[29,34],[7,34]],m:'white'},{t:'p',pts:[[13,15],[16,15],[12,34],[7,34]],m:'white',b:.12},{t:'p',pts:[[19,18],[21,18],[24,34],[16,34]],m:'white',b:-.18},
+ {t:'r',x:17,y:16,w:2,h:18,m:'gold'},{t:'r',x:14,y:19,w:8,h:2,m:'gold'},{t:'r',x:11,y:24,w:14,h:2,m:'gold',b:-.1},{t:'r',x:8,y:32,w:20,h:2,m:'gold'},
+ {t:'e',cx:10,cy:20,rx:3.2,ry:5,m:'white'},{t:'e',cx:26,cy:19,rx:3.2,ry:5,m:'white'},{t:'e',cx:27,cy:23,rx:2.4,ry:2.4,m:'skin'},{t:'e',cx:9,cy:25,rx:2.4,ry:2.4,m:'skin'},
+ {t:'r',x:7,y:21,w:6,h:1,m:'gold'},{t:'r',x:23,y:20,w:6,h:1,m:'gold'},
+ {t:'e',cx:18,cy:9.5,rx:7,ry:7.4,m:'white'},{t:'e',cx:18,cy:11,rx:4.4,ry:4.7,m:'skin'},{t:'px',x:16,y:11,c:'#1a1424'},{t:'px',x:20,y:11,c:'#1a1424'},{t:'r',x:17,y:14,w:2,h:1,m:'skin',b:-.3},
+ {t:'r',x:12,y:5,w:12,h:1,m:'gold'},{t:'px',x:18,y:5,c:'#e34540'},{t:'r',x:13,y:2,w:10,h:1,m:'gold',b:.1},
+ {t:'l',x0:31,y0:8,x1:30,y1:34,w:2,m:'wood',k:.6},{t:'r',x:29,y:0,w:4,h:9,m:'gold'},{t:'r',x:26,y:3,w:10,h:3,m:'gold'},{t:'px',x:31,y:4,c:'#fff8c0'},
+ {t:'e',cx:18,cy:26,rx:2.4,ry:2.4,m:'glow'},
+]});
+ART.rogue=()=>mkArt({parts:[
+ {t:'p',pts:[[9,14],[27,14],[31,33],[5,33]],m:'dark',b:-.1},
+ {t:'c',x:12,y:27,w:5,h:7,m:'dark'},{t:'c',x:19,y:27,w:5,h:7,m:'dark'},{t:'r',x:11,y:32,w:7,h:3,m:'black'},{t:'r',x:18,y:32,w:7,h:3,m:'black'},{t:'r',x:11,y:32,w:7,h:1,m:'leather'},{t:'r',x:18,y:32,w:7,h:1,m:'leather'},
+ {t:'c',x:12,y:15,w:12,h:13,m:'leather'},{t:'l',x0:13,y0:16,x1:23,y1:27,w:2,m:'dark',k:.4},{t:'r',x:12,y:25,w:12,h:2,m:'dark'},{t:'r',x:16,y:25,w:4,h:2,m:'gold'},
+ {t:'e',cx:10,cy:20,rx:3,ry:5,m:'leather'},{t:'e',cx:26,cy:20,rx:3,ry:5,m:'leather'},{t:'e',cx:8,cy:25,rx:2.3,ry:2.3,m:'skin'},{t:'e',cx:28,cy:25,rx:2.3,ry:2.3,m:'skin'},
+ {t:'e',cx:18,cy:9,rx:7,ry:7.6,m:'dark'},{t:'e',cx:18,cy:11,rx:4.8,ry:4.4,m:'black'},{t:'px',x:16,y:10,c:'#ffe27a'},{t:'px',x:20,y:10,c:'#ffe27a'},{t:'px',x:16,y:11,c:'#ffe27a'},{t:'px',x:20,y:11,c:'#ffe27a'},
+ {t:'r',x:13,y:14,w:10,h:3,m:'crimson'},{t:'p',pts:[[14,17],[22,17],[24,23],[12,23]],m:'crimson',b:-.15},
+ {t:'p',pts:[[18,0],[24,5],[23,9],[18,4],[13,9],[12,5]],m:'dark',b:.1},
+ {t:'l',x0:5,y0:27,x1:2,y1:12,w:2,m:'steel',k:.7},{t:'l',x0:6,y0:27,x1:3,y1:12,w:1,m:'white',k:.9},{t:'r',x:3,y:26,w:6,h:2,m:'gold'},
+ {t:'l',x0:31,y0:27,x1:34,y1:12,w:2,m:'steel',k:.7},{t:'l',x0:30,y0:27,x1:33,y1:12,w:1,m:'white',k:.9},{t:'r',x:27,y:26,w:6,h:2,m:'gold'},
+]});
+ART.paladin=()=>mkArt({parts:[
+ {t:'c',x:12,y:27,w:5,h:6,m:'steelD'},{t:'c',x:19,y:27,w:5,h:6,m:'steelD'},{t:'r',x:11,y:32,w:7,h:3,m:'gold'},{t:'r',x:18,y:32,w:7,h:3,m:'gold'},
+ {t:'p',pts:[[24,15],[31,21],[30,31],[25,29]],m:'blue',b:-.1},
+ {t:'c',x:11,y:15,w:14,h:13,m:'white'},{t:'p',pts:[[13,16],[23,16],[23,29],[18,32],[13,29]],m:'blue'},{t:'r',x:17,y:17,w:2,h:9,m:'gold'},{t:'r',x:14,y:20,w:8,h:2,m:'gold'},{t:'r',x:11,y:25,w:14,h:2,m:'gold',b:-.1},
+ {t:'e',cx:10,cy:17,rx:4.5,ry:3.8,m:'white'},{t:'e',cx:26,cy:17,rx:4.5,ry:3.8,m:'white'},{t:'r',x:6,y:19,w:9,h:1,m:'gold'},{t:'r',x:22,y:19,w:9,h:1,m:'gold'},
+ {t:'e',cx:18,cy:9,rx:6.2,ry:7,m:'white'},{t:'r',x:12,y:11,w:12,h:2,m:'gold'},{t:'r',x:13,y:8,w:10,h:3,m:'dark'},{t:'px',x:15,y:9,c:'#a0e0ff'},{t:'px',x:20,y:9,c:'#a0e0ff'},{t:'r',x:17,y:8,w:2,h:6,m:'gold'},
+ {t:'p',pts:[[12,7],[6,2],[8,9]],m:'white',b:.1},{t:'p',pts:[[24,7],[30,2],[28,9]],m:'white',b:.1},{t:'p',pts:[[18,0],[21,4],[18,6],[15,4]],m:'gold'},
+ {t:'p',pts:[[2,15],[11,15],[11,25],[6,32],[2,25]],m:'white'},{t:'p',pts:[[2,15],[3,15],[5,30],[3,25]],m:'gold',b:-.15},{t:'r',x:5,y:17,w:2,h:11,m:'gold'},{t:'r',x:3,y:20,w:7,h:2,m:'gold'},
+ {t:'r',x:29,y:3,w:3,h:18,m:'glow'},{t:'r',x:30,y:3,w:1,h:17,m:'white'},{t:'r',x:27,y:20,w:7,h:2,m:'gold'},{t:'r',x:29,y:22,w:3,h:4,m:'leather'},{t:'e',cx:30.5,cy:27,rx:2,ry:1.5,m:'gold'},
+ {t:'c',x:26,y:19,w:5,h:5,m:'steelD'},
 ]});
 /* Монстры, партия 1: Тёмный лес */
 const eyes2=(x1,x2,y,c)=>[{t:'px',x:x1,y,c},{t:'px',x:x2,y,c}];
@@ -1160,7 +1207,7 @@ ART.lab=()=>mkArt({parts:[
  {t:'p',pts:[[21,33],[23,29],[25,33]],m:'orange'},{t:'p',pts:[[26,33],[28,29],[30,33]],m:'orange'},
 ]});
 /* Покадровая анимация: из готового спрайта получаем кадры деформацией (смещение полос тела, ног, рук, волна подола, сжатие). */
-const ANIMK={toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
+const ANIMK={priest:'robe',rogue:'hum',paladin:'hum',toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
 const FACE_LEFT={wolf:1,boar:1};            // спрайт нарисован мордой влево
 const NO_FLIP={dragon:1,ghost:0};
 const ANIMP={
@@ -1293,29 +1340,51 @@ const HDEF={
        3:{hp:2,atk:1,pick:[{n:'Огненный шар',d:'Новое умение: урон цели и всем врагам рядом с ней (3 ОД).',ab:['fireball']},{n:'Ледяная стрела',d:'Новое умение: АТК+1 урона, враг заморожен и пропускает ход (2 ОД).',ab:['frost']}]},
        4:{hp:2,rng:1},
        5:{hp:2,atk:1,pick:[{n:'Воскрешение',d:'Новое умение: вернуть павшего героя с 50% HP (раз за локацию, 3 ОД).',ab:['revive']},{n:'Массовое лечение',d:'Новое умение: лечит всех союзников в радиусе 3 на 2+уровень HP (3 ОД).',ab:['massheal']}]}}},
+ priest:{n:'Жрец',hp:11,atk:2,def:1,ap:3,rng:2,spr:'priest',abil:['smite','mend'],
+   role:'Свет: лечит, снимает яды, карает нежить.',
+   lv:{2:{hp:2,ab:['cleanse']},
+       3:{hp:2,pick:[{n:'Священный щит',d:'Новое умение: союзник в 3 гексах получает «Блок» — следующий удар по нему блокируется (2 ОД).',ab:['ward']},{n:'Благословение',d:'Новое умение: союзник получает +2 АТК и +1 ЗАЩ на 2 раунда (2 ОД).',ab:['bless']}]},
+       4:{hp:2,rng:1},
+       5:{hp:3,atk:1,pick:[{n:'Святой нимб',d:'В начале каждого раунда Жрец лечит всех союзников в радиусе 2 на 2 HP.',flag:'halo'},{n:'Воскрешение',d:'Новое умение: вернуть павшего героя с 50% HP (раз за локацию, 3 ОД).',ab:['revive']}]}}},
+ rogue:{n:'Разбойник',hp:10,atk:4,def:0,ap:3,rng:1,spd:1,spr:'rogue',abil:['backstab'],
+   role:'Быстрый убийца: ходит на 3 гекса за ОД, без ударов вдогонку.',
+   lv:{2:{hp:2,ab:['knives']},
+       3:{hp:2,pick:[{n:'Яд на клинках',d:'Каждый удар Разбойника вызывает у врага кровотечение (1 урон 2 хода).',flag:'venom'},{n:'Острые клинки',d:'+1 АТК навсегда.',atk:1}]},
+       4:{hp:2,ab:['smoke']},
+       5:{hp:2,atk:1,pick:[{n:'Казнь',d:'Новое умение: по врагу с ≤50% HP — тройной урон (2 ОД).',ab:['execute']},{n:'Быстрые руки',d:'+1 очко действия каждый раунд.',ap:1}]}}},
+ paladin:{n:'Паладин',hp:17,atk:3,def:2,ap:3,rng:1,spr:'paladin',abil:['holystrike'],
+   role:'Воин света: бьёт и исцеляет соседей, усиливает отряд.',
+   lv:{2:{hp:3,ab:['layhands']},
+       3:{hp:3,pick:[{n:'Аура щита',d:'Союзники рядом (в 1 гексе) получают +1 ЗАЩ.',flag:'aura'},{n:'Латы веры',d:'+1 ЗАЩ навсегда.',def:1}]},
+       4:{hp:3,atk:1,ab:['judge']},
+       5:{hp:3,pick:[{n:'Несгибаемая вера',d:'Раз за локацию: смертельный удар оставляет Паладина с 1 HP.',flag:'faith'},{n:'Праведный клич',d:'Новое умение: союзники в радиусе 3 получают +2 АТК и +1 ЗАЩ на 2 раунда (3 ОД).',ab:['rally']}]}}},
 };
-const HORDER=['tank','sword','archer','mage'];
+const HORDER=['tank','sword','archer','mage','priest','rogue','paladin'];
+const SQUAD0=['tank','sword','archer','mage'];
+const squad=()=>(NET.squad&&NET.squad.length===4&&NET.squad.every(id=>HDEF[id]))?NET.squad:SQUAD0;
+const heroIds=()=>(G.heroes&&G.heroes.length)?G.heroes.map(h=>h.id):squad();
+const inSquad=id=>!ITEMS[id].cls||heroIds().includes(ITEMS[id].cls);
 
 /* Монстры: hp, atk, def, mv (гексов за ход), rng, xp */
 const MON={
  goblin:{n:'Гоблин',hp:5,atk:3,def:0,mv:2,rng:1,xp:1,spr:'goblin',d:'Мелкий мародёр.'},
  wolf:{n:'Волк',hp:6,atk:3,def:0,mv:4,rng:1,xp:2,spr:'wolf',bleed:2,d:'Очень быстрый: ходит на 4 гекса. Укус вызывает кровотечение.'},
- skel:{n:'Скелет',hp:7,atk:3,def:1,mv:2,rng:1,xp:2,spr:'skel',d:'Костяной воин, защита 1.'},
+ skel:{n:'Скелет',undead:1,hp:7,atk:3,def:1,mv:2,rng:1,xp:2,spr:'skel',d:'Костяной воин, защита 1.'},
  spider:{n:'Паук',hp:6,atk:2,def:0,mv:3,rng:1,xp:2,spr:'spider',poison:1,d:'Яд: жертва теряет 1 HP в начале 2 раундов.'},
  bandit:{n:'Разбойник-лучник',hp:5,atk:3,def:0,mv:2,rng:3,xp:2,spr:'bandit',d:'Стреляет с расстояния 3.'},
  slime:{n:'Слизь',hp:9,atk:2,def:0,mv:1,rng:1,xp:2,spr:'slime',split:1,d:'Медленная. После смерти делится на 2 слизнячка.'},
  slimelet:{n:'Слизнячок',hp:3,atk:1,def:0,mv:1,rng:1,xp:0,spr:'slimelet',d:'Остаток слизи.'},
  orc:{n:'Орк',hp:13,atk:6,def:1,mv:2,rng:1,xp:3,spr:'orc',rage:1,d:'Ярость: ниже половины HP бьёт на +1.'},
  dknight:{n:'Тёмный рыцарь',hp:16,atk:6,def:3,mv:2,rng:1,xp:4,spr:'dknight',d:'Тяжёлая броня (защита 3). Нужна магия или меткий выстрел.'},
- necro:{n:'Некромант',hp:9,atk:5,def:0,mv:2,rng:3,xp:4,spr:'necro',summon:1,pierce:1,d:'Магия пробивает броню. Раз в 3 хода поднимает Скелета.'},
+ necro:{n:'Некромант',undead:1,hp:9,atk:5,def:0,mv:2,rng:3,xp:4,spr:'necro',summon:1,pierce:1,d:'Магия пробивает броню. Раз в 3 хода поднимает Скелета.'},
  troll:{n:'Тролль',hp:20,atk:6,def:1,mv:2,rng:1,xp:5,spr:'troll',regen:2,d:'Регенерация: +2 HP в начале каждого хода.'},
- ghost:{n:'Призрак',hp:9,atk:5,def:0,mv:3,rng:1,xp:4,spr:'ghost',pierce:1,d:'Его удар игнорирует защиту.'},
+ ghost:{n:'Призрак',undead:1,hp:9,atk:5,def:0,mv:3,rng:1,xp:4,spr:'ghost',pierce:1,d:'Его удар игнорирует защиту.'},
  ogre:{n:'Огр',hp:22,atk:8,def:0,mv:1,rng:1,xp:5,spr:'ogre',d:'Медленный, но сокрушительно бьёт.'},
  bat:{n:'Летучая мышь',hp:3,atk:2,def:0,mv:5,rng:1,xp:1,spr:'bat',d:'Хрупкая, но очень быстрая: 5 гексов за ход.'},
  boar:{n:'Кабан',hp:9,atk:4,def:1,mv:3,rng:1,xp:2,spr:'boar',charge:1,bleed:2,d:'Разбег: если перед атакой бежал, бьёт на +2. Клыки вызывают кровотечение.'},
  shaman:{n:'Гоблин-шаман',hp:5,atk:2,def:0,mv:2,rng:3,xp:2,spr:'shaman',healer:3,d:'Лечит раненых союзников на 3 HP вместо атаки. Убейте его первым!'},
  shroom:{n:'Ядовитый гриб',hp:6,atk:2,def:0,mv:0,rng:1,xp:1,spr:'shroom',poison:1,d:'Не двигается. Удар отравляет.'},
- wraith:{n:'Банши',hp:8,atk:4,def:0,mv:3,rng:2,xp:3,spr:'wraith',pierce:1,d:'Крик на 2 гекса, игнорирует защиту.'},
+ wraith:{n:'Банши',undead:1,hp:8,atk:4,def:0,mv:3,rng:2,xp:3,spr:'wraith',pierce:1,d:'Крик на 2 гекса, игнорирует защиту.'},
  golem:{n:'Каменный голем',hp:24,atk:6,def:2,mv:1,rng:1,xp:5,spr:'golem',d:'Очень прочный и медленный.'},
  cultist:{n:'Культист',hp:7,atk:4,def:0,mv:2,rng:2,xp:3,spr:'cultist',explode:4,d:'При смерти взрывается: 4 урона всем героям рядом.'},
  gargoyle:{n:'Горгулья',hp:10,atk:4,def:3,mv:3,rng:1,xp:3,spr:'gargoyle',d:'Каменная кожа (защита 3). Бейте магией или метким выстрелом.'},
@@ -1333,7 +1402,7 @@ const MON={
  plaguerat:{n:'Чумная крыса',hp:4,atk:2,def:0,mv:5,rng:1,xp:1,spr:'plaguerat',poison:1,d:'Хрупкая, но очень быстрая: 5 гексов за ход. Укус отравляет.'},
  acidslime:{n:'Кислотная слизь',hp:10,atk:3,def:0,mv:1,rng:1,xp:2,spr:'acidslime',split:1,poison:1,d:'Медленная. Яд при ударе. После смерти делится на 2 слизнячка.'},
  alchemist:{n:'Алхимик',hp:8,atk:4,def:0,mv:2,rng:3,xp:4,spr:'alchemist',poison:1,explode:3,d:'Бросает колбы с ядом на 3 гекса. При смерти колбы лопаются: 3 урона героям рядом.'},
- zombie:{n:'Зомби',hp:15,atk:5,def:0,mv:1,rng:1,xp:3,spr:'zombie',poison:1,d:'Медленный и живучий. Укус заражает ядом.'},
+ zombie:{n:'Зомби',undead:1,hp:15,atk:5,def:0,mv:1,rng:1,xp:3,spr:'zombie',poison:1,d:'Медленный и живучий. Укус заражает ядом.'},
  scorpion:{n:'Скорпион',hp:9,atk:5,def:1,mv:3,rng:1,xp:3,spr:'scorpion',poison:2,d:'Быстрый. Жало вызывает долгий яд (3 хода).'},
  spiderqueen:{n:'Королева пауков',hp:95,atk:7,def:2,mv:3,rng:1,xp:14,spr:'spiderqueen',poison:2,summon:'spider',sumMax:3,web:1,key:1,lair:4,d:'МИНИ-БОСС. Яд, призывает до 3 пауков, раз в 3 хода плюёт паутиной: 2 урона и −1 ОД двум героям в 4 гексах. Не оглушается. Хранит ключ.'},
  whelp:{n:'Дракончик',hp:5,atk:3,def:0,mv:3,rng:1,xp:0,spr:'whelp',d:'Отродье Дракона.'},
@@ -1353,6 +1422,13 @@ const ITEMS={
  bomb:{n:'Бомба',type:'Свиток',d:'1 ОД: 4 урона (пробивает броню) цели и соседним врагам, дальность 3. Одноразовая.',use:{cost:1,t:'enemy',rng:3,consume:1,run:(h,m)=>{sfx('boom');aoeMon(h,m,4+(hasRelic('powder')?3:0),{pierce:1});}}},
  feather:{n:'Перо феникса',type:'Артефакт',d:'2 ОД: воскрешает павшего героя рядом с 50% HP. Одноразовое.',use:{cost:2,t:'dead',rng:1,consume:1,run:(h,t)=>reviveHero(t,.5)}},
  // классовые
+ mace:{n:'Булава жреца',type:'Класс: Жрец',cls:'priest',d:'+1 АТК, +2 макс. HP',mods:{atk:1,hp:2}},
+ holysymbol:{n:'Священный символ',type:'Класс: Жрец',cls:'priest',d:'+1 дальность, +2 к лечению',mods:{rng:1,heal:2}},
+ twindagger:{n:'Парные кинжалы',type:'Класс: Разбойник',cls:'rogue',d:'+1 АТК, +1 ЗАЩ',mods:{atk:1,def:1}},
+ assassinblade:{n:'Клинок убийцы',type:'Класс: Разбойник',cls:'rogue',d:'+2 АТК',mods:{atk:2}},
+ shadowcloak:{n:'Плащ теней',type:'Класс: Разбойник',cls:'rogue',d:'+1 ЗАЩ, +1 гекс за ОД движения',mods:{def:1,spd:1}},
+ holyshield:{n:'Святой щит',type:'Класс: Паладин',cls:'paladin',d:'+1 ЗАЩ, +2 макс. HP',mods:{def:1,hp:2}},
+ lighthammer:{n:'Молот света',type:'Класс: Паладин',cls:'paladin',d:'+1 АТК, +1 ЗАЩ',mods:{atk:1,def:1}},
  barbed:{n:'Зазубренные стрелы',type:'Класс: Лучник',cls:'archer',d:'+1 АТК',mods:{atk:1}},
  longbow:{n:'Длинный лук',type:'Класс: Лучник',cls:'archer',d:'+1 дальность',mods:{rng:1}},
  oakstaff:{n:'Дубовый посох',type:'Класс: Маг',cls:'mage',d:'+1 АТК',mods:{atk:1}},
@@ -1423,6 +1499,31 @@ const ABIL={
      l.forEach(m=>{if(m.alive)dmgMon(h,m,st(h,'atk')-1+roll());});}},
  frost:{n:'Ледяная стрела',cost:2,t:'enemy',rng:3,d:'АТК+1 магического урона; враг заморожен и пропускает ход (Дракон — нет).',
    run:(h,m)=>{sfx('zap');dmgMon(h,m,st(h,'atk')+1+roll(),{magic:1});if(m.alive&&!ccImmune(m)){m.stun=true;pop(m,'ЗАМОРОЖЕН','#9df');}}},
+ smite:{n:'Кара',cost:2,t:'enemy',rng:3,d:'АТК+2 магического урона (дальность 3). По нежити — скелетам, призракам, зомби, банши — вдвое больше.',
+   run:(h,m)=>{sfx('zap');let b=st(h,'atk')+2+roll();if(MON[m.id]&&MON[m.id].undead){b*=2;log('Свет жжёт нежить!');}dmgMon(h,m,b,{magic:1});}},
+ mend:{n:'Целительный свет',cost:1,t:'ally',rng:2,d:'Восстановить союзнику 2+уровень HP (дальность 2, всего 1 ОД).',
+   run:(h,t)=>healHero(h,t,2+h.lv+st(h,'heal'),true)},
+ cleanse:{n:'Очищение',cost:1,t:'ally',rng:2,d:'Снять с союзника яд, горение, кровотечение и холод и вылечить 2 HP.',
+   run:(h,t)=>{const had=t.poison||t.burn||t.bleed||t.chill;t.poison=t.burn=t.bleed=t.chill=0;sfx('heal');if(had){pop(t,'ОЧИЩЕН','#fff');log(h.d.n+' очищает '+t.d.n+' от недугов.');}healHero(h,t,2,true);}},
+ ward:{n:'Священный щит',cost:2,t:'ally',rng:3,d:'Союзник получает «Блок»: следующий удар по нему полностью блокируется.',
+   run:(h,t)=>{t.block=true;sfx('shield');pop(t,'ЩИТ','#9df');log(h.d.n+' ограждает '+t.d.n+' священным щитом.');}},
+ bless:{n:'Благословение',cost:2,t:'ally',rng:3,d:'Союзник получает +2 АТК и +1 ЗАЩ на 2 раунда.',
+   run:(h,t)=>{t.bless=2;sfx('haste');pop(t,'БЛАГОСЛОВЕН','#ffe27a');log(h.d.n+' благословляет '+t.d.n+'.');}},
+ backstab:{n:'Удар в спину',cost:2,t:'enemy',rng:'melee',d:'АТК+3 урона, игнорирует броню. Если враг оглушён, пригвождён или спит — тройной урон (3×АТК).',
+   run:(h,m)=>{const sleeping=(m.lair||(MON[m.id]&&MON[m.id].lair))&&!m.aggro;const sneak=m.stun||m.root||sleeping;
+     if(sneak)log('Удар в спину!');dmgMon(h,m,sneak?3*st(h,'atk')+roll():st(h,'atk')+3+roll(),{pierce:1});}},
+ knives:{n:'Метание ножей',cost:1,t:'enemy',rng:3,d:'Бросок ножа: АТК−1 урона, дальность 3 (всего 1 ОД).',
+   run:(h,m)=>{dmgMon(h,m,Math.max(1,st(h,'atk')-1)+roll());}},
+ smoke:{n:'Дымовая завеса',cost:2,t:'self',d:'Все враги в радиусе 2 оглушены и пропускают ход (боссы и вожаки не оглушаются).',
+   run:h=>{sfx('whoosh');const l=G.monsters.filter(m=>m.alive&&mdist(h,m)<=2&&!ccImmune(m));if(!l.length)log('Дым рассеялся впустую.');l.forEach(m=>{m.stun=true;pop(m,'ОГЛУШЁН');});}},
+ holystrike:{n:'Священный удар',cost:2,t:'enemy',rng:'melee',d:'АТК+2 урона. Паладин и союзники рядом с ним исцеляются на 2 HP.',
+   run:(h,m)=>{dmgMon(h,m,st(h,'atk')+2+roll());G.heroes.filter(x=>x.alive&&(x===h||dist(h.c,h.r,x.c,x.r)<=1)&&x.hp<st(x,'maxhp')).forEach(x=>healHero(h,x,2));}},
+ layhands:{n:'Возложение рук',cost:2,t:'ally',rng:1,d:'Восстановить союзнику рядом 4+уровень HP.',
+   run:(h,t)=>healHero(h,t,4+h.lv+st(h,'heal'),true)},
+ judge:{n:'Правосудие',cost:3,t:'enemy',rng:'melee',d:'2×АТК+2 магического урона и оглушение врага.',
+   run:(h,m)=>{sfx('clang');dmgMon(h,m,2*st(h,'atk')+2+roll(),{magic:1});if(m.alive&&!ccImmune(m)){m.stun=true;pop(m,'ОГЛУШЁН');}}},
+ rally:{n:'Праведный клич',cost:3,t:'self',d:'Все союзники в радиусе 3 (и сам Паладин) получают +2 АТК и +1 ЗАЩ на 2 раунда.',
+   run:h=>{sfx('haste');G.heroes.filter(x=>x.alive&&dist(h.c,h.r,x.c,x.r)<=3).forEach(x=>{x.bless=2;pop(x,'БЛАГОСЛОВЕН','#ffe27a');});log(h.d.n+' поднимает отряд на бой!');}},
  massheal:{n:'Массовое лечение',cost:3,t:'self',d:'Все живые союзники в радиусе 3 (и сам Маг) восстанавливают 2+уровень HP.',
    run:h=>{const l=G.heroes.filter(x=>x.alive&&x.hp<st(x,'maxhp')&&dist(h.c,h.r,x.c,x.r)<=3);if(!l.length)log('Все рядом и так здоровы.');l.forEach(x=>healHero(h,x,2+h.lv+st(h,'heal')));}},
 };
@@ -1477,7 +1578,7 @@ const LOCS={
  4:{n:'Логово Дракона',cols:11,rows:9,deco:'pillar'},
 };
 const POOL_A=['ringhp','boots','leather','potion','rustsword','helmet','dagger','cloak','vampring'];
-const CLASS1=['barbed','oakstaff','duelist','spikeshield','elvencloak','crystal','bloodblade','platelegs'], CLASS2=['longbow','tome','claymore','towershield','elvencloak','crystal','bloodblade','platelegs'];
+const CLASS1=['barbed','oakstaff','duelist','spikeshield','mace','twindagger','holyshield','elvencloak','crystal','bloodblade','platelegs','shadowcloak'], CLASS2=['longbow','tome','claymore','towershield','holysymbol','assassinblade','lighthammer','elvencloak','crystal','bloodblade','platelegs','shadowcloak'];
 const GEN1=['leather','rustsword','scroll','helmet','dagger','antidote','icerune','cloak','ragepot'];
 const GEN2=['chain','bomb','scroll','axe','trollheart','stormrune','blink','ragepot','icerune','vampring','amulet'];
 
@@ -1517,11 +1618,11 @@ function giveRelic(id){
 function st(h,k){
   const d=h.d;
   switch(k){
-    case 'atk':return d.atk+lvSum(h,'atk')+itemMods(h,'atk')+(h.rage||0)+(hasRelic('whetstone')?1:0)+(hasRelic('crown')?2:0);
-    case 'def':return Math.max(0,d.def+lvSum(h,'def')+itemMods(h,'def')+(guardOn(h)?1:0)+(hasRelic('ancestor')?1:0)+(hasRelic('banner')&&G.heroes.some(x=>x!==h&&x.alive&&dist(h.c,h.r,x.c,x.r)<=1)?1:0));
+    case 'atk':return d.atk+lvSum(h,'atk')+itemMods(h,'atk')+(h.rage||0)+(h.bless>0?2:0)+(hasRelic('whetstone')?1:0)+(hasRelic('crown')?2:0);
+    case 'def':return Math.max(0,d.def+lvSum(h,'def')+itemMods(h,'def')+(guardOn(h)?1:0)+(h.bless>0?1:0)+(G.heroes.some(x=>x!==h&&x.alive&&x.id==='paladin'&&hasPerk(x,'aura')&&dist(h.c,h.r,x.c,x.r)<=1)?1:0)+(hasRelic('ancestor')?1:0)+(hasRelic('banner')&&G.heroes.some(x=>x!==h&&x.alive&&dist(h.c,h.r,x.c,x.r)<=1)?1:0));
     case 'maxhp':return d.hp+lvSum(h,'hp')+itemMods(h,'hp')+(hasRelic('ironwill')?4:0);
     case 'ap':return d.ap+lvSum(h,'ap')+itemMods(h,'ap');
-    case 'spd':return 2+itemMods(h,'spd')+(hasRelic('windboots')?1:0);
+    case 'spd':return 2+(d.spd||0)+itemMods(h,'spd')+(hasRelic('windboots')?1:0);
     case 'rng':return d.rng+lvSum(h,'rng')+itemMods(h,'rng')+(hasRelic('eagle')&&(h.id==='archer'||h.id==='mage')?1:0);
     case 'heal':return itemMods(h,'heal');
   }
@@ -1599,7 +1700,7 @@ function genField(n){
    while(mons.length<want)mons.push(pick(L.mon));mons=mons.slice(0,want);
    if(G.endless){const all=[...LOCS[1].mon,...LOCS[2].mon,...LOCS[3].mon,...LOCS[5].mon,...LOCS[6].mon];const pr=Math.min(.6,.07*(G.depth-1));mons=mons.map(m=>Math.random()<pr?pick(all):m);}
    mons.forEach(m=>tokens.push({t:'monster',m}));}
-  const g1=shuffle(GEN1.slice()),g2=shuffle(GEN2.slice()),cc=shuffle((n===1?CLASS1:CLASS2).slice());
+  const g1=shuffle(GEN1.slice()),g2=shuffle(GEN2.slice()),cc=shuffle((n===1?CLASS1:CLASS2).filter(inSquad));
   L.items.forEach(i=>tokens.push({t:'item',it:i==='*c1'||i==='*c2'?cc.pop():i==='*g1'?g1.pop():i==='*g2'?g2.pop():i}));
   for(let i=0;i<L.keys;i++)tokens.push({t:'key'});
   L.events.forEach(e=>tokens.push({t:'event',e}));
@@ -1708,14 +1809,14 @@ function newGame(){
   const _si=G&&G.showInt;
   G={showInt:_si,relics:[],relicPending:0,diff:NET.diff||'normal',gold:0,camp:null,ready:{},heroes:[],monsters:[],keys:0,loc:0,round:1,log:[],fx:[],hover:null,mode:null,sel:'sword',busy:false,over:false,tele:null,dragon:null,stats:{deaths:0,kills:0}};
   G.endless=!!NET.endless;G.depth=1;G.floorClear=false;if(G.endless)G.keys=KEYS_NEEDED;
-  HORDER.forEach(id=>G.heroes.push({id,d:HDEF[id],lv:1,xp:0,hp:HDEF[id].hp,alive:true,c:0,r:0,ap:HDEF[id].ap,items:[],block:false,guard:false,taunt:false,haste:false,poison:0,reviveUsed:false,xpFlag:false,perks:{}}));
+  squad().forEach(id=>G.heroes.push({id,d:HDEF[id],lv:1,xp:0,hp:HDEF[id].hp,alive:true,c:0,r:0,ap:HDEF[id].ap,items:[],block:false,guard:false,taunt:false,haste:false,poison:0,reviveUsed:false,xpFlag:false,perks:{}}));
   startLoc(1);
 }
 function startLoc(n){
   G.loc=n;G.undo=null;G.mini=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
   if(n!==ARENA)genField(n);else genArena();
   G.obj=null;if(n!==ARENA&&LOCS[n].mon)rollObjective();
-  G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;});
+  G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;h.bless=0;h.faith=false;});
   G.phxUsed=false;
   G.sel=(G.heroes.find(h=>h.alive&&mine(h))||G.heroes.find(h=>h.alive)).id;
   {const ot=objText();const objLine=ot?'\nЦель: '+ot.n+(G.obj.type==='hunt'?' ('+G.obj.goal+')':G.obj.type==='alarm'?' (за '+G.obj.limit+' раундов)':''):'';
@@ -1778,7 +1879,7 @@ function dmgMon(h,m,raw,o={}){
   else if(!o.noproj)fxQ({burst:'lunge',c:h.c,r:h.r,tc:m.c,tr:m.r});
   m.hp-=dmg;m.hit.add(h.id);pop(m,'-'+dmg);sfx(o.magic||h.id==='mage'?'zap':h.id==='archer'?'arrow':'slash');
   log(h.d.n+' → '+m.n+': '+dmg+' урона'+(m.hp>0?' ('+m.hp+' HP осталось)':'')+'.');
-  if(m.hp>0&&!m.boss){if(hasRelic('venom')&&!o.noproj)m.bleed=Math.max(m.bleed||0,2);if(o.burn)m.burn=Math.max(m.burn||0,o.burn);if(o.bleed)m.bleed=Math.max(m.bleed||0,o.bleed);}
+  if(m.hp>0&&!m.boss){if(hasRelic('venom')&&!o.noproj)m.bleed=Math.max(m.bleed||0,2);if(o.burn)m.burn=Math.max(m.burn||0,o.burn);if(o.bleed)m.bleed=Math.max(m.bleed||0,o.bleed);if(hasPerk(h,'venom')&&!o.noproj)m.bleed=Math.max(m.bleed||0,2);}
   if(m.hp<=0)killMon(m,h);
   return dmg;
 }
@@ -1840,6 +1941,7 @@ function reviveHero(t,frac){
   sfx('revive');pop(t,'ВОСКРЕС');log(t.d.n+' возвращается к жизни с '+t.hp+' HP!');
 }
 function killHero(h){
+  if(hasPerk(h,'faith')&&!h.faith){h.faith=true;h.hp=1;h.alive=true;pop(h,'ВЕРА','#fff8c0');fxQ({burst:'level',c:h.c,r:h.r});sfx('revive');log(h.d.n+' удерживается на грани силой веры!');return;}
   if(hasRelic('phoenix')&&!G.phxUsed){G.phxUsed=true;h.hp=Math.max(1,Math.ceil(st(h,'maxhp')*.3));h.alive=true;pop(h,'ВОЗРОЖДЕНИЕ','#ffb060');fxQ({burst:'level',c:h.c,r:h.r});sfx('revive');log('Перо-оберег возрождает: '+h.d.n+'!');return;}
   h.hp=0;h.alive=false;h.ap=0;h.block=h.guard=h.taunt=h.haste=false;G.stats.deaths++;
   sfx('death');pop(h,'ПАЛ');log(h.d.n+' погибает!');
@@ -1907,7 +2009,7 @@ function reach(h,maxSteps){
   return dm;
 }
 function moveHero(h,c,r,noFree){
-  const adj=noFree?[]:G.monsters.filter(m=>m.alive&&!m.big&&m.rng===1&&!m.stun&&mdist(h,m)<=1);
+  const adj=(noFree||h.id==='rogue')?[]:G.monsters.filter(m=>m.alive&&!m.big&&m.rng===1&&!m.stun&&mdist(h,m)<=1);
   h.c=c;h.r=r;sfx(noFree?'whoosh':'step');pickupHere(h);enterCell(h,true);scoutTraps(h);
   for(const m of adj){
     if(!h.alive)break;
@@ -2267,7 +2369,7 @@ async function dragonTurn(){
 function newRound(){
   G.round++;G.ready={};G.undo=null;
   G.heroes.forEach(h=>{
-    h.block=h.guard=h.taunt=false;h.xpFlag=false;h.rage=0;
+    h.block=h.guard=h.taunt=false;h.xpFlag=false;h.rage=0;if(h.bless>0)h.bless--;
     if(h.alive){
       const rg=itemFx(h,'regen');if(rg&&h.hp<st(h,'maxhp')){h.hp=Math.min(st(h,'maxhp'),h.hp+rg);pop(h,'+'+rg);}
       h.ap=st(h,'ap')+(h.haste?1:0);h.haste=false;
@@ -2278,6 +2380,7 @@ function newRound(){
       if(h.alive&&h.bleed>0){h.bleed--;h.hp-=1;pop(h,'КРОВЬ -1','#f55');log(h.d.n+' истекает кровью (−1 HP).');if(h.hp<=0)killHero(h);}
     }
   });
+  G.heroes.filter(p=>p.alive&&hasPerk(p,'halo')).forEach(p=>G.heroes.forEach(x=>{if(x.alive&&dist(p.c,p.r,x.c,x.r)<=2&&x.hp<st(x,'maxhp'))healHero(p,x,2);}));
   alarmTick();
   G.busy=false;
   if(!checkEnd()){log('— Раунд '+G.round+' —');sfx('round');}
@@ -2296,7 +2399,7 @@ async function endRound(){
 async function aiPhase(){
   log('— Ход союзников (ИИ) —');
   for(const h of G.heroes.filter(x=>x.alive&&isAI(x))){
-    h.aiExp=0;h.aiHaste=0;
+    h.aiExp=0;h.aiHaste=0;h.aiRally=0;h.aiBless=0;
     const l=pendingPick(h);if(l){h.perks=h.perks||{};h.perks[l]=0;const o=h.d.lv[l].pick[0];if(o.ap)h.ap+=o.ap;log(h.d.n+' (ИИ) выбирает: «'+o.n+'».');}
     for(let i=0;i<8&&h.alive&&h.ap>0&&!G.over;i++){
       let did=false;try{did=aiStep(h);}catch(e){console.error(e);}
@@ -2340,7 +2443,7 @@ function aiStep(h){
   // 2. воскрешение
   const deadNear=G.heroes.find(x=>!x.alive&&dist(h.c,h.r,x.c,x.r)<=2);
   if(deadNear){
-    if(h.id==='mage'&&aiUse(h,'revive',deadNear))return true;
+    if(aiUse(h,'revive',deadNear))return true;
     const dn1=G.heroes.find(x=>!x.alive&&dist(h.c,h.r,x.c,x.r)<=1);
     if(dn1&&aiHas(h,'feather')&&aiItemOn(h,'feather',dn1))return true;
   }
@@ -2350,6 +2453,21 @@ function aiStep(h){
     const hurt=allies.filter(x=>aiHurtFrac(x)<=lim&&aiNear(h,x)<=3).sort((a,b)=>aiHurtFrac(a)-aiHurtFrac(b));
     if(hurt.length>=2&&hurt.filter(x=>aiHurtFrac(x)<=.7).length>=2&&aiUse(h,'massheal'))return true;
     if(hurt[0]&&(inFight?hurt[0].hp<=st(hurt[0],'maxhp')-3:st(hurt[0],'maxhp')-hurt[0].hp>=3)&&aiUse(h,'heal',hurt[0]))return true;
+  }
+  if(h.id==='priest'){
+    const lim=inFight?.75:.99;
+    const near=allies.filter(x=>aiNear(h,x)<=2);
+    const sick=near.filter(x=>(x.poison||x.burn||x.bleed)&&aiHurtFrac(x)<.95).sort((a,b)=>aiHurtFrac(a)-aiHurtFrac(b))[0];
+    if(sick&&aiUse(h,'cleanse',sick))return true;
+    const hurt=near.filter(x=>aiHurtFrac(x)<=lim).sort((a,b)=>aiHurtFrac(a)-aiHurtFrac(b));
+    if(hurt[0]&&(inFight?hurt[0].hp<=st(hurt[0],'maxhp')-3:st(hurt[0],'maxhp')-hurt[0].hp>=3)&&aiUse(h,'mend',hurt[0]))return true;
+    const weak=allies.filter(x=>x!==h&&aiNear(h,x)<=3&&aiHurtFrac(x)<=.4&&!x.block&&foes.some(m=>mdist(x,m)<=m.mv+m.rng+1))[0];
+    if(inFight&&weak&&h.ap>=2&&aiUse(h,'ward',weak))return true;
+  }
+  if(h.id==='paladin'){
+    const hurt=allies.filter(x=>x!==h&&aiNear(h,x)<=1&&aiHurtFrac(x)<=.5).sort((a,b)=>aiHurtFrac(a)-aiHurtFrac(b))[0];
+    if(hurt&&aiUse(h,'layhands',hurt))return true;
+    if(aiHurtFrac(h)<=.4&&aiUse(h,'layhands',h))return true;
   }
   // 4. зелья: себе и раненым соседям
   const cure=x=>aiHurtFrac(x)<=.4||(x.poison&&aiHurtFrac(x)<=.7);
@@ -2384,9 +2502,19 @@ function aiStep(h){
       sword:[t.hp<=t.max/2&&'execute',adj>=2&&'whirl',mdist(h,t)<=1&&'power'],
       tank:[adj>=2&&'quake',mdist(h,t)<=1&&!ccImmune(t)&&'bash'],
       archer:[inR.length>=3&&'volley',t.def>=2&&'aimed','triple',!ccImmune(t)&&t.mv>=3&&'pin'],
-      mage:[clus(t)>=1&&'fireball',!ccImmune(t)&&t.atk>=4&&'frost','fireball']}[h.id]||[];
+      mage:[clus(t)>=1&&'fireball',!ccImmune(t)&&t.atk>=4&&'frost','fireball'],
+      priest:['smite'],
+      rogue:[(t.stun||t.root)&&'backstab',adj>=2&&'smoke',mdist(h,t)<=1&&'backstab',t.hp<=t.max/2&&'execute'],
+      paladin:[mdist(h,t)<=1&&!ccImmune(t)&&t.atk>=5&&'judge',mdist(h,t)<=1&&'holystrike']}[h.id]||[];
     for(const id of tries){if(!id)continue;const sp=ABIL[id];if(!sp||h.ap-sp.cost<reserve)continue;if(aiUse(h,id,sp.t==='self'?null:t))return true;}
     if(h.ap-1>=reserve){doAttack(h,t);return true;}
+  }
+  // 6б. Разбойник кидает ножи издалека, Паладин поднимает отряд, Жрец благословляет
+  if(h.id==='rogue'&&!inR.length&&h.ap>=2){const f=foes.filter(m=>mdist(h,m)<=3).sort((a,b)=>mdist(h,a)-mdist(h,b))[0];if(f&&aiUse(h,'knives',f))return true;}
+  if(h.id==='paladin'&&inFight&&h.ap>=3&&!h.aiRally&&allies.filter(x=>x!==h&&aiNear(h,x)<=3).length>=2&&foes.some(m=>mdist(h,m)<=m.mv+m.rng+1)){h.aiRally=1;if(aiUse(h,'rally'))return true;}
+  if(h.id==='priest'&&inFight&&h.ap>=2&&!h.aiBless&&habils(h).includes('bless')){
+    const tg=allies.filter(x=>x!==h&&aiNear(h,x)<=3&&!(x.bless>0)).sort((a,b)=>st(b,'atk')-st(a,'atk'))[0];
+    if(tg){h.aiBless=1;if(aiUse(h,'bless',tg))return true;}
   }
   // 7. Маг ускоряет самого полезного бойца, когда нечего больше делать
   if(h.id==='mage'&&inFight&&h.ap>=2&&!h.aiHaste&&habils(h).includes('haste')){
@@ -2477,7 +2605,7 @@ function victory(){
 }
 function openCamp(out){
   const pool=shuffle([...GEN1,...GEN2,'potion','elixir','feather','ringhp','boots'].filter((x,i,a)=>a.indexOf(x)===i));
-  const cls=shuffle((G.loc>=2?CLASS2:CLASS1).slice()).slice(0,2);
+  const cls=shuffle((G.loc>=2?CLASS2:CLASS1).filter(inSquad)).slice(0,2);
   const stock=['potion',...pool.filter(x=>x!=='potion').slice(0,4),...cls];
   G.camp={out,stock,rested:false,relics:G.relicPending>0?pickRelics(3):null};G.mode=null;sfx('travel');log('=== Привал: торговец раскладывает товар ===');ui();
 }
@@ -3014,7 +3142,7 @@ function renderPixi(){
   for(const h of G.heroes){
     if(!h.alive)continue;const ap=animPos('h'+h.id,h.id,h.c,h.r,dt),ux=unitFx(h.c,h.r,now),x=ap.x+ux[0],y=ap.y+ux[1];
     if(h.id===G.sel&&!G.busy){g.lineStyle(2,0xffd23f);g.drawPolygon(hexPts(x,y,HS-1));g.lineStyle(0);}
-    const br=Math.sin(now/430+HORDER.indexOf(h.id)*1.3);
+    const br=Math.sin(now/430+G.heroes.indexOf(h)*1.3);
     shadow(g,x-ux[0],y-ux[1]+10,11-br*.5,4-br*.2);
     g.lineStyle(1.5,CLSCOL[h.id]||0xffffff,h.id===G.sel?.95:.55);g.drawEllipse(x-ux[0],y-ux[1]+10,13,5);g.lineStyle(0);
     const gl=PX.pGlow.get(PX.glowTex);gl.position.set(Math.round(x),Math.round(y));gl.scale.set(1.7);gl.tint=0xffc880;gl.alpha=.15+.03*Math.sin(now/500+h.c);
@@ -3024,7 +3152,7 @@ function renderPixi(){
     pbar(f,x,y+12,h.hp/st(h,'maxhp'),hpCol(h.hp/st(h,'maxhp')));pStatus(f,h,x,y);
     if(h.block){f.lineStyle(2,0x66deef);f.moveTo(x+13*Math.cos(-2.4),y-2+13*Math.sin(-2.4));f.arc(x,y-2,13,-2.4,-0.7);f.lineStyle(0);}
     if(h.id==='tank'&&guardOn(h)){f.lineStyle(2,0x4283ea);f.moveTo(x+15*Math.cos(.4),y-2+15*Math.sin(.4));f.arc(x,y-2,15,.4,2.7);f.lineStyle(0);}
-    T(String(HORDER.indexOf(h.id)+1),x-13,y-10,7,'#ffd23f');
+    T(String(G.heroes.indexOf(h)+1),x-13,y-10,7,'#ffd23f');
   }
   // подсветки поверх
   hl.atk.forEach(k=>{const [c,r]=k.split(',').map(Number);const {x,y}=hc(c,r);f.lineStyle(2,(Math.floor(now/250)%2)?0xff5a4a:0xffa090);dashedHex(f,x,y,HS-1,4,3);f.lineStyle(0);});
@@ -3169,11 +3297,11 @@ function renderCanvas(){
     if(!h.alive)continue;const ap=animPos('h'+h.id,h.id,h.c,h.r,dt),x=ap.x,y=ap.y;
     if(h.id===G.sel&&!G.busy){hexPath(x,y,HS-1);ctx.strokeStyle='#ffd23f';ctx.lineWidth=2;ctx.stroke();ctx.lineWidth=1;}
     ell(x,y+10,11,4);
-    spr(h.d.spr,x,y,-4-Math.round(ap.hop)+Math.round(Math.sin(now/420+HORDER.indexOf(h.id))*1));
+    spr(h.d.spr,x,y,-4-Math.round(ap.hop)+Math.round(Math.sin(now/420+G.heroes.indexOf(h))*1));
     bar(x,y+12,h.hp/st(h,'maxhp'),hpCol(h.hp/st(h,'maxhp')));statusDots(h,x,y);
     if(h.block){ctx.strokeStyle='#66deef';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-2,13,-2.4,-0.7);ctx.stroke();ctx.lineWidth=1;}
     if(h.id==='tank'&&guardOn(h)){ctx.strokeStyle='#4283ea';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y-2,15,0.4,2.7);ctx.stroke();ctx.lineWidth=1;}
-    ctx.fillStyle='#ffd23f';ctx.font='7px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText(String(HORDER.indexOf(h.id)+1),x-13,y-10);
+    ctx.fillStyle='#ffd23f';ctx.font='7px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText(String(G.heroes.indexOf(h)+1),x-13,y-10);
   }
   hl.atk.forEach(k=>{const [c,r]=k.split(',').map(Number);const {x,y}=hc(c,r);hexPath(x,y,HS-1);ctx.strokeStyle=(Math.floor(now/250)%2)?'#ff5a4a':'#ffa090';ctx.lineWidth=2;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);ctx.lineWidth=1;});
   hl.exp.forEach(k=>{const [c,r]=k.split(',').map(Number);const {x,y}=hc(c,r);hexPath(x,y,HS-1);ctx.strokeStyle='#ffd23f';ctx.lineWidth=2;ctx.stroke();ctx.lineWidth=1;});
@@ -3268,7 +3396,7 @@ function renderHeroes(){
     const notes=[];for(let l=2;l<=h.lv;l++){const o=perkOf(h,l);if(o&&!o.ab)notes.push('★ '+o.n);}
     const pend=pendingPick(h);
     const nextTxt=h.lv<5?'<div class="next">Ур.'+(h.lv+1)+': '+lvText(h.d.lv[h.lv+1])+'</div>':'';
-    const sts=[[h.poison,'ЯД'],[h.burn,'ГОРИТ'],[h.bleed,'КРОВЬ'],[h.chill,'ХОЛОД'],[h.block,'БЛОК'],[guardOn(h)&&h.id==='tank',h.guard?'СТРАЖА':'СТРАЖА']].filter(a=>a[0]).map(a=>'<span class="chip st-bad" style="'+(a[1]==='БЛОК'||a[1]==='СТРАЖА'?'color:#9fe0ff;border-color:#24566b;background:#0e1e2a':'')+'">'+a[1]+'</span>').join('');
+    const sts=[[h.poison,'ЯД'],[h.burn,'ГОРИТ'],[h.bleed,'КРОВЬ'],[h.chill,'ХОЛОД'],[h.block,'БЛОК'],[h.bless>0,'БЛАГОСЛОВЕН'],[guardOn(h)&&h.id==='tank',h.guard?'СТРАЖА':'СТРАЖА']].filter(a=>a[0]).map(a=>'<span class="chip st-bad" style="'+(a[1]==='БЛОК'||a[1]==='СТРАЖА'||a[1]==='БЛАГОСЛОВЕН'?'color:#9fe0ff;border-color:#24566b;background:#0e1e2a':'')+'">'+a[1]+'</span>').join('');
     return '<div class="card cls-'+h.id+(h.id===G.sel?' sel':'')+(h.alive?'':' dead')+'" data-act="sel" data-h="'+h.id+'">'+
      '<div class="hd"><div class="pt"><img src="'+SPR[h.d.spr].toDataURL()+'"><span class="lv">'+h.lv+'</span></div><div class="nm"><b>'+(i+1)+'. '+h.d.n+'</b>'+(h.alive?'':' <span class="chip st-bad">ПАЛ</span>')+ownTag(h).replace('[ИИ]','<span class="tagai">ИИ</span>')+'<div class="role">'+h.d.role+'</div></div></div>'+
      '<div class="hp"><i class="'+(fr>.5?'':fr>.25?'y':'r')+'" style="width:'+(100*fr)+'%"></i><span>'+Math.max(0,h.hp)+' / '+mx+'</span></div>'+
@@ -3416,6 +3544,7 @@ function applySnap(s){
     exitCells:s.exitCells,startCells:s.startCells,fx:old.fx||[],hover:old.hover||null,mode:null,sel:old.sel||'sword',tele:null,monsters:[],dragon:null,hl:null};
   ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,trap:c.tp?{seen:true}:null})));
   ng.heroes=s.heroes.map(h=>Object.assign(h,{d:HDEF[h.id]}));
+  if(!ng.heroes.some(h=>h.id===ng.sel))ng.sel=ng.heroes[0].id;
   ng.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));
   ng.dragon=s.dragon>=0?ng.monsters[s.dragon]:null;
   if(s.tele)ng.tele={cells:new Set(s.tele),flash:0};
@@ -3433,11 +3562,11 @@ function applySnap(s){
 
 /* --- лобби --- */
 function sendLobby(){
-  bc({t:'lobby',players:NET.players,owners:NET.owners,started:NET.started,code:NET.code,diff:NET.diff||'normal',freeAI:!!NET.freeAI,endless:!!NET.endless});
+  bc({t:'lobby',players:NET.players,owners:NET.owners,started:NET.started,code:NET.code,diff:NET.diff||'normal',freeAI:!!NET.freeAI,endless:!!NET.endless,squad:squad()});
   if(NET.lobby)showLobby();
 }
 function claim(hero,who){
-  if(!HDEF[hero])return;
+  if(!HDEF[hero]||!squad().includes(hero))return;
   const o=NET.owners[hero];
   if(!o)NET.owners[hero]=who;else if(o===who)delete NET.owners[hero];
   sendLobby();if(NET.started)ui();
@@ -3456,11 +3585,12 @@ function showLobby(){
   html+='<p>Режим: <b>'+(NET.endless?'Бесконечное подземелье':'Сюжет')+'</b></p><p>Сложность: <b>'+DIFF[NET.diff||'normal'].n+'</b> — '+DIFF[NET.diff||'normal'].d+'</p>';
   html+='<h2>Игроки</h2><ul>'+Object.keys(NET.players).map(id=>'<li>'+esc(pname(id))+(id===NET.me?' (вы)':'')+(id==='H'?' — хост':'')+(NET.players[id]&&NET.players[id].off?' — нет связи':'')+'</li>').join('')+'</ul>';
   html+='<h2>Герои — нажмите, чтобы взять или освободить</h2><p>Свободных героев ведёт: <b>'+(NET.freeAI?'ИИ':'хост')+'</b>.</p>';
-  const btns=HORDER.map(id=>{const o=NET.owners[id];const nm=HDEF[id].n;
+  const btns=squad().map(id=>{const o=NET.owners[id];const nm=HDEF[id].n;
     const t=o?nm+' — '+pname(o)+(o===NET.me?' [освободить]':''):nm+' — свободен [взять]';
     return {t,fn:()=>{if(isHost)claim(id,'H');else NET.conn.send({t:'claim',hero:id});}};});
   if(isHost){
     if(NET.code!=='LOCAL')btns.push({t:'Скопировать ссылку',fn:e=>{if(copyLink(link))e.target.textContent='Скопировано ✓';else window.prompt('Скопируйте ссылку (Ctrl+C):',link);}});
+    if(!NET.started)btns.push({t:'Отряд: '+squad().map(id=>HDEF[id].n).join(', ')+' ▸',fn:()=>chooseSquad(()=>{NET.owners={};sendLobby();showLobby();})});
     if(!NET.started)btns.push({t:'Режим: '+(NET.endless?'Бесконечное подземелье':'Сюжет')+' ▸',fn:()=>{NET.endless=!NET.endless;sendLobby();}});
     if(!NET.started)btns.push({t:'Сложность: '+DIFF[NET.diff||'normal'].n+' ▸',fn:()=>{NET.diff=DORDER[(DORDER.indexOf(NET.diff||'normal')+1)%3];sendLobby();}});
     btns.push({t:'Свободные герои: '+(NET.freeAI?'ИИ':'хост')+' ▸',fn:()=>{NET.freeAI=!NET.freeAI;sendLobby();if(NET.started)ui();}});
@@ -3597,7 +3727,7 @@ function hostRoom(n){
 }
 function guestData(m){
   if(m.t==='you')NET.me=m.id;
-  else if(m.t==='lobby'){NET.diff=m.diff;NET.endless=m.endless;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
+  else if(m.t==='lobby'){NET.squad=m.squad||SQUAD0;NET.diff=m.diff;NET.endless=m.endless;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
   else if(m.t==='snap'){NET.started=true;if(NET.lobby){NET.lobby=false;closeModal();}applySnap(m.s);}
   else if(m.t==='modal'){NET.lobby=false;openModal(m.html+'<p style="color:var(--gold)">Решает хост.</p>',m.labels.map(t=>({t,fn:()=>{}})),true);document.querySelectorAll('#mbox .btn').forEach(b=>b.disabled=true);}
   else if(m.t==='mclose'){NET.lobby=false;closeModal();}
@@ -3841,13 +3971,22 @@ function resumeBtns(){
   if(sg)b.push({t:'Вернуться в комнату '+sg.code+' ('+ago(sg.t)+')',fn:()=>{NET.myName=sg.name||NET.myName;NET.srv=sg.srv||defSrv();joinWS(sg.code,{tok:sg.tok,resume:true});}});
   return b;
 }
+function chooseSquad(then){
+  const sel=new Set(squad());
+  const draw=()=>openModal('<h1>Состав отряда</h1><p>Выберите <b>ровно 4</b> героев из 7 (выбрано: <b style="color:var(--gold)">'+sel.size+'/4</b>). Отряд один на всю партию; в сети им делятся игроки.</p>'+
+    HORDER.map(id=>'<p>'+(sel.has(id)?'★ ':'— ')+'<b>'+HDEF[id].n+'</b>: '+HDEF[id].role+'</p>').join(''),
+    [...HORDER.map(id=>({t:(sel.has(id)?'★ ':'')+HDEF[id].n,fn:()=>{if(sel.has(id))sel.delete(id);else if(sel.size<4)sel.add(id);draw();}})),
+     {t:'Классический отряд',fn:()=>{sel.clear();SQUAD0.forEach(x=>sel.add(x));draw();}},
+     {t:'ГОТОВО ▶',fn:()=>{if(sel.size!==4){log('Нужно выбрать ровно 4 героя.');sfx('trap');return;}NET.squad=HORDER.filter(id=>sel.has(id));NET.soloPick=null;then();}}],true);
+  draw();
+}
 function chooseHeroes(then){
-  const sel=NET.soloPick||(NET.soloPick=new Set(HORDER));
+  const sel=NET.soloPick||(NET.soloPick=new Set(squad()));
   const draw=()=>openModal('<h1>Кем вы играете?</h1><p>Отмеченными героями управляете вы, остальными — ИИ-союзники. Они ходят после того, как вы нажмёте «Конец раунда»: лечат, прикрывают, атакуют и следуют за вами.</p>'+
-    HORDER.map(id=>'<p>'+(sel.has(id)?'★ ':'— ')+'<b>'+HDEF[id].n+'</b>: '+HDEF[id].role+' — '+(sel.has(id)?'<span style="color:var(--gold)">вы</span>':'<span style="color:#8ad8ff">ИИ</span>')+'</p>').join(''),
-    [...HORDER.map(id=>({t:(sel.has(id)?'★ ':'')+HDEF[id].n,fn:()=>{if(sel.has(id)){if(sel.size>1)sel.delete(id);}else sel.add(id);draw();}})),
-     {t:'Все — мои',fn:()=>{HORDER.forEach(x=>sel.add(x));draw();}},
-     {t:'НАЧАТЬ ▶',fn:()=>{NET.owners={};NET.freeAI=sel.size<4;HORDER.forEach(id=>{if(sel.has(id))NET.owners[id]='H';});then();}}],true);
+    squad().map(id=>'<p>'+(sel.has(id)?'★ ':'— ')+'<b>'+HDEF[id].n+'</b>: '+HDEF[id].role+' — '+(sel.has(id)?'<span style="color:var(--gold)">вы</span>':'<span style="color:#8ad8ff">ИИ</span>')+'</p>').join(''),
+    [...squad().map(id=>({t:(sel.has(id)?'★ ':'')+HDEF[id].n,fn:()=>{if(sel.has(id)){if(sel.size>1)sel.delete(id);}else sel.add(id);draw();}})),
+     {t:'Все — мои',fn:()=>{squad().forEach(x=>sel.add(x));draw();}},
+     {t:'НАЧАТЬ ▶',fn:()=>{NET.owners={};NET.freeAI=sel.size<4;squad().forEach(id=>{if(sel.has(id))NET.owners[id]='H';});then();}}],true);
   draw();
 }
 function chooseMode(then){
@@ -3868,7 +4007,7 @@ function showMenu(){
    '<h2>Ваше имя</h2><input id="pname" maxlength="14" value="'+esc(nm)+'" placeholder="Игрок">'+
    '<h2>Код комнаты (чтобы присоединиться)</h2>'+(code?'<p>Код подставлен из ссылки — просто нажмите «Войти по коду».</p>':'<p>Чтобы создать свою комнату, код вводить не нужно.</p>')+'<input id="pcode" maxlength="6" value="'+esc(code)+'" placeholder="ABCD">'+
    '<h2>Адрес сервера</h2><input id="psrv" value="'+esc(srv)+'">',
-   [...resumeBtns(),{t:'Играть одному',fn:()=>{saveName();chooseMode(()=>chooseDiff(()=>chooseHeroes(()=>{NET.playing=true;newGame();closeModal();showIntro();})));}},
+   [...resumeBtns(),{t:'Играть одному',fn:()=>{saveName();chooseMode(()=>chooseDiff(()=>chooseSquad(()=>chooseHeroes(()=>{NET.playing=true;newGame();closeModal();showIntro();}))));}},
     {t:'Создать комнату',fn:()=>{saveName();saveSrv();hostWS();}},
     {t:'Войти по коду',fn:()=>{saveName();saveSrv();joinWS($('#pcode').value);}},
     {t:'P2P / без сервера',fn:()=>{saveName();showP2PMenu();}},

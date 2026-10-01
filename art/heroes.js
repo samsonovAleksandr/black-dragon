@@ -84,3 +84,36 @@ ART.mage=()=>mkArt({parts:[
  {t:'e',cx:31,cy:9,rx:3.6,ry:3.8,m:'glow'},{t:'e',cx:31,cy:9,rx:1.6,ry:1.8,m:'white'},
  {t:'px',x:27,y:5,c:'#b4f4ff'},{t:'px',x:35,y:7,c:'#b4f4ff'},{t:'px',x:33,y:3,c:'#ffffff'},
 ]});
+/* Новые герои: Жрец, Разбойник, Паладин */
+ART.priest=()=>mkArt({parts:[
+ {t:'p',pts:[[13,15],[23,15],[29,34],[7,34]],m:'white'},{t:'p',pts:[[13,15],[16,15],[12,34],[7,34]],m:'white',b:.12},{t:'p',pts:[[19,18],[21,18],[24,34],[16,34]],m:'white',b:-.18},
+ {t:'r',x:17,y:16,w:2,h:18,m:'gold'},{t:'r',x:14,y:19,w:8,h:2,m:'gold'},{t:'r',x:11,y:24,w:14,h:2,m:'gold',b:-.1},{t:'r',x:8,y:32,w:20,h:2,m:'gold'},
+ {t:'e',cx:10,cy:20,rx:3.2,ry:5,m:'white'},{t:'e',cx:26,cy:19,rx:3.2,ry:5,m:'white'},{t:'e',cx:27,cy:23,rx:2.4,ry:2.4,m:'skin'},{t:'e',cx:9,cy:25,rx:2.4,ry:2.4,m:'skin'},
+ {t:'r',x:7,y:21,w:6,h:1,m:'gold'},{t:'r',x:23,y:20,w:6,h:1,m:'gold'},
+ {t:'e',cx:18,cy:9.5,rx:7,ry:7.4,m:'white'},{t:'e',cx:18,cy:11,rx:4.4,ry:4.7,m:'skin'},{t:'px',x:16,y:11,c:'#1a1424'},{t:'px',x:20,y:11,c:'#1a1424'},{t:'r',x:17,y:14,w:2,h:1,m:'skin',b:-.3},
+ {t:'r',x:12,y:5,w:12,h:1,m:'gold'},{t:'px',x:18,y:5,c:'#e34540'},{t:'r',x:13,y:2,w:10,h:1,m:'gold',b:.1},
+ {t:'l',x0:31,y0:8,x1:30,y1:34,w:2,m:'wood',k:.6},{t:'r',x:29,y:0,w:4,h:9,m:'gold'},{t:'r',x:26,y:3,w:10,h:3,m:'gold'},{t:'px',x:31,y:4,c:'#fff8c0'},
+ {t:'e',cx:18,cy:26,rx:2.4,ry:2.4,m:'glow'},
+]});
+ART.rogue=()=>mkArt({parts:[
+ {t:'p',pts:[[9,14],[27,14],[31,33],[5,33]],m:'dark',b:-.1},
+ {t:'c',x:12,y:27,w:5,h:7,m:'dark'},{t:'c',x:19,y:27,w:5,h:7,m:'dark'},{t:'r',x:11,y:32,w:7,h:3,m:'black'},{t:'r',x:18,y:32,w:7,h:3,m:'black'},{t:'r',x:11,y:32,w:7,h:1,m:'leather'},{t:'r',x:18,y:32,w:7,h:1,m:'leather'},
+ {t:'c',x:12,y:15,w:12,h:13,m:'leather'},{t:'l',x0:13,y0:16,x1:23,y1:27,w:2,m:'dark',k:.4},{t:'r',x:12,y:25,w:12,h:2,m:'dark'},{t:'r',x:16,y:25,w:4,h:2,m:'gold'},
+ {t:'e',cx:10,cy:20,rx:3,ry:5,m:'leather'},{t:'e',cx:26,cy:20,rx:3,ry:5,m:'leather'},{t:'e',cx:8,cy:25,rx:2.3,ry:2.3,m:'skin'},{t:'e',cx:28,cy:25,rx:2.3,ry:2.3,m:'skin'},
+ {t:'e',cx:18,cy:9,rx:7,ry:7.6,m:'dark'},{t:'e',cx:18,cy:11,rx:4.8,ry:4.4,m:'black'},{t:'px',x:16,y:10,c:'#ffe27a'},{t:'px',x:20,y:10,c:'#ffe27a'},{t:'px',x:16,y:11,c:'#ffe27a'},{t:'px',x:20,y:11,c:'#ffe27a'},
+ {t:'r',x:13,y:14,w:10,h:3,m:'crimson'},{t:'p',pts:[[14,17],[22,17],[24,23],[12,23]],m:'crimson',b:-.15},
+ {t:'p',pts:[[18,0],[24,5],[23,9],[18,4],[13,9],[12,5]],m:'dark',b:.1},
+ {t:'l',x0:5,y0:27,x1:2,y1:12,w:2,m:'steel',k:.7},{t:'l',x0:6,y0:27,x1:3,y1:12,w:1,m:'white',k:.9},{t:'r',x:3,y:26,w:6,h:2,m:'gold'},
+ {t:'l',x0:31,y0:27,x1:34,y1:12,w:2,m:'steel',k:.7},{t:'l',x0:30,y0:27,x1:33,y1:12,w:1,m:'white',k:.9},{t:'r',x:27,y:26,w:6,h:2,m:'gold'},
+]});
+ART.paladin=()=>mkArt({parts:[
+ {t:'c',x:12,y:27,w:5,h:6,m:'steelD'},{t:'c',x:19,y:27,w:5,h:6,m:'steelD'},{t:'r',x:11,y:32,w:7,h:3,m:'gold'},{t:'r',x:18,y:32,w:7,h:3,m:'gold'},
+ {t:'p',pts:[[24,15],[31,21],[30,31],[25,29]],m:'blue',b:-.1},
+ {t:'c',x:11,y:15,w:14,h:13,m:'white'},{t:'p',pts:[[13,16],[23,16],[23,29],[18,32],[13,29]],m:'blue'},{t:'r',x:17,y:17,w:2,h:9,m:'gold'},{t:'r',x:14,y:20,w:8,h:2,m:'gold'},{t:'r',x:11,y:25,w:14,h:2,m:'gold',b:-.1},
+ {t:'e',cx:10,cy:17,rx:4.5,ry:3.8,m:'white'},{t:'e',cx:26,cy:17,rx:4.5,ry:3.8,m:'white'},{t:'r',x:6,y:19,w:9,h:1,m:'gold'},{t:'r',x:22,y:19,w:9,h:1,m:'gold'},
+ {t:'e',cx:18,cy:9,rx:6.2,ry:7,m:'white'},{t:'r',x:12,y:11,w:12,h:2,m:'gold'},{t:'r',x:13,y:8,w:10,h:3,m:'dark'},{t:'px',x:15,y:9,c:'#a0e0ff'},{t:'px',x:20,y:9,c:'#a0e0ff'},{t:'r',x:17,y:8,w:2,h:6,m:'gold'},
+ {t:'p',pts:[[12,7],[6,2],[8,9]],m:'white',b:.1},{t:'p',pts:[[24,7],[30,2],[28,9]],m:'white',b:.1},{t:'p',pts:[[18,0],[21,4],[18,6],[15,4]],m:'gold'},
+ {t:'p',pts:[[2,15],[11,15],[11,25],[6,32],[2,25]],m:'white'},{t:'p',pts:[[2,15],[3,15],[5,30],[3,25]],m:'gold',b:-.15},{t:'r',x:5,y:17,w:2,h:11,m:'gold'},{t:'r',x:3,y:20,w:7,h:2,m:'gold'},
+ {t:'r',x:29,y:3,w:3,h:18,m:'glow'},{t:'r',x:30,y:3,w:1,h:17,m:'white'},{t:'r',x:27,y:20,w:7,h:2,m:'gold'},{t:'r',x:29,y:22,w:3,h:4,m:'leather'},{t:'e',cx:30.5,cy:27,rx:2,ry:1.5,m:'gold'},
+ {t:'c',x:26,y:19,w:5,h:5,m:'steelD'},
+]});
