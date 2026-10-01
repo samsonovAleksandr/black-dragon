@@ -1,0 +1,110 @@
+/* Монстры, партия 4: Гиблые топи и Ядовитые катакомбы (+ мини-боссы Гидра и Королева пауков) */
+ART.toad=()=>mkArt({parts:[
+ {t:'e',cx:8,cy:29,rx:6,ry:4.6,m:'bog',b:-.1},{t:'r',x:2,y:32,w:9,h:2,m:'bog',b:-.2},{t:'px',x:3,y:33,c:'#9cc86a'},{t:'px',x:6,y:33,c:'#9cc86a'},{t:'px',x:9,y:33,c:'#9cc86a'},
+ {t:'e',cx:28,cy:29,rx:5,ry:4.2,m:'bog',b:-.1},{t:'r',x:26,y:32,w:9,h:2,m:'bog',b:-.2},{t:'px',x:27,y:33,c:'#9cc86a'},{t:'px',x:30,y:33,c:'#9cc86a'},{t:'px',x:33,y:33,c:'#9cc86a'},
+ {t:'e',cx:18,cy:24,rx:13,ry:9,m:'bog'},{t:'e',cx:18,cy:28,rx:8,ry:4,m:'bone',b:-.05},
+ {t:'px',x:11,y:19,c:'#3a5a28'},{t:'px',x:15,y:17,c:'#3a5a28'},{t:'px',x:22,y:18,c:'#3a5a28'},{t:'px',x:26,y:21,c:'#3a5a28'},{t:'px',x:9,y:24,c:'#3a5a28'},
+ {t:'e',cx:19,cy:16,rx:9.5,ry:6,m:'bog',b:.05},
+ {t:'e',cx:12,cy:11,rx:3.4,ry:3.4,m:'bog'},{t:'e',cx:25,cy:11,rx:3.4,ry:3.4,m:'bog'},{t:'e',cx:12,cy:11,rx:2.3,ry:2.3,m:'yellow'},{t:'e',cx:25,cy:11,rx:2.3,ry:2.3,m:'yellow'},
+ {t:'r',x:12,y:9,w:1,h:4,m:'black'},{t:'r',x:25,y:9,w:1,h:4,m:'black'},
+ {t:'r',x:9,y:19,w:20,h:1,m:'dark'},{t:'px',x:9,y:18,c:'#1a1424'},{t:'px',x:28,y:18,c:'#1a1424'},{t:'r',x:17,y:20,w:6,h:2,m:'red'},
+]});
+ART.leech=()=>mkArt({parts:[
+ {t:'e',cx:7,cy:30,rx:5,ry:3.6,m:'mud',b:-.1},{t:'e',cx:12,cy:26,rx:6,ry:4.6,m:'mud'},{t:'e',cx:18,cy:23,rx:6.4,ry:5,m:'mud',b:.05},{t:'e',cx:23.5,cy:19,rx:6,ry:5,m:'mud'},
+ {t:'p',pts:[[11,22],[13,22],[8,31],[6,30]],m:'orange',b:-.1},{t:'p',pts:[[17,18],[19,18],[19,28],[16,27]],m:'orange',b:-.1},{t:'p',pts:[[23,14],[25,14],[24,23],[22,23]],m:'orange',b:-.1},
+ {t:'e',cx:28,cy:12,rx:5.2,ry:5.6,m:'mud',b:.1},{t:'e',cx:29,cy:11,rx:3,ry:3.2,m:'red'},{t:'e',cx:29,cy:11,rx:1.4,ry:1.5,m:'black'},
+ {t:'px',x:27,y:8,c:'#fff'},{t:'px',x:31,y:9,c:'#fff'},{t:'px',x:30,y:14,c:'#fff'},{t:'px',x:27,y:13,c:'#fff'},
+ {t:'px',x:25,y:8,c:'#ffe27a'},{t:'px',x:32,y:6,c:'#ffe27a'},
+]});
+ART.croc=()=>mkArt({parts:[
+ {t:'p',pts:[[1,29],[9,22],[11,28],[4,32]],m:'crocgreen',b:-.1},{t:'p',pts:[[0,31],[3,27],[5,31]],m:'crocgreen',b:-.2},
+ {t:'c',x:10,y:28,w:4,h:6,m:'crocgreen',b:-.15},{t:'c',x:22,y:28,w:4,h:6,m:'crocgreen',b:-.15},{t:'r',x:9,y:33,w:6,h:2,m:'bone'},{t:'r',x:21,y:33,w:6,h:2,m:'bone'},
+ {t:'e',cx:17,cy:24,rx:14,ry:6.6,m:'crocgreen'},{t:'e',cx:19,cy:28,rx:9,ry:3,m:'bone',b:-.1},
+ {t:'p',pts:[[6,19],[8,16],[10,19]],m:'bog'},{t:'p',pts:[[12,18],[14,14],[16,18]],m:'bog'},{t:'p',pts:[[18,18],[20,14],[22,18]],m:'bog'},{t:'p',pts:[[24,19],[26,16],[28,19]],m:'bog'},
+ {t:'e',cx:28,cy:21,rx:5.5,ry:4.4,m:'crocgreen',b:.05},{t:'r',x:27,y:19,w:9,h:5,m:'crocgreen',b:.05},
+ {t:'r',x:27,y:23,w:9,h:1,m:'dark'},{t:'px',x:28,y:24,c:'#fff'},{t:'px',x:30,y:24,c:'#fff'},{t:'px',x:32,y:24,c:'#fff'},{t:'px',x:34,y:24,c:'#fff'},{t:'px',x:29,y:22,c:'#fff'},{t:'px',x:33,y:22,c:'#fff'},
+ {t:'e',cx:27,cy:18,rx:2,ry:2,m:'yellow'},{t:'px',x:27,y:18,c:'#05030a'},{t:'px',x:35,y:20,c:'#05030a'},
+]});
+ART.bogwitch=()=>mkArt({parts:[
+ {t:'p',pts:[[13,15],[23,15],[30,34],[6,34]],m:'witchc'},{t:'p',pts:[[13,15],[16,15],[12,34],[6,34]],m:'witchc',b:.12},{t:'p',pts:[[18,19],[20,19],[23,34],[15,34]],m:'witchc',b:-.18},
+ {t:'r',x:11,y:23,w:14,h:2,m:'leather'},{t:'px',x:18,y:24,c:'#ddffa0'},{t:'r',x:7,y:32,w:22,h:2,m:'mud'},
+ {t:'e',cx:10,cy:20,rx:3,ry:5,m:'witchc'},{t:'e',cx:26,cy:19,rx:3,ry:5,m:'witchc'},{t:'e',cx:27,cy:24,rx:2.4,ry:2.4,m:'bog'},{t:'e',cx:9,cy:25,rx:2.4,ry:2.4,m:'bog'},
+ {t:'l',x0:31,y0:5,x1:29,y1:34,w:2,m:'wood',k:.6},{t:'e',cx:31,cy:5,rx:3.2,ry:3.4,m:'acid'},{t:'px',x:30,y:4,c:'#fff'},
+ {t:'p',pts:[[12,10],[14,15],[11,24],[9,26],[10,15]],m:'wolfgray',b:-.1},{t:'p',pts:[[24,10],[22,15],[25,24],[27,26],[26,15]],m:'wolfgray',b:-.1},
+ {t:'e',cx:18,cy:11,rx:5.2,ry:5.6,m:'bog',b:.05},{t:'px',x:16,y:11,c:'#fff070'},{t:'px',x:20,y:11,c:'#fff070'},{t:'p',pts:[[17,12],[19,12],[18,16]],m:'bog',b:-.2},{t:'r',x:16,y:15,w:4,h:1,m:'dark'},
+ {t:'e',cx:18,cy:7.5,rx:9.5,ry:2.4,m:'dark'},{t:'p',pts:[[13,7],[23,7],[19,0],[16,0],[17,3]],m:'dark'},{t:'r',x:13,y:6,w:10,h:2,m:'yellow'},
+]});
+ART.wisp=()=>mkArt({parts:[
+ {t:'p',pts:[[18,0],[24,9],[28,17],[24,28],[18,33],[12,28],[8,17],[12,9]],m:'orange'},
+ {t:'p',pts:[[18,6],[22,13],[24,20],[21,27],[18,30],[15,27],[12,20],[14,13]],m:'yellow',b:.1},
+ {t:'p',pts:[[18,12],[21,18],[18,27],[15,18]],m:'white',b:.15},
+ {t:'p',pts:[[6,20],[2,13],[9,15]],m:'orange',b:.1},{t:'p',pts:[[30,20],[34,13],[27,15]],m:'orange',b:.1},{t:'p',pts:[[13,31],[9,35],[16,33]],m:'orange',b:-.1},{t:'p',pts:[[23,31],[27,35],[20,33]],m:'orange',b:-.1},
+ {t:'e',cx:15,cy:19,rx:1.6,ry:2.4,m:'black'},{t:'e',cx:21,cy:19,rx:1.6,ry:2.4,m:'black'},{t:'r',x:16,y:24,w:4,h:1,m:'black'},
+]});
+ART.hydra=()=>mkArt({w:44,h:44,parts:[
+ {t:'p',pts:[[1,38],[8,30],[14,34],[6,42]],m:'crocgreen',b:-.1},{t:'p',pts:[[43,38],[36,30],[30,34],[38,42]],m:'crocgreen',b:-.1},
+ {t:'e',cx:22,cy:34,rx:17,ry:9,m:'crocgreen'},{t:'e',cx:22,cy:38,rx:11,ry:4.5,m:'bone',b:-.1},
+ {t:'l',x0:14,y0:30,x1:7,y1:15,w:5,m:'crocgreen',k:.55},{t:'l',x0:22,y0:30,x1:22,y1:10,w:5,m:'crocgreen',k:.6},{t:'l',x0:30,y0:30,x1:37,y1:15,w:5,m:'crocgreen',k:.55},
+ {t:'e',cx:6,cy:13,rx:5.4,ry:4.4,m:'crocgreen',b:.05},{t:'p',pts:[[1,13],[-1,16],[4,17]],m:'crocgreen'},{t:'r',x:2,y:16,w:8,h:1,m:'dark'},{t:'px',x:3,y:17,c:'#fff'},{t:'px',x:6,y:17,c:'#fff'},{t:'e',cx:7,cy:11,rx:1.6,ry:1.6,m:'yellow'},
+ {t:'e',cx:22,cy:7,rx:6,ry:5,m:'crocgreen',b:.08},{t:'r',x:17,y:10,w:10,h:1,m:'dark'},{t:'px',x:18,y:11,c:'#fff'},{t:'px',x:22,y:11,c:'#fff'},{t:'px',x:25,y:11,c:'#fff'},{t:'e',cx:20,cy:5.5,rx:1.6,ry:1.6,m:'yellow'},{t:'e',cx:25,cy:5.5,rx:1.6,ry:1.6,m:'yellow'},
+ {t:'e',cx:38,cy:13,rx:5.4,ry:4.4,m:'crocgreen',b:.05},{t:'p',pts:[[43,13],[45,16],[40,17]],m:'crocgreen'},{t:'r',x:34,y:16,w:8,h:1,m:'dark'},{t:'px',x:35,y:17,c:'#fff'},{t:'px',x:38,y:17,c:'#fff'},{t:'e',cx:37,cy:11,rx:1.6,ry:1.6,m:'yellow'},
+ {t:'p',pts:[[14,29],[16,25],[18,29]],m:'bog'},{t:'p',pts:[[20,27],[22,23],[24,27]],m:'bog'},{t:'p',pts:[[26,29],[28,25],[30,29]],m:'bog'},
+ {t:'px',x:6,y:12,c:'#05030a'},{t:'px',x:21,y:5,c:'#05030a'},{t:'px',x:26,y:5,c:'#05030a'},{t:'px',x:38,y:12,c:'#05030a'},
+ {t:'px',x:15,y:34,c:'#8ae850'},{t:'px',x:29,y:35,c:'#8ae850'},{t:'px',x:22,y:31,c:'#8ae850'},
+]});
+ART.plaguerat=()=>mkArt({parts:[
+ {t:'l',x0:6,y0:27,x1:1,y1:20,w:2,m:'pink',k:.5},{t:'l',x0:1,y0:20,x1:3,y1:13,w:1,m:'pink',k:.5},
+ {t:'c',x:9,y:28,w:3,h:5,m:'rat',b:-.15},{t:'c',x:22,y:28,w:3,h:5,m:'rat',b:-.15},{t:'r',x:8,y:32,w:5,h:2,m:'pink',b:-.2},{t:'r',x:21,y:32,w:5,h:2,m:'pink',b:-.2},
+ {t:'e',cx:16,cy:25,rx:11,ry:7,m:'rat'},{t:'e',cx:17,cy:29,rx:7,ry:3,m:'bone',b:-.2},
+ {t:'p',pts:[[24,17],[27,11],[30,17]],m:'rat',b:-.1},{t:'p',pts:[[26,18],[28,13],[29,18]],m:'pink'},
+ {t:'e',cx:28,cy:22,rx:5.5,ry:4.5,m:'rat',b:.05},{t:'p',pts:[[31,19],[36,23],[31,26]],m:'rat',b:.05},{t:'px',x:35,y:23,c:'#ff8aa0'},
+ {t:'px',x:28,y:20,c:'#ff4040'},{t:'px',x:30,y:20,c:'#ff4040'},{t:'px',x:32,y:26,c:'#fff'},{t:'px',x:30,y:26,c:'#fff'},
+ {t:'px',x:11,y:21,c:'#8ae850'},{t:'px',x:16,y:20,c:'#8ae850'},{t:'px',x:20,y:21,c:'#8ae850'},{t:'px',x:33,y:28,c:'#8ae850'},{t:'px',x:33,y:30,c:'#8ae850'},
+]});
+ART.acidslime=()=>mkArt({parts:[
+ {t:'e',cx:18,cy:25,rx:15,ry:10,m:'acid'},{t:'e',cx:18,cy:30,rx:16,ry:4,m:'acid',b:-.15},
+ {t:'e',cx:18,cy:19,rx:11,ry:7,m:'acid',b:.12},
+ {t:'e',cx:10,cy:24,rx:2.2,ry:2.2,m:'white',b:-.1},{t:'e',cx:26,cy:27,rx:2.6,ry:2.6,m:'white',b:-.1},{t:'e',cx:21,cy:30,rx:1.6,ry:1.6,m:'white',b:-.1},{t:'e',cx:14,cy:29,rx:1.3,ry:1.3,m:'white',b:-.1},
+ {t:'r',x:13,y:21,w:3,h:4,m:'black'},{t:'r',x:21,y:21,w:3,h:4,m:'black'},{t:'px',x:14,y:21,c:'#ffffff'},{t:'px',x:22,y:21,c:'#ffffff'},{t:'r',x:16,y:27,w:5,h:1,m:'black'},
+ {t:'p',pts:[[6,31],[8,31],[7,35]],m:'acid'},{t:'p',pts:[[28,31],[30,31],[29,36]],m:'acid'},{t:'px',x:18,y:12,c:'#ddffa0'},{t:'px',x:24,y:14,c:'#ddffa0'},
+]});
+ART.alchemist=()=>mkArt({parts:[
+ {t:'c',x:12,y:27,w:5,h:6,m:'dark'},{t:'c',x:19,y:27,w:5,h:6,m:'dark'},{t:'r',x:11,y:32,w:7,h:3,m:'leather'},{t:'r',x:18,y:32,w:7,h:3,m:'leather'},
+ {t:'p',pts:[[24,14],[31,18],[31,30],[25,28]],m:'brown'},{t:'e',cx:29,cy:20,rx:2,ry:3,m:'acid'},{t:'e',cx:29,cy:26,rx:1.8,ry:2.6,m:'purple'},
+ {t:'p',pts:[[10,15],[26,15],[28,31],[8,31]],m:'leather'},{t:'p',pts:[[13,16],[23,16],[24,30],[12,30]],m:'white',b:-.1},{t:'r',x:11,y:24,w:14,h:2,m:'brown'},{t:'e',cx:18,cy:25,rx:1.5,ry:1.5,m:'gold'},
+ {t:'e',cx:9,cy:20,rx:3,ry:5,m:'leather'},{t:'e',cx:7,cy:25,rx:2.5,ry:2.5,m:'skin'},
+ {t:'e',cx:27,cy:18,rx:3,ry:4.5,m:'leather'},{t:'e',cx:30,cy:13,rx:2.5,ry:2.5,m:'skin'},
+ {t:'e',cx:33,cy:7,rx:3.2,ry:3.4,m:'acid'},{t:'r',x:32,y:3,w:3,h:3,m:'white'},{t:'r',x:32,y:1,w:3,h:2,m:'wood'},{t:'px',x:32,y:6,c:'#ddffa0'},
+ {t:'e',cx:18,cy:9,rx:5.8,ry:6.2,m:'skin'},{t:'p',pts:[[12,7],[24,7],[23,3],[13,3]],m:'brown'},{t:'r',x:11,y:7,w:14,h:2,m:'leather'},
+ {t:'e',cx:15,cy:10,rx:2.4,ry:2.4,m:'gold'},{t:'e',cx:21,cy:10,rx:2.4,ry:2.4,m:'gold'},{t:'e',cx:15,cy:10,rx:1.4,ry:1.4,m:'acid'},{t:'e',cx:21,cy:10,rx:1.4,ry:1.4,m:'acid'},
+ {t:'r',x:14,y:13,w:8,h:3,m:'gray'},{t:'px',x:15,y:14,c:'#1a1424'},{t:'px',x:20,y:14,c:'#1a1424'},
+]});
+ART.zombie=()=>mkArt({parts:[
+ {t:'c',x:12,y:27,w:5,h:7,m:'flesh',b:-.1},{t:'c',x:19,y:27,w:5,h:7,m:'flesh',b:-.1},{t:'r',x:11,y:33,w:7,h:2,m:'mud'},{t:'r',x:18,y:33,w:7,h:2,m:'mud'},
+ {t:'p',pts:[[11,15],[25,15],[26,29],[24,32],[21,29],[18,32],[15,29],[12,32],[10,29]],m:'brown'},{t:'r',x:10,y:24,w:16,h:2,m:'leather'},
+ {t:'cut',x:15,y:19,w:1,h:3},{t:'r',x:14,y:20,w:5,h:3,m:'flesh',b:-.2},{t:'px',x:15,y:21,c:'#e0d8be'},{t:'px',x:17,y:21,c:'#e0d8be'},
+ {t:'e',cx:9,cy:19,rx:2.6,ry:4,m:'flesh'},{t:'l',x0:10,y0:18,x1:2,y1:20,w:3,m:'flesh',k:.55},{t:'e',cx:2.5,cy:20,rx:2.2,ry:2.2,m:'flesh',b:.1},
+ {t:'l',x0:26,y0:18,x1:33,y1:20,w:3,m:'flesh',k:.55},{t:'e',cx:33.5,cy:20,rx:2.2,ry:2.2,m:'flesh',b:.1},
+ {t:'e',cx:18,cy:9,rx:5.8,ry:6.4,m:'flesh'},{t:'p',pts:[[13,5],[18,3],[23,5],[21,7],[18,5],[15,7]],m:'hair'},
+ {t:'e',cx:15.5,cy:9,rx:2,ry:2,m:'black'},{t:'e',cx:20.5,cy:9,rx:2,ry:2,m:'black'},{t:'px',x:15,y:9,c:'#fff070'},{t:'px',x:21,y:9,c:'#fff070'},
+ {t:'r',x:15,y:13,w:6,h:2,m:'black'},{t:'px',x:16,y:13,c:'#e0d8be'},{t:'px',x:19,y:13,c:'#e0d8be'},{t:'px',x:26,y:22,c:'#8ae850'},{t:'px',x:11,y:27,c:'#8ae850'},
+]});
+ART.scorpion=()=>mkArt({parts:[
+ {t:'l',x0:10,y0:24,x1:3,y1:30,w:2,m:'chitin',k:.5},{t:'l',x0:13,y0:27,x1:7,y1:34,w:2,m:'chitin',k:.5},{t:'l',x0:22,y0:27,x1:28,y1:34,w:2,m:'chitin',k:.5},{t:'l',x0:25,y0:24,x1:32,y1:30,w:2,m:'chitin',k:.5},
+ {t:'e',cx:18,cy:25,rx:9.5,ry:5.8,m:'chitin'},{t:'r',x:11,y:22,w:1,h:7,m:'chitin',b:-.25},{t:'r',x:16,y:20,w:1,h:10,m:'chitin',b:-.25},{t:'r',x:21,y:20,w:1,h:10,m:'chitin',b:-.25},
+ {t:'e',cx:23,cy:19,rx:5,ry:3.6,m:'chitin',b:.1},{t:'px',x:22,y:17,c:'#ff4040'},{t:'px',x:25,y:17,c:'#ff4040'},
+ {t:'l',x0:24,y0:19,x1:30,y1:15,w:3,m:'chitin',k:.55},{t:'e',cx:31,cy:14,rx:4.4,ry:3.4,m:'chitin',b:.05},{t:'r',x:30,y:15,w:5,h:1,m:'dark'},
+ {t:'l',x0:24,y0:18,x1:27,y1:23,w:3,m:'chitin',k:.55},{t:'e',cx:28,cy:25,rx:3.4,ry:2.8,m:'chitin',b:.05},{t:'r',x:27,y:24,w:4,h:1,m:'dark'},
+ {t:'e',cx:7,cy:23,rx:3.2,ry:3,m:'chitin',b:-.05},{t:'e',cx:6,cy:15,rx:3,ry:3,m:'chitin'},{t:'e',cx:9,cy:8,rx:3,ry:2.8,m:'chitin',b:.05},{t:'e',cx:14,cy:4,rx:3,ry:2.6,m:'chitin',b:.1},
+ {t:'p',pts:[[17,2],[21,4],[16,6]],m:'acid'},{t:'px',x:19,y:3,c:'#ddffa0'},{t:'px',x:18,y:7,c:'#8ae850'},
+]});
+ART.spiderqueen=()=>mkArt({w:44,h:44,parts:[
+ {t:'l',x0:17,y0:24,x1:3,y1:14,w:2,m:'purple',k:.5},{t:'l',x0:3,y0:14,x1:1,y1:38,w:2,m:'purple',k:.5},{t:'l',x0:16,y0:28,x1:1,y1:26,w:2,m:'purple',k:.5},{t:'l',x0:1,y0:26,x1:5,y1:40,w:2,m:'purple',k:.45},
+ {t:'l',x0:27,y0:24,x1:41,y1:14,w:2,m:'purple',k:.5},{t:'l',x0:41,y0:14,x1:43,y1:38,w:2,m:'purple',k:.5},{t:'l',x0:28,y0:28,x1:43,y1:26,w:2,m:'purple',k:.5},{t:'l',x0:43,y0:26,x1:39,y1:40,w:2,m:'purple',k:.45},
+ {t:'e',cx:22,cy:30,rx:11,ry:10,m:'black'},{t:'e',cx:22,cy:30,rx:9,ry:8,m:'purple',b:-.1},
+ {t:'p',pts:[[22,22],[26,30],[22,38],[18,30]],m:'acid',b:-.05},{t:'p',pts:[[19,26],[25,26],[22,30]],m:'black'},{t:'p',pts:[[19,34],[25,34],[22,30]],m:'black'},
+ {t:'e',cx:22,cy:18,rx:7.4,ry:6.2,m:'black',b:.1},
+ {t:'px',x:18,y:15,c:'#ff4040'},{t:'px',x:20,y:14,c:'#ff4040'},{t:'px',x:24,y:14,c:'#ff4040'},{t:'px',x:26,y:15,c:'#ff4040'},{t:'px',x:19,y:17,c:'#ffb0a0'},{t:'px',x:25,y:17,c:'#ffb0a0'},
+ {t:'p',pts:[[17,21],[19,21],[18,26]],m:'bone'},{t:'p',pts:[[25,21],[27,21],[26,26]],m:'bone'},{t:'px',x:18,y:26,c:'#8ae850'},{t:'px',x:26,y:26,c:'#8ae850'},
+ {t:'p',pts:[[15,12],[17,6],[19,10],[22,3],[25,10],[27,6],[29,12]],m:'gold'},{t:'r',x:15,y:11,w:14,h:2,m:'gold',b:-.1},{t:'px',x:22,y:6,c:'#d84848'},{t:'px',x:17,y:9,c:'#4a88ec'},{t:'px',x:27,y:9,c:'#4a88ec'},
+]});

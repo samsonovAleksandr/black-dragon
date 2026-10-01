@@ -3,7 +3,7 @@
    Запуск: python3 art/inject.py   (после правок engine.js, heroes.js, monsters*.js)"""
 import os,re
 d=os.path.dirname(os.path.abspath(__file__));p=os.path.join(d,'..','index.html')
-code='/*ART-BEGIN*/\n'+''.join(open(os.path.join(d,f),encoding='utf-8').read().rstrip()+'\n' for f in ['engine.js','heroes.js','monsters1.js','monsters2.js','monsters3.js','decor.js','anim.js'])+'/*ART-END*/'
+code='/*ART-BEGIN*/\n'+''.join(open(os.path.join(d,f),encoding='utf-8').read().rstrip()+'\n' for f in ['engine.js','heroes.js','monsters1.js','monsters2.js','monsters3.js','monsters4.js','decor.js','anim.js'])+'/*ART-END*/'
 s=open(p,encoding='utf-8').read()
 if '/*ART-BEGIN*/' in s:
     s=re.sub(r'/\*ART-BEGIN\*/.*?/\*ART-END\*/',lambda m:code,s,flags=re.S)

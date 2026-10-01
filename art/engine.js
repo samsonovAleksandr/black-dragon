@@ -19,6 +19,9 @@ const MAT={
  stone:['#2a2c32','#575c68','#8a909e','#bfc5d2'], moss:['#1a3014','#35602a','#5c9a42','#98d070'],
  fur:['#4a5a7a','#8498bc','#c2d0ea','#f2f7ff'], wraithc:['#150c28','#33185a','#5e2e96','#a070e0'],
  bloodrobe:['#2c0810','#661222','#a62438','#e0586a'],
+ bog:['#1a2a14','#3a5a28','#5e8a3c','#9cc86a'], mud:['#24180e','#4a3420','#6e5030','#9a7a50'], acid:['#18401a','#38a830','#8ae850','#ddffa0'],
+ crocgreen:['#14261a','#2e5232','#4e8248','#8cba70'], flesh:['#26362a','#506a54','#84a488','#b8d2b8'], chitin:['#3a1a0a','#7a3a14','#b8601e','#f09a50'],
+ witchc:['#102a2a','#1e5a50','#34906e','#7ad0a0'], rat:['#2a2220','#544842','#867a70','#bcb0a4'],
  dragonred:['#240610','#5a101e','#9a2230','#cf4a3a'], dragonwing:['#18040e','#42101c','#701a2a','#a02a3a'],
 };
 const hex2rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];

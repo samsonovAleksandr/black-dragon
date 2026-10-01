@@ -88,3 +88,33 @@ ART.dragon=()=>mkArt({w:56,h:44,scale:2,mirror:true,parts:[
  {t:'p',pts:[[20,9],[27,11.5],[27,10],[21,7]],m:'black'},
  {t:'p',pts:[[25,22],[26,26],[27,22]],m:'bone'},{c1:1,t:'e',cx:28,cy:23,rx:2.4,ry:1.4,m:'orange'},{c1:1,t:'px',x:28,y:23,c:'#fff070'},
 ]});
+/* Декор новых локаций */
+ART.mangrove=()=>mkArt({parts:[
+ {t:'l',x0:6,y0:33,x1:12,y1:20,w:2,m:'mud',k:.5},{t:'l',x0:30,y0:33,x1:24,y1:20,w:2,m:'mud',k:.5},{t:'l',x0:14,y0:34,x1:16,y1:22,w:2,m:'mud',k:.5},{t:'l',x0:23,y0:34,x1:21,y1:22,w:2,m:'mud',k:.5},
+ {t:'c',x:15,y:12,w:7,h:12,m:'mud'},{t:'l',x0:17,y0:14,x1:17,y1:22,w:1,m:'mud',k:.2},
+ {t:'e',cx:10,cy:12,rx:8,ry:5.5,m:'moss'},{t:'e',cx:26,cy:11,rx:8,ry:5.5,m:'moss'},{t:'e',cx:18,cy:6,rx:9,ry:5.5,m:'moss',b:.08},{t:'e',cx:18,cy:13,rx:8,ry:4,m:'bog',b:-.12},
+ {t:'l',x0:6,y0:15,x1:5,y1:23,w:1,m:'bog',k:.45},{t:'l',x0:12,y0:17,x1:12,y1:25,w:1,m:'bog',k:.45},{t:'l',x0:25,y0:16,x1:26,y1:24,w:1,m:'bog',k:.45},{t:'l',x0:31,y0:14,x1:32,y1:22,w:1,m:'bog',k:.45},
+ {t:'px',x:14,y:4,c:'#b8e070'},{t:'px',x:24,y:8,c:'#b8e070'},{t:'px',x:9,y:11,c:'#b8e070'},
+]});
+ART.mushroom=()=>mkArt({parts:[
+ {t:'c',x:9,y:18,w:5,h:15,m:'bone'},{t:'c',x:24,y:22,w:4,h:11,m:'bone'},{t:'c',x:16,y:26,w:3,h:7,m:'bone'},
+ {t:'e',cx:11.5,cy:15,rx:10,ry:6.5,m:'purple'},{t:'e',cx:26,cy:20,rx:7.5,ry:5,m:'pink',b:-.05},{t:'e',cx:17.5,cy:25,rx:5,ry:3.4,m:'purple',b:.05},
+ {t:'e',cx:8,cy:13,rx:1.8,ry:1.6,m:'acid'},{t:'e',cx:14,cy:11,rx:1.6,ry:1.4,m:'acid'},{t:'e',cx:12,cy:16,rx:1.4,ry:1.2,m:'acid'},{t:'e',cx:24,cy:18,rx:1.5,ry:1.3,m:'acid'},{t:'e',cx:28,cy:21,rx:1.3,ry:1.2,m:'acid'},
+ {t:'px',x:10,y:30,c:'#8ae850'},{t:'px',x:26,y:30,c:'#8ae850'},{t:'px',x:4,y:6,c:'#ddffa0'},{t:'px',x:32,y:12,c:'#ddffa0'},
+]});
+ART.hut=()=>mkArt({parts:[
+ {t:'c',x:3,y:30,w:2,h:5,m:'wood'},{t:'c',x:31,y:30,w:2,h:5,m:'wood'},
+ {t:'r',x:6,y:17,w:24,h:15,m:'wood'},{t:'r',x:6,y:24,w:24,h:1,m:'wood',b:-.2},{t:'r',x:6,y:20,w:24,h:1,m:'wood',b:-.2},
+ {t:'p',pts:[[2,18],[18,4],[34,18],[30,20],[18,9],[6,20]],m:'yellow',b:-.25},{t:'p',pts:[[2,18],[18,4],[34,18]],m:'brown',b:-.05},
+ {t:'r',x:15,y:22,w:7,h:10,m:'dark'},{t:'px',x:20,y:27,c:'#ffd070'},{t:'r',x:8,y:20,w:4,h:4,m:'yellow',b:.1},{t:'r',x:24,y:20,w:4,h:4,m:'acid',b:.1},
+ {t:'l',x0:32,y0:33,x1:32,y1:15,w:1,m:'wood',k:.6},{t:'e',cx:32,cy:13,rx:2.6,ry:2.8,m:'bone'},{t:'px',x:31,y:13,c:'#05030a'},{t:'px',x:33,y:13,c:'#05030a'},
+]});
+ART.lab=()=>mkArt({parts:[
+ {t:'r',x:3,y:12,w:12,h:20,m:'stone'},{t:'r',x:3,y:12,w:12,h:2,m:'gray'},{t:'r',x:5,y:5,w:3,h:8,m:'stone'},{t:'px',x:6,y:3,c:'#8ae850'},{t:'px',x:7,y:1,c:'#ddffa0'},
+ {t:'r',x:6,y:17,w:5,h:5,m:'acid',b:.1},{t:'r',x:6,y:25,w:6,h:7,m:'dark'},
+ {t:'l',x0:15,y0:20,x1:22,y1:20,w:2,m:'steelD',k:.5},
+ {t:'c',x:19,y:30,w:2,h:4,m:'steelD'},{t:'c',x:30,y:30,w:2,h:4,m:'steelD'},{t:'p',pts:[[17,24],[33,24],[31,32],[19,32]],m:'steelD'},{t:'e',cx:25,cy:24,rx:8.5,ry:2.6,m:'steel'},
+ {t:'e',cx:25,cy:24,rx:7,ry:1.8,m:'acid'},{t:'e',cx:22,cy:22,rx:1.4,ry:1.4,m:'acid',b:.2},{t:'e',cx:27,cy:20,rx:1.8,ry:1.8,m:'acid',b:.2},{t:'e',cx:25,cy:16,rx:1.2,ry:1.2,m:'acid',b:.2},
+ {t:'p',pts:[[21,33],[23,29],[25,33]],m:'orange'},{t:'p',pts:[[26,33],[28,29],[30,33]],m:'orange'},
+]});
+
