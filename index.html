@@ -1072,21 +1072,21 @@ for(const id in RELICS){const [k,c]=RELICS[id].ic;SPR['rl_'+id]=mkSpr({fn:a=>ICN
 /* =========================================================
    ДАННЫЕ ИГРЫ
    ========================================================= */
-const XPT=[5,12,22,34];                        // опыт для уровней 2..5
+const XPT=[8,20,38,62];                        // опыт для уровней 2..5
 const KEYS_NEEDED=5;
 const LOC_SUB={1:'Найдите ключи и доберитесь до выхода',2:'Земля мертвецов, орков и тёмных рыцарей',3:'Ледяная королева охраняет последний ключ',4:'Разбейте печати. Сразите Дракона!'};
 const DIFF={
  easy:{n:'Лёгкая',hp:.75,atk:-1,mon:-2,gold:1.4,boss:.8,d:'Монстры слабее и их меньше, больше золота. Для знакомства с игрой.'},
- normal:{n:'Обычная',hp:1,atk:0,mon:0,gold:1,boss:1,d:'Задуманный баланс.'},
- hard:{n:'Героическая',hp:1.35,atk:1,mon:2,gold:.8,boss:1.25,d:'Монстры сильнее и их больше, золота меньше. Для опытной команды.'}};
+ normal:{n:'Обычная',hp:1.25,atk:0,mon:1,gold:1,boss:1.2,d:'Задуманный баланс.'},
+ hard:{n:'Героическая',hp:1.8,atk:2,mon:4,gold:.7,boss:1.6,d:'Монстры сильнее и их больше, золота меньше. Для опытной команды.'}};
 const DORDER=['easy','normal','hard'];
 const D=()=>DIFF[G.diff]||DIFF.normal;
 /* --- Бесконечное подземелье --- */
 const BOSS_EVERY=5;
 const isBossFloor=d=>d%BOSS_EVERY===0;
 const themeFor=d=>isBossFloor(d)?4:((d-1)%3)+1;
-const DS=()=>G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:{hp:1,atk:0,cnt:0};
-const hasExit=()=>G.loc<ARENA||!!G.floorClear;
+const DS=()=>G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:(()=>{const k=Math.max(0,Math.min(G.loc||1,3)-1);return {hp:1+.15*k,atk:k>=2?1:0,cnt:k};})();
+const hasExit=()=>!!G.mini||G.loc<ARENA||!!G.floorClear;
 function loadRecords(){try{return JSON.parse(localStorage.getItem('bd_endless')||'[]');}catch(e){return [];}}
 function saveRecord(r){const a=loadRecords();a.push(r);a.sort((x,y)=>y.score-x.score);a.length=Math.min(a.length,5);try{localStorage.setItem('bd_endless',JSON.stringify(a));}catch(e){}return a;}
 const endlessScore=()=>G.depth*100+G.stats.kills*5+Math.floor((G.gold||0)/5);
@@ -1150,7 +1150,7 @@ const MON={
  icespirit:{n:'Ледяной дух',hp:7,atk:4,def:0,mv:3,rng:2,xp:3,spr:'icespirit',chill:1,d:'Бьёт холодом на 2 гекса и промораживает.'},
  frostspider:{n:'Морозный паук',hp:7,atk:3,def:0,mv:3,rng:1,xp:2,spr:'frostspider',chill:1,poison:1,d:'Яд и холод одновременно.'},
  icegolem:{n:'Ледяной голем',hp:20,atk:6,def:3,mv:1,rng:1,xp:5,spr:'icegolem',d:'Медленный ледяной страж (защита 3). Горение и магия — лучшее средство.'},
- icequeen:{n:'Ледяная королева',hp:45,atk:6,def:2,mv:2,rng:3,xp:10,spr:'icequeen',chill:1,pierce:1,summon:'icespirit',key:1,lair:4,d:'МИНИ-БОСС. Бьёт льдом на 3 гекса сквозь броню, промораживает, призывает ледяных духов. Не оглушается. Охраняет трон: нападает, если подойти ближе 4 гексов. Хранит последний ключ.'},
+ icequeen:{n:'Ледяная королева',hp:85,atk:8,def:3,mv:2,rng:3,xp:12,spr:'icequeen',chill:1,pierce:1,summon:'icespirit',sumMax:3,nova:1,key:1,lair:4,d:'МИНИ-БОСС. Бьёт льдом на 3 гекса сквозь броню, промораживает, призывает до 3 ледяных духов. Ниже половины HP каждые 3 хода выпускает Ледяной взрыв (4 урона и холод всем героям в 2 гексах). Не оглушается. Охраняет трон: нападает, если подойти ближе 4 гексов. Хранит последний ключ.'},
  whelp:{n:'Дракончик',hp:5,atk:3,def:0,mv:3,rng:1,xp:0,spr:'whelp',d:'Отродье Дракона.'},
 };
 
@@ -1247,24 +1247,30 @@ const LOCS={
  1:{n:'Тёмный лес',cols:12,rows:10,deco:'tree',
    poi:[{n:'Старое дерево',spr:'oldtree',at:[.32,.42],tok:{t:'item',it:'*a'}},
         {n:'Руины храма',spr:'ruins',at:[.72,.3],tok:{t:'key',guard:'skel'}},
-        {n:'Заброшенный лагерь',spr:'camp',at:[.3,.78],tok:{t:'item',it:'*a'}}],
+        {n:'Заброшенный лагерь',spr:'camp',at:[.3,.78],tok:{t:'item',it:'*a'}},
+        {n:'Звериное логово',spr:'cave',at:[.55,.62],tok:{t:'portal'}}],
    mon:['goblin','goblin','goblin','wolf','wolf','skel','skel','spider','bandit','slime','bat','bat','boar','shaman','shroom'],monN:10,
    items:['potion','potion','*g1','*g1','*g1','*c1','*c1'],keys:1,
-   events:['trap','spring','ambush','empty','shrine','chest'],terr:{slow:7,barrel:3,trap:2},slowName:'Болото'},
+   events:['trap','spring','ambush','empty','shrine','chest'],terr:{slow:7,barrel:3,trap:2},slowName:'Болото',
+   mini:{n:'Звериное логово',d:'Тесная нора, где свирепые звери защищают добычу.',mon:['wolf','wolf','boar','boar','spider','orc'],terr:{slow:3}}},
  2:{n:'Мёртвые земли',cols:14,rows:10,deco:'rock',
    poi:[{n:'Кладбище',spr:'grave',at:[.3,.3],tok:{t:'key',guard:'necro'}},
         {n:'Пещера тролля',spr:'cave',at:[.72,.55],tok:{t:'key',guard:'troll'}},
-        {n:'Забытый алтарь',spr:'altar',at:[.45,.78],tok:{t:'item',it:'feather'}}],
+        {n:'Забытый алтарь',spr:'altar',at:[.45,.78],tok:{t:'item',it:'feather'}},
+        {n:'Вход в склеп',spr:'ruins',at:[.58,.28],tok:{t:'portal'}}],
    mon:['orc','orc','orc','dknight','dknight','necro','troll','ghost','ghost','ogre','spider','wraith','golem','cultist','gargoyle','gargoyle'],monN:11,
    items:['elixir','potion','*g2','*g2','*g2','*c2','*c2'],keys:0,
-   events:['trap','trap','spring','ambush','shrine','chest'],terr:{lava:6,barrel:3,trap:3}},
+   events:['trap','trap','spring','ambush','shrine','chest'],terr:{lava:6,barrel:3,trap:3},
+   mini:{n:'Склеп павших',d:'Древняя усыпальница: мертвецы не любят гостей.',mon:['dknight','necro','ghost','ghost','cultist','ogre'],terr:{lava:3}}},
  3:{n:'Ледяные пещеры',cols:13,rows:10,deco:'icicle',
    poi:[{n:'Замёрзший караван',spr:'frozencamp',at:[.3,.35],tok:{t:'item',it:'*a'}},
         {n:'Ледяной трон',spr:'throne',at:[.74,.28],boss:'icequeen'},
-        {n:'Ледяной грот',spr:'cave',at:[.45,.8],tok:{t:'item',it:'elixir'}}],
+        {n:'Ледяной грот',spr:'cave',at:[.45,.8],tok:{t:'item',it:'elixir'}},
+        {n:'Ледяная цитадель',spr:'throne',at:[.5,.52],tok:{t:'portal'}}],
    mon:['yeti','yeti','icespirit','icespirit','frostspider','frostspider','icegolem','wolf','wolf','skel','bat','wraith'],monN:10,
    items:['potion','elixir','*g2','*g2','*c2','*c2'],keys:0,
-   events:['trap','spring','ambush','chest','shrine','empty'],terr:{slow:8,barrel:2,trap:3},slowName:'Сугроб'},
+   events:['trap','spring','ambush','chest','shrine','empty'],terr:{slow:8,barrel:2,trap:3},slowName:'Сугроб',
+   mini:{n:'Ледяная цитадель',d:'Заброшенная крепость, занятая ледяными стражами.',mon:['yeti','icegolem','icespirit','icespirit','frostspider','wraith'],terr:{slow:3}}},
  4:{n:'Логово Дракона',cols:11,rows:9,deco:'pillar'},
 };
 const POOL_A=['ringhp','boots','leather','potion','rustsword','helmet','dagger','cloak','vampring'];
@@ -1404,6 +1410,60 @@ function genField(n){
   G.startCells=startCells;G.exitCells=exitCells;
   placeTerrain(L);
   poiTokens.filter(c=>c.poi.boss).forEach(c=>{const f=freeNear(c.c,c.r);if(f){const m=spawnMon(c.poi.boss,f[0],f[1]);m.elite=true;m.home=[c.c,c.r];}});
+}
+/* --- Малые локации: вход по фишке-порталу, бой с сильными врагами, возврат на большую карту --- */
+const stripHit=m=>{const {hit,...r}=m;return r;};
+function genMini(L,M){
+  const cols=9,rows=7;let startCells,exitCells,reach;
+  for(let tries=0;tries<80;tries++){
+    makeGrid(cols,rows);
+    startCells=zoneAround(1,rows-2,'start');exitCells=zoneAround(cols-3,1,'exit');
+    for(const row of G.grid)for(const cell of row){
+      if(cell.zone)continue;
+      if(dist(cell.c,cell.r,1,rows-2)<=1||dist(cell.c,cell.r,cols-3,1)<=1)continue;
+      cell.block=Math.random()<0.10;
+    }
+    reach=floodFrom(exitCells[0][0],exitCells[0][1]);
+    const total=G.grid.flat().filter(c=>!c.block).length;
+    if(startCells.every(([x,y])=>reach.has(key(x,y)))&&reach.size>=total*0.95)break;
+  }
+  G.grid.flat().forEach(c=>{if(c.block)c.deco=L.deco;});
+  G.startCells=startCells;G.exitCells=exitCells;
+  placeTerrain({terr:Object.assign({barrel:2},M.terr||{})});
+}
+function enterMini(cell){
+  const L=LOCS[G.loc],M=L.mini;if(!M||G.mini)return;
+  G.mini={n:M.n,won:false,st:{grid:G.grid,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,monsters:G.monsters.map(stripHit),exitCells:G.exitCells,startCells:G.startCells,
+    cell:[cell.c,cell.r],pos:G.heroes.map(h=>[h.c,h.r])}};
+  G.tele=null;G.mode=null;G.monsters=[];genMini(L,M);
+  G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i%G.startCells.length];h.c=c;h.r=r;h.block=h.guard=h.taunt=false;});
+  const want=5+(D().mon>=2?1:0)+Math.floor(DS().cnt/2);
+  let mons=shuffle(M.mon.slice());while(mons.length<want)mons.push(pick(M.mon));mons=mons.slice(0,want);
+  const spots=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.terr&&!c.barrel&&dist(c.c,c.r,G.startCells[0][0],G.startCells[0][1])>=5));
+  mons.forEach((id,i)=>{const c=spots[i];if(!c)return;const m=spawnMon(id,c.c,c.r);
+    m.hp=m.max=Math.round(m.hp*1.5);m.atk+=2;m.def+=1;m.n='Свирепый: '+m.n;m.strong=true;});
+  log('=== '+M.n+' ===');showBanner(M.n,'Сильные враги. Победите всех — или отступите на светлые гексы.');sfx('roar');ui();
+}
+function winMini(){
+  const M=G.mini;if(!M||M.won)return;M.won=true;
+  const g=evGold(35+(G.endless?G.depth*3:0));sfx('victory');fxQ({burst:'confetti',c:0,r:0});
+  G.heroes.forEach(h=>{if(h.alive)gainXP(h,3);});
+  const al=G.heroes.filter(h=>h.alive);const rare=pick(['amulet','trollheart','vampring','chain','axe','elixir']);
+  const hh=al.find(h=>canUse(h,rare))||al[0];if(hh)giveItem(hh,rare,cellOf(hh.c,hh.r));
+  log('★ '+M.n+' зачищено! +'+g+' золота, +3 опыта каждому, награда: '+ITEMS[rare].n+'.');
+  const ids=pickRelics(3);
+  const back=()=>{closeModal();leaveMini(true);};
+  if(!ids.length){openModal('<h1>'+M.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'.</p>',[{t:'Вернуться на карту',fn:back}]);return;}
+  openModal('<h1>'+M.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'. Выберите реликвию:</p><div class="shop">'+ids.map(id=>'<div class="item"><div class="ih"><img class="ic" src="'+RICON[id]+'"><div><b>'+RELICS[id].n+'</b><div class="ty">Реликвия</div></div></div><div class="ds">'+RELICS[id].d+'</div></div>').join('')+'</div>',
+    ids.map(id=>({t:'Взять: '+RELICS[id].n,fn:()=>{giveRelic(id);back();}})));
+}
+function leaveMini(won){
+  const M=G.mini;if(!M)return;const s=M.st;
+  G.grid=s.grid;G.cols=s.cols;G.rows=s.rows;G.ox=s.ox;G.oy=s.oy;G.exitCells=s.exitCells;G.startCells=s.startCells;
+  G.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));G.tele=null;G.mode=null;
+  G.heroes.forEach((h,i)=>{const p=s.pos[i];if(p){h.c=p[0];h.r=p[1];}});
+  const cell=cellOf(s.cell[0],s.cell[1]);if(won&&cell){cell.token=null;if(cell.poi)cell.poi=Object.assign({},cell.poi,{done:1});}
+  G.mini=null;log(won?'Отряд возвращается на карту с добычей.':'Отряд отступает из подземелья. Вход остаётся открытым.');sfx('travel');ui();
 }
 function placeTerrain(L){
   const T=L.terr||{};
@@ -1695,6 +1755,9 @@ function revealToken(h,cell){
   if(cell.poi)log('Осматриваем: '+cell.poi.n+'...');
   switch(t.t){
     case 'monster':{const m=spawnMon(t.m,cell.c,cell.r);log('Из фишки выходит: '+m.n+'!');sfx('spawn');fxQ({burst:'spawn',c:cell.c,r:cell.r});pop(m,'!');break;}
+    case 'portal':{cell.token=t;const M=LOCS[G.loc].mini;if(!M||G.mini)break;
+      openModal('<h1>'+M.n+'</h1><p>'+M.d+'</p><p>Внутри ждут <b style="color:#ff9a8a">сильные враги</b> (на 50% крепче и злее обычных). Награда: реликвия, золото, редкий предмет и опыт. Отступить можно с «светлых» гексов выхода — прогресс боя не сохранится.</p><p style="color:var(--mid)">Герои войдут все вместе.</p>',
+        [{t:'Войти ▶',fn:()=>{closeModal();enterMini(cell);}},{t:'Не сейчас',fn:()=>{closeModal();log('Вы решаете пока не соваться внутрь.');ui();}}]);break;}
     case 'item':giveItem(h,t.it,cell);break;
     case 'key':{if(G.endless){const g=evGold(18+G.depth*2);sfx('key');log('Тайник! Найдено '+g+' золота.');pop(pos,'+'+g+' з','#ffd23f');G.heroes.forEach(x=>{if(x.alive)gainXP(x,1);});}else{G.keys++;sfx('key');log('КЛЮЧ найден! Ключей: '+G.keys+'/'+KEYS_NEEDED+'. Печать Дракона ослабла.');pop(pos,'КЛЮЧ');}
       if(t.guard){const f=freeNear(cell.c,cell.r);if(f){const m=spawnMon(t.guard,f[0],f[1]);log('Хранитель пробуждается: '+m.n+'!');sfx('spawn');}}
@@ -1759,7 +1822,7 @@ function objProgress(k){
   if(o.prog>=o.goal)objDone();
 }
 function alarmTick(){
-  const o=G.obj;if(!o||o.type!=='alarm'||o.done)return;
+  const o=G.obj;if(G.mini||!o||o.type!=='alarm'||o.done)return;
   if(G.round>o.limit){
     if(!o.fail){o.fail=true;log('ТРЕВОГА! Враги почуяли отряд — подкрепление прибывает каждый раунд!');showBanner('ТРЕВОГА!','Подкрепление врага на подходе');sfx('roar');}
     const c=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!heroAt(c.c,c.r)&&!monsterAt(c.c,c.r)&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))[0];
@@ -1879,7 +1942,8 @@ function computeIntents(){
     if(m.stun){m.int={k:'stun'};continue;}
     const lairR=m.lair||b.lair;if(lairR&&!m.aggro&&!(m.hit&&m.hit.size)){m.int={k:'sleep'};continue;}
     const t=pickTarget(m);if(!t)continue;
-    if(b.summon&&m.cd<=0&&G.monsters.filter(x=>x.alive&&x.id===(typeof b.summon==='string'?b.summon:'skel')&&x.summoned).length<2){m.int={k:'summon'};continue;}
+    if(b.summon&&m.cd<=0&&G.monsters.filter(x=>x.alive&&x.id===(typeof b.summon==='string'?b.summon:'skel')&&x.summoned).length<(b.sumMax||2)){m.int={k:'summon'};continue;}
+    if(b.nova&&m.hp<=m.max/2&&(m.ncd||0)<=0){m.int={k:'summon'};continue;}
     if(b.healer){const w=G.monsters.filter(x=>x.alive&&x!==m&&!x.boss&&x.hp<x.max&&dist(m.c,m.r,x.c,x.r)<=3)[0];if(w){m.int={k:'heal',tc:w.c,tr:w.r};continue;}}
     let dc=m.c,dr=m.r;
     if(dist(m.c,m.r,t.c,t.r)>m.rng&&!m.root){const d=chooseDest(m,t,false);if(d){dc=d[0];dr=d[1];}}
@@ -1902,9 +1966,15 @@ async function monsterAct(m){
   if(lairR&&!m.aggro){const near=G.heroes.some(h=>h.alive&&dist(h.c,h.r,m.c,m.r)<=lairR);if(!near&&!m.hit.size)return;m.aggro=true;log(m.n+' поднимается с трона!');sfx('roar');}
   if(b.regen&&m.hp<m.max){m.hp=Math.min(m.max,m.hp+b.regen);pop(m,'+'+b.regen);}
   const t=pickTarget(m);if(!t)return;
+  if(b.nova&&m.hp<=m.max/2){
+    if((m.ncd||0)>0)m.ncd--;
+    else{m.ncd=2;sfx('boom');fxQ({burst:'boom',c:m.c,r:m.r});log(m.n+' выпускает Ледяной взрыв!');pop(m,'ВЗРЫВ','#9df');
+      G.heroes.filter(h=>h.alive&&dist(h.c,h.r,m.c,m.r)<=2).forEach(h=>{hitHero(h,4,m,{pierce:true});if(h.alive){h.chill=1;pop(h,'ХОЛОД','#9df');}});
+      await sleep(300);return;}
+  }
   if(b.summon){
     if(m.cd>0)m.cd--;
-    else if(G.monsters.filter(x=>x.alive&&x.id===(typeof b.summon==='string'?b.summon:'skel')&&x.summoned).length<2){
+    else if(G.monsters.filter(x=>x.alive&&x.id===(typeof b.summon==='string'?b.summon:'skel')&&x.summoned).length<(b.sumMax||2)){
       const sid=typeof b.summon==='string'?b.summon:'skel';const f=freeNear(m.c,m.r);
       if(f){const s=spawnMon(sid,f[0],f[1]);s.xp=0;s.summoned=true;m.cd=2;log(m.n+' призывает: '+MON[sid].n+'!');sfx('summon');fxQ({burst:'spawn',c:s.c,r:s.r});return;}
     }
@@ -2038,7 +2108,7 @@ function aiSafe(h){
   return !foes.some(m=>allies.some(a=>mdist(a,m)<=4))&&aiHurtFrac(h)>=.5;
 }
 // ближайший к герою «?» в радиусе 1 от него
-const aiSkipTok=c=>c.token&&c.token.t==='event'&&(EXTRA_EV.includes(c.token.e)||c.token.e==='treasure');
+const aiSkipTok=c=>c.token&&c.token.t==='portal'||c.token&&c.token.t==='event'&&(EXTRA_EV.includes(c.token.e)||c.token.e==='treasure');
 const aiAdjToken=h=>nb(h.c,h.r).map(([c,r])=>cellOf(c,r)).find(c=>c&&c.token&&!aiSkipTok(c));
 function aiStep(h){
   const foes=aiFoes(),rng=st(h,'rng'),mx=st(h,'maxhp');
@@ -2159,6 +2229,7 @@ function aiMove(h,mode){
    ========================================================= */
 function checkEnd(){
   if(G.over)return true;
+  if(G.mini&&!G.mini.won&&G.heroes.some(h=>h.alive)&&!G.monsters.some(m=>m.alive))winMini();
   if(!G.heroes.some(h=>h.alive)){
     G.over=true;G.busy=true;sfx('defeat');document.body.classList.add('lost');hurtFlash();
     if(G.endless){
@@ -2225,6 +2296,7 @@ function renderCamp(){
 }
 function goNext(){
   if(G.busy||G.over||!atExit())return;
+  if(G.mini){if(!G.mini.won)leaveMini(false);return;}
   const go=()=>{objProgress('exit');G.relicPending=(G.relicPending||0)+1;const out=campRest();openCamp(out);};
   if(G.loc===ARENA-1&&G.keys<KEYS_NEEDED){
     const s=KEYS_NEEDED-G.keys;
@@ -2875,8 +2947,8 @@ function renderTop(){
   const keysH=G.endless?'<span class="chip" data-tn="Бесконечное подземелье" data-tip="Каждый этаж сложнее предыдущего. Каждые 5 этажей — босс. Враги: +'+Math.round((DS().hp-1)*100)+'% HP." style="color:#ffb0a0;border-color:#7a2a2a">Этаж '+G.depth+(isBossFloor(G.depth)?' · БОСС':'')+'</span>':'<span class="keys"><span class="lb">КЛЮЧИ</span>'+Array.from({length:KEYS_NEEDED},(_,i)=>'<i class="gem'+(i<G.keys?' on':'')+'"></i>').join('')+'</span>';
   const relH=(G.relics&&G.relics.length)?'<span class="relics">'+G.relics.map(id=>'<img class="ric" src="'+RICON[id]+'" data-tn="'+esc(RELICS[id].n)+'" data-tc="Реликвия" data-tip="'+esc(RELICS[id].d)+'">').join('')+'</span>':'';
   const ot=objText();const objH=ot?'<span class="chip obj '+ot.st+'" data-tn="Цель: '+esc(ot.n)+'" data-tip="'+esc(ot.d)+' Награда: золото и реликвия.">'+(ot.st==='ok'?'✓ ':ot.st==='bad'?'✗ ':'◎ ')+esc(ot.n)+(ot.prog?' '+ot.prog:'')+'</span>':'';
-  const exH=hasExit()?(atExit()?'<button class="btn act" data-act="next">Дальше ▶</button>':'<span class="chip">Выход '+G.heroes.filter(h=>h.alive&&cellOf(h.c,h.r).zone==='exit').length+'/'+G.heroes.filter(h=>h.alive).length+'</span>'):'';
-  $('#top').innerHTML='<span class="loc">'+L.n+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+exH+
+  const exH=hasExit()?(atExit()?'<button class="btn act" data-act="next">'+(G.mini?'Отступить ◀':'Дальше ▶')+'</button>':'<span class="chip">Выход '+G.heroes.filter(h=>h.alive&&cellOf(h.c,h.r).zone==='exit').length+'/'+G.heroes.filter(h=>h.alive).length+'</span>'):'';
+  $('#top').innerHTML='<span class="loc">'+L.n+(G.mini?' · '+G.mini.n:'')+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+exH+
    netTop()+
    '<button class="btn" data-act="quit">Выход</button><button class="btn" data-act="rules">?</button><button class="btn" data-act="music">'+(MUSIC?'♪ Музыка':'♪ выкл')+'</button><button class="btn" data-act="mute">'+(MUTE?'🔇 выкл':'🔊 Звук')+'</button>';
 }
@@ -3060,7 +3132,7 @@ function makeSnap(){
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,mini:G.mini?{n:G.mini.n,won:G.mini.won}:null},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
@@ -3460,7 +3532,7 @@ function packG(){
   return {loc:G.loc,round:G.round,keys:G.keys,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,grid:G.grid,
     heroes:G.heroes.map(({d,...r})=>r),monsters:G.monsters.map(({hit,...r})=>r),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,tele:G.tele?[...G.tele.cells]:null,
-    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear};
+    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,mini:G.mini||null};
 }
 function unpackG(g){
   const ng=Object.assign({},g,{fx:[],hover:null,mode:null,hl:null,busy:false,ready:{}});
