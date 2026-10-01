@@ -20,7 +20,7 @@
 
 ## 📖 Содержание
 
-[О игре](#-о-игре) · [Возможности](#-возможности) · [Скриншоты](#-скриншоты) · [Как играть](#-как-играть) · [Запуск](#-запуск) · [Мультиплеер](#-мультиплеер) · [Публикация в интернете](#-публикация-в-интернете) · [Устройство проекта](#-устройство-проекта) · [Дорожная карта](#-дорожная-карта)
+[О игре](#-о-игре) · [Возможности](#-возможности) · [Скриншоты](#-скриншоты) · [Как играть](#-как-играть) · [Мультиплеер](#-мультиплеер) · [Устройство проекта](#-устройство-проекта) · [Дорожная карта](#-дорожная-карта)
 
 ---
 
@@ -114,23 +114,6 @@
 
 **Цель сюжетного режима:** найти 5 ключей (по два в лесу и в мёртвых землях, последний хранит Ледяная королева) и победить Дракона. Чем меньше ключей, тем сильнее босс.
 
-## 🚀 Запуск
-
-Нужен [Node.js](https://nodejs.org/) 18+.
-
-```bash
-git clone https://github.com/samsonovAleksandr/black-dragon.git
-cd black-dragon/server
-npm install
-npm start
-```
-
-Откройте <http://localhost:8080/>. Другой порт: `PORT=3000 npm start`.
-
-Проверка сервера: <http://localhost:8080/health> → `ok rooms=0`.
-
-> Одиночную игру можно запустить и без сервера, открыв `index.html` в браузере. Сервер нужен для комнат и для раздачи PixiJS (`/vendor/pixi.min.js`). Если PixiJS недоступен, игра работает на запасном canvas-рендере.
-
 ## 🌐 Мультиплеер
 
 1. Один игрок жмёт **«Создать комнату»** и получает код и ссылку вида `https://адрес/#room=ABCD`.
@@ -142,32 +125,6 @@ npm start
 - Каждый гость получает токен: после обрыва связи он возвращается на своё место с теми же героями.
 - Если хост закрыл вкладку, партия сохраняется у него в браузере, а комната поднимается с тем же кодом.
 - Запасные способы без сервера (PeerJS и ручной обмен кодами) есть в меню «P2P / без сервера».
-
-## 🔒 Публикация в интернете
-
-Готовые конфиги лежат в [`deploy/`](deploy):
-
-- [`black-dragon.service`](deploy/black-dragon.service) — автозапуск сервера через systemd.
-- [`black-dragon.online.conf`](deploy/black-dragon.online.conf) — nginx как обратный прокси с поддержкой WebSocket.
-
-```bash
-# 1. автозапуск (поправьте User и пути в файле под себя)
-sudo cp deploy/black-dragon.service /etc/systemd/system/
-sudo systemctl daemon-reload && sudo systemctl enable --now black-dragon
-
-# 2. nginx (замените домен в файле)
-sudo cp deploy/black-dragon.online.conf /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/black-dragon.online.conf /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-
-# 3. сертификат Let's Encrypt
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d ваш-домен --redirect
-```
-
-Нужны проброс портов 80 и 443 на роутере и A-запись домена на ваш внешний IP. Игра сама определяет адрес сервера и использует `wss://` при открытии по HTTPS.
-
-Альтернативы без белого IP: [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) или Tailscale.
 
 ## 🧱 Устройство проекта
 
