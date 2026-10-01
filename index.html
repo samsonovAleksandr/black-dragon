@@ -1318,7 +1318,7 @@ const STORY_TIERS=[[1],[2,5],[3,6]];
 const nextOpts=()=>STORY_TIERS[(LOC_TIER[G.loc]||0)+1]||[ARENA];
 const DS=()=>G.horde?{hp:1+.09*(G.horde.wave-1),atk:Math.floor((G.horde.wave-1)/4),cnt:0}:G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:(()=>{const k=Math.min(LOC_TIER[G.loc]||0,2);return {hp:1+.15*k,atk:k>=2?1:0,cnt:k};})();
 const HORDE_LOC=7;
-const hasExit=()=>!G.horde&&(!!G.mini||G.loc!==ARENA||!!G.floorClear);
+const hasExit=()=>!G.horde&&(G.loc!==ARENA||!!G.floorClear);
 function loadRecords(){try{return JSON.parse(localStorage.getItem('bd_endless')||'[]');}catch(e){return [];}}
 function saveRecord(r){const a=loadRecords();a.push(r);a.sort((x,y)=>y.score-x.score);a.length=Math.min(a.length,5);try{localStorage.setItem('bd_endless',JSON.stringify(a));}catch(e){}return a;}
 const endlessScore=()=>G.depth*100+G.stats.kills*5+Math.floor((G.gold||0)/5);
@@ -1598,13 +1598,13 @@ const GEN2=['chain','bomb','scroll','axe','trollheart','stormrune','blink','rage
 /* =========================================================
    ГЕКСЫ (odd-r, «острый» верх)
    ========================================================= */
-const HS=22,W=620,H=440,S3=Math.sqrt(3);
+const HS=22,S3=Math.sqrt(3);let W=620,H=440;
 const DIRS=[[[1,0],[0,-1],[-1,-1],[-1,0],[-1,1],[0,1]],[[1,0],[1,-1],[0,-1],[-1,0],[0,1],[1,1]]];
 let G={};
 const inb=(c,r)=>c>=0&&r>=0&&c<G.cols&&r<G.rows;
 const nb=(c,r)=>DIRS[r&1].map(d=>[c+d[0],r+d[1]]).filter(([x,y])=>inb(x,y));
 function cube(c,r){const x=c-(r-(r&1))/2;return [x,-x-r,r];}
-function dist(c1,r1,c2,r2){const a=cube(c1,r1),b=cube(c2,r2);return Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]),Math.abs(a[2]-b[2]));}
+function dist(c1,r1,c2,r2){if(G.room&&((c1>=G.room.c0)!==(c2>=G.room.c0)))return 99;const a=cube(c1,r1),b=cube(c2,r2);return Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]),Math.abs(a[2]-b[2]));}
 function hc(c,r){return {x:G.ox+S3*HS*(c+0.5*(r&1)),y:G.oy+1.5*HS*r};}
 const cellOf=(c,r)=>G.grid[r]&&G.grid[r][c];
 
@@ -1660,8 +1660,12 @@ function pop(e,txt,col){if(NET.role==='host'&&NET.started)NET.fq.push({c:e.c,r:e
 /* =========================================================
    ГЕНЕРАЦИЯ КАРТ
    ========================================================= */
+function syncWorld(){
+  W=G.ww||620;H=G.wh||440;
+  try{if(cv&&(cv.width!==W||cv.height!==H)){cv.width=W;cv.height=H;if(typeof fit==='function')fit();}}catch(e){}
+}
 function makeGrid(cols,rows){
-  G.cols=cols;G.rows=rows;
+  G.cols=cols;G.rows=rows;G.ww=620;G.wh=440;W=620;H=440;
   const g=[];for(let r=0;r<rows;r++){g.push([]);for(let c=0;c<cols;c++)g[r].push({c,r,block:false,seed:Math.random(),token:null,zone:null,dragon:false,poi:null,deco:null});}
   G.grid=g;
   const mw=(cols+0.5)*S3*HS,mh=(rows-1)*1.5*HS+2*HS;
@@ -1704,7 +1708,7 @@ function genField(n){
       const cand=G.grid.flat().filter(x=>free(x.c,x.r)).sort((a,b)=>dist(a.c,a.r,c,r)-dist(b.c,b.r,c,r));
       ({c,r}=cand[0]);
     }
-    const cell=cellOf(c,r);cell.block=false;cell.poi=p;if(p.tok&&p.tok.t==='portal'){cell.portal=true;cell.token=null;}else cell.token=p.tok?Object.assign({},p.tok):null;poiTokens.push(cell);
+    const cell=cellOf(c,r);cell.block=false;cell.poi=p;if(p.tok&&p.tok.t==='portal'){cell.portal=true;cell.token=null;cell.poi=Object.assign({},p,{entry:1});}else cell.token=p.tok?Object.assign({},p.tok):null;poiTokens.push(cell);
   }
   // случайные фишки
   const c1=pick(CLASS1),c2=pick(CLASS2);
@@ -1727,6 +1731,7 @@ function genField(n){
   G.startCells=startCells;G.exitCells=exitCells;
   placeTerrain(L);
   poiTokens.filter(c=>c.poi.boss).forEach(c=>{const f=freeNear(c.c,c.r);if(f){const m=spawnMon(c.poi.boss,f[0],f[1]);m.elite=true;m.home=[c.c,c.r];}});
+  if(L.mini&&poiTokens.some(c=>c.portal))addRoomWing(L,L.mini);
 }
 
 /* --- Режим «Орда»: одна арена, волны врагов, привал между волнами --- */
@@ -1783,72 +1788,77 @@ function loadHordeRecords(){try{return JSON.parse(localStorage.getItem('bd_horde
 function saveHordeRecord(r){const a=loadHordeRecords();a.push(r);a.sort((x,y)=>y.score-x.score);a.length=Math.min(a.length,5);try{localStorage.setItem('bd_horde',JSON.stringify(a));}catch(e){}return a;}
 
 /* --- Малые локации: вход по фишке-порталу, бой с сильными врагами, возврат на большую карту --- */
-const stripHit=m=>{const {hit,...r}=m;return r;};
-function genMini(L,M){
-  const cols=9,rows=7;let startCells,exitCells,reach;
+const inRoom=(c)=>!!G.room&&c>=G.room.c0;
+/* Комната-«крыло»: дорисована справа от основной карты в той же сетке. Отдельная область — ходьба и стрельба между областями невозможны (dist=99). */
+function addRoomWing(L,M){
+  const mainCols=G.cols,mainRows=G.rows,GAP=1,RC=9,RR=7;
+  const c0=mainCols+GAP,total=c0+RC;
+  for(let r=0;r<mainRows;r++)for(let c=mainCols;c<total;c++)G.grid[r].push({c,r,block:true,void:true,seed:Math.random(),token:null,zone:null,dragon:false,poi:null,deco:null});
+  G.cols=total;
+  const r0=Math.max(0,Math.floor((mainRows-RR)/2));
+  const sc=c0+1,sr=r0+RR-2,ec=c0+RC-2,er=r0+1;
   for(let tries=0;tries<80;tries++){
-    makeGrid(cols,rows);
-    startCells=zoneAround(1,rows-2,'start');exitCells=zoneAround(cols-3,1,'exit');
-    for(const row of G.grid)for(const cell of row){
-      if(cell.zone)continue;
-      if(dist(cell.c,cell.r,1,rows-2)<=1||dist(cell.c,cell.r,cols-3,1)<=1)continue;
-      cell.block=Math.random()<0.10;
-    }
-    reach=floodFrom(exitCells[0][0],exitCells[0][1]);
-    const total=G.grid.flat().filter(c=>!c.block).length;
-    if(startCells.every(([x,y])=>reach.has(key(x,y)))&&reach.size>=total*0.95)break;
+    for(let r=r0;r<r0+RR;r++)for(let c=c0;c<c0+RC;c++){const cl=cellOf(c,r);cl.void=false;cl.block=false;cl.room=true;cl.zone=null;cl.deco=null;cl.terr=null;cl.barrel=false;}
+    zoneAround(sc,sr,'start');
+    for(let r=r0;r<r0+RR;r++)for(let c=c0;c<c0+RC;c++){const cl=cellOf(c,r);if(cl.zone)continue;if(dist2(c,r,sc,sr)<=1||dist2(c,r,ec,er)<=1)continue;cl.block=Math.random()<0.1;}
+    cellOf(ec,er).block=false;
+    const reach=floodFrom(sc,sr);const tot=G.grid.flat().filter(x=>x.room&&!x.block).length;
+    if(reach.has(key(ec,er))&&reach.size>=tot*0.95)break;
   }
-  G.grid.flat().forEach(c=>{if(c.block)c.deco=L.deco;});
-  G.startCells=startCells;G.exitCells=exitCells;
-  placeTerrain({terr:Object.assign({barrel:2},M.terr||{})});
+  const room=G.grid.flat().filter(x=>x.room);
+  room.forEach(x=>{if(x.block)x.deco=L.deco;});
+  cellOf(ec,er).rexit=true;
+  const empty=()=>shuffle(room.filter(x=>!x.block&&!x.zone&&!x.rexit&&dist2(x.c,x.r,sc,sr)>=3));
+  const T=M.terr||{};
+  ['slow','lava','acid'].forEach(kind=>{let n=T[kind]||0;for(const sd of empty()){if(n<=0)break;sd.terr=kind;n--;}});
+  let b=2;for(const x of empty()){if(b<=0)break;if(x.terr)continue;x.block=true;const f=floodFrom(sc,sr);
+    if(room.every(y=>y.block||f.has(key(y.c,y.r)))){x.barrel=true;x.deco='barrel';b--;}else x.block=false;}
+  const mw=(total+0.5)*S3*HS;G.ww=Math.max(620,Math.ceil(mw)+16);G.ox=(G.ww-mw)/2+S3*HS/2;
+  G.room={c0,r0,cols:RC,rows:RR,n:M.n,d:M.d,mon:M.mon,opened:false,won:false,start:[sc,sr],exit:[ec,er]};
+  syncWorld();
 }
-function promptMini(h,cell){
-  const M=LOCS[G.loc].mini;if(!M||G.mini||G.over)return;
-  openModal('<h1>'+(cell.poi?cell.poi.n:M.n)+'</h1><p>'+M.d+'</p><p>Войти может только <b>'+h.d.n+'</b> — тот, кто встал на этот гекс. Остальные герои подождут снаружи.</p><p>Внутри ждут <b style="color:#ff9a8a">сильные враги</b> (на 50% крепче и злее обычных; чем меньше героев входит, тем меньше врагов). Награда: реликвия, золото, редкий предмет и опыт. Отступить можно с «светлых» гексов выхода — прогресс боя не сохранится. Если герой падёт, комната останется открытой.</p>',
-    [{t:'Войти ▶',fn:()=>{closeModal();enterMini(cell,h);}},{t:'Не сейчас',fn:()=>{closeModal();log('Вы решаете пока не заходить внутрь.');ui();}}]);
+function dist2(c1,r1,c2,r2){const a=cube(c1,r1),b=cube(c2,r2);return Math.max(Math.abs(a[0]-b[0]),Math.abs(a[1]-b[1]),Math.abs(a[2]-b[2]));}
+function promptRoom(h,cell){
+  const R=G.room;if(!R||R.won||G.over)return;
+  openModal('<h1>'+(cell.poi?cell.poi.n:R.n)+'</h1><p>'+R.d+'</p><p><b>'+h.d.n+'</b> может войти в подземелье — оно дорисовано справа на карте. Остальные герои продолжают ходить на основной карте, всё идёт в одном раунде. Входить могут и другие герои — каждый, кто встанет на этот гекс.</p><p>Внутри <b style="color:#ff9a8a">сильные враги</b> (на 50% крепче и злее обычных). Награда за зачистку: реликвия, золото, редкий предмет и опыт. Выйти можно в любой момент через гекс «ВЫХОД» внутри.</p>',
+    [{t:'Войти ▶',fn:()=>{closeModal();enterRoom(h,cell);}},{t:'Не сейчас',fn:()=>{closeModal();log('Вы решаете пока не заходить внутрь.');ui();}}]);
 }
-function enterMini(cell,hero){
-  const L=LOCS[G.loc],M=L.mini;if(!M||G.mini||!hero||!hero.alive)return;
-  const away=G.heroes.filter(x=>x!==hero).map(x=>{const {d,...r}=x;return r;});
-  G.mini={n:M.n,won:false,st:{grid:G.grid,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,monsters:G.monsters.map(stripHit),exitCells:G.exitCells,startCells:G.startCells,
-    cell:[cell.c,cell.r],order:G.heroes.map(x=>x.id),away}};
-  G.heroes=[hero];G.sel=hero.id;
-  G.tele=null;G.mode=null;G.undo=null;G.monsters=[];genMini(L,M);
-  const [sc,sr]=G.startCells[0];hero.c=sc;hero.r=sr;hero.block=hero.guard=hero.taunt=false;
-  const want=Math.min(6,Math.round(1.6*G.heroes.length)+1)+(D().mon>=2?1:0)+Math.floor(DS().cnt/2);
-  let mons=shuffle(M.mon.slice());while(mons.length<want)mons.push(pick(M.mon));mons=mons.slice(0,want);
-  const spots=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.terr&&!c.barrel&&dist(c.c,c.r,sc,sr)>=5));
-  mons.forEach((id,i)=>{const c=spots[i];if(!c)return;const m=spawnMon(id,c.c,c.r);
-    m.hp=m.max=Math.round(m.hp*1.5);m.atk+=2;m.def+=1;m.n='Свирепый: '+m.n;m.strong=true;});
-  log('=== '+M.n+': входит '+hero.d.n+' ===');showBanner(M.n,hero.d.n+' идёт внутрь один. Победите всех — или отступите на светлые гексы.');sfx('roar');ui();
+function enterRoom(h,cell){
+  const R=G.room;if(!R||!h||!h.alive||inRoom(h.c))return;
+  const spots=G.grid.flat().filter(x=>x.zone==='start'&&x.room&&!heroAt(x.c,x.r)&&!monsterAt(x.c,x.r));
+  const f=spots[0]||(()=>{const q=freeNear(R.start[0],R.start[1]);return q?cellOf(q[0],q[1]):null;})();if(!f)return;
+  h.c=f.c;h.r=f.r;G.undo=null;G.mode=null;sfx('travel');fxQ({burst:'spawn',c:f.c,r:f.r});
+  if(!R.opened){
+    R.opened=true;
+    const want=4+(D().mon>=2?1:0)+Math.floor(DS().cnt/2);
+    let mons=shuffle(R.mon.slice());while(mons.length<want)mons.push(pick(R.mon));mons=mons.slice(0,want);
+    const sp=shuffle(G.grid.flat().filter(x=>x.room&&!x.block&&!x.zone&&!x.rexit&&!x.terr&&!x.barrel&&!heroAt(x.c,x.r)&&dist2(x.c,x.r,R.start[0],R.start[1])>=4));
+    mons.forEach((id,i)=>{const c=sp[i];if(!c)return;const m=spawnMon(id,c.c,c.r);m.hp=m.max=Math.round(m.hp*1.5);m.atk+=2;m.def+=1;m.n='Свирепый: '+m.n;m.strong=true;});
+    showBanner(R.n,'Сильные враги. Остальной отряд ходит на основной карте.');sfx('roar');
+  }
+  log(h.d.n+' входит в «'+R.n+'».');ui();
 }
-function winMini(){
-  const M=G.mini;if(!M||M.won)return;M.won=true;ach('mini');G.stats.minis=(G.stats.minis||0)+1;if(G.stats.minis>=3)ach('mini3');
+function leaveRoom(h){
+  const R=G.room;if(!R||!inRoom(h.c))return;
+  const en=G.grid.flat().find(x=>x.poi&&x.poi.n&&x.poi.entry);const ec=en||null;
+  const q=ec?freeNear(ec.c,ec.r):null;const f=q||(()=>{const all=G.grid.flat().filter(x=>!inRoom(x.c)&&!x.block&&!x.token&&!heroAt(x.c,x.r));return all.length?[all[0].c,all[0].r]:null;})();
+  if(!f)return;
+  h.c=f[0];h.r=f[1];G.undo=null;sfx('travel');log(h.d.n+' выходит из подземелья.');ui();
+}
+function winRoom(){
+  const R=G.room;if(!R||R.won)return;R.won=true;ach('mini');G.stats.minis=(G.stats.minis||0)+1;if(G.stats.minis>=3)ach('mini3');
+  const inside=G.heroes.filter(h=>h.alive&&inRoom(h.c));
   const g=evGold(35+(G.endless?G.depth*3:0));sfx('victory');fxQ({burst:'confetti',c:0,r:0});
-  G.heroes.forEach(h=>{if(h.alive)gainXP(h,3);});
-  const al=G.heroes.filter(h=>h.alive);const rare=pick(['amulet','trollheart','vampring','chain','axe','elixir']);
-  const hh=al.find(h=>canUse(h,rare))||al[0];if(hh)giveItem(hh,rare,cellOf(hh.c,hh.r));
-  log('★ '+M.n+' зачищено! +'+g+' золота, +3 опыта, награда: '+ITEMS[rare].n+'.');
+  inside.forEach(h=>gainXP(h,3));
+  const rare=pick(['amulet','trollheart','vampring','chain','axe','elixir']);
+  const hh=inside.find(h=>canUse(h,rare))||inside[0];if(hh)giveItem(hh,rare,cellOf(hh.c,hh.r));
+  log('★ '+R.n+' зачищено! +'+g+' золота, +3 опыта вошедшим, награда: '+ITEMS[rare].n+'.');
+  const en=G.grid.flat().find(x=>x.portal);if(en){en.portal=false;if(en.poi)en.poi=Object.assign({},en.poi,{done:1});}
   const ids=pickRelics(3);
-  const back=()=>{closeModal();leaveMini(true);};
-  if(!ids.length){openModal('<h1>'+M.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'.</p>',[{t:'Вернуться на карту',fn:back}]);return;}
-  openModal('<h1>'+M.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'. Выберите реликвию:</p><div class="shop">'+ids.map(id=>'<div class="item"><div class="ih"><img class="ic" src="'+RICON[id]+'"><div><b>'+RELICS[id].n+'</b><div class="ty">Реликвия</div></div></div><div class="ds">'+RELICS[id].d+'</div></div>').join('')+'</div>',
+  const back=()=>{closeModal();G.heroes.filter(h=>h.alive&&inRoom(h.c)).forEach(h=>leaveRoom(h));};
+  if(!ids.length){openModal('<h1>'+R.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'.</p>',[{t:'Вернуться на карту',fn:back}]);return;}
+  openModal('<h1>'+R.n+' зачищено!</h1><p>Золото: <b style="color:var(--gold)">+'+g+'</b>, предмет: '+ITEMS[rare].n+'. Выберите реликвию:</p><div class="shop">'+ids.map(id=>'<div class="item"><div class="ih"><img class="ic" src="'+RICON[id]+'"><div><b>'+RELICS[id].n+'</b><div class="ty">Реликвия</div></div></div><div class="ds">'+RELICS[id].d+'</div></div>').join('')+'</div>',
     ids.map(id=>({t:'Взять: '+RELICS[id].n,fn:()=>{giveRelic(id);back();}})));
-}
-function leaveMini(won){
-  const M=G.mini;if(!M)return;const s=M.st;
-  const inside=G.heroes;
-  G.grid=s.grid;G.cols=s.cols;G.rows=s.rows;G.ox=s.ox;G.oy=s.oy;G.exitCells=s.exitCells;G.startCells=s.startCells;
-  G.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));G.tele=null;G.mode=null;G.undo=null;
-  const away=s.away.map(r=>Object.assign(r,{d:HDEF[r.id]}));
-  G.heroes=s.order.map(id=>inside.find(h=>h.id===id)||away.find(h=>h.id===id)).filter(Boolean);
-  inside.forEach(h=>{h.c=s.cell[0];h.r=s.cell[1];});
-  const cell=cellOf(s.cell[0],s.cell[1]);if(won&&cell){cell.portal=false;if(cell.poi)cell.poi=Object.assign({},cell.poi,{done:1});}
-  G.sel=(inside.find(h=>h.alive)||G.heroes.find(h=>h.alive)||G.heroes[0]).id;
-  G.mini=null;log(won?'Герой возвращается на карту с добычей.':'Герой выходит из подземелья. Вход остаётся открытым.');sfx('travel');ui();
-}
-function failMini(){
-  const M=G.mini;if(!M)return;log('Герой пал в подземелье «'+M.n+'». Отряд отступает без добычи.');showBanner('Герой пал','Вход остаётся открытым');leaveMini(false);
 }
 function placeTerrain(L){
   const T=L.terr||{};
@@ -1895,7 +1905,7 @@ function newGame(){
   if(G.horde){G.keys=KEYS_NEEDED;startLoc(HORDE_LOC);nextWave();}else startLoc(1);
 }
 function startLoc(n){
-  G.loc=n;G.undo=null;G.mini=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
+  G.loc=n;G.undo=null;G.room=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
   const build=()=>{if(n===HORDE_LOC)genHorde();else if(n!==ARENA)genField(n);else genArena();G.obj=null;if(n!==ARENA&&LOCS[n].mon)rollObjective();};
   if(G.daily)withSeed(G.daily+'|'+G.depth,build);else build();
   G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;h.bless=0;h.faith=false;});
@@ -2200,7 +2210,8 @@ function moveHero(h,c,r,noFree){
 }
 function enterCell(u,hero){
   const cl=cellOf(u.c,u.r);if(!cl)return;
-  if(hero&&cl.portal&&!G.mini&&u.alive&&!G.over&&!isAI(u)&&LOCS[G.loc]&&LOCS[G.loc].mini)promptMini(u,cl);
+  if(hero&&cl.portal&&G.room&&!G.room.won&&u.alive&&!G.over&&!isAI(u))promptRoom(u,cl);
+  if(hero&&cl.rexit&&G.room&&u.alive)leaveRoom(u);
   if(cl.terr==='acid'&&hero){u.poison=Math.max(u.poison||0,2);pop(u,'ЯД','#8ae850');sfx('poison');log(u.d.n+' ступает в кислоту и отравляется!');}
   if(cl.terr==='lava'&&!u.boss){u.burn=Math.max(u.burn||0,2);pop(u,'ГОРИТ','#f80');sfx('fire');log((hero?u.d.n:u.n)+' ступает в лаву и загорается!');}
   if(hero&&cl.trap&&!cl.trap.seen){cl.trap=null;sfx('trap');pop(u,'ЛОВУШКА','#f55');log('Скрытая ловушка! '+u.d.n+' получает 4 урона и кровотечение.');hitHero(u,4,null,{pierce:true});if(u.alive)u.bleed=Math.max(u.bleed||0,2);}
@@ -2285,7 +2296,7 @@ const OBJ={
 function rollObjective(){
   const L=LOCS[G.loc];const t=pick(['leader','hunt','treasure','alarm']);
   const o=G.obj={type:t,done:false,fail:false,prog:0,goal:t==='hunt'?rnd(6,9)+(G.endless?Math.floor(G.depth/3):0):1,limit:t==='alarm'?rnd(11,15):0};
-  const empty=()=>shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!c.poi&&!c.barrel&&!monsterAt(c.c,c.r)&&dist(c.c,c.r,G.startCells[0][0],G.startCells[0][1])>=7));
+  const empty=()=>shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!c.poi&&!c.barrel&&!inRoom(c.c)&&!monsterAt(c.c,c.r)&&dist(c.c,c.r,G.startCells[0][0],G.startCells[0][1])>=7));
   if(t==='leader'){
     const base=pick(L.mon.filter(id=>MON[id]&&MON[id].hp>=6&&MON[id].mv>=1&&!MON[id].split));const c=empty()[0];
     if(c){const m=spawnMon(base,c.c,c.r);m.hp=m.max=Math.round(m.hp*2.4);m.atk+=2;m.def+=1;m.n='Вожак: '+m.n;m.elite=true;m.leader=true;m.lair=5;m.xp=m.xp*3+3;}
@@ -2311,10 +2322,10 @@ function objProgress(k){
   if(o.prog>=o.goal)objDone();
 }
 function alarmTick(){
-  const o=G.obj;if(G.mini||!o||o.type!=='alarm'||o.done)return;
+  const o=G.obj;if(!o||o.type!=='alarm'||o.done)return;
   if(G.round>o.limit){
     if(!o.fail){o.fail=true;log('ТРЕВОГА! Враги почуяли отряд — подкрепление прибывает каждый раунд!');showBanner('ТРЕВОГА!','Подкрепление врага на подходе');sfx('roar');}
-    const c=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!heroAt(c.c,c.r)&&!monsterAt(c.c,c.r)&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))[0];
+    const c=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!inRoom(c.c)&&!heroAt(c.c,c.r)&&!monsterAt(c.c,c.r)&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))[0];
     if(c){const L=LOCS[G.loc];const m=spawnMon(pick(L.mon.filter(id=>MON[id]&&!MON[id].split&&MON[id].hp<=14)),c.c,c.r);fxQ({burst:'spawn',c:c.c,r:c.r});log('Подкрепление: '+m.n+'.');}
   }
 }
@@ -2758,8 +2769,7 @@ function aiMove(h,mode){
 function checkEnd(){
   if(G.over)return true;
   if(G.horde&&G.horde.state==='fight'&&!G.camp&&G.heroes.some(h=>h.alive)&&!G.monsters.some(m=>m.alive))waveClear();
-  if(G.mini&&!G.mini.won&&G.heroes.some(h=>h.alive)&&!G.monsters.some(m=>m.alive))winMini();
-  if(G.mini&&!G.mini.won&&!G.heroes.some(h=>h.alive)&&G.mini.st.away.some(h=>h.alive)){failMini();return false;}
+  if(G.room&&G.room.opened&&!G.room.won&&G.heroes.some(h=>h.alive&&inRoom(h.c))&&!G.monsters.some(m=>m.alive&&inRoom(m.c)))winRoom();
   if(!G.heroes.some(h=>h.alive)){
     G.over=true;G.busy=true;sfx('defeat');document.body.classList.add('lost');hurtFlash();
     if(G.horde){
@@ -2839,7 +2849,6 @@ function renderCamp(){
 }
 function goNext(){
   if(G.busy||G.over||!atExit())return;
-  if(G.mini){if(!G.mini.won)leaveMini(false);return;}
   const go=()=>{ach(({1:'forest',5:'swamp',6:'poison'})[G.loc]||'forest');objProgress('exit');G.relicPending=(G.relicPending||0)+1;const out=campRest();openCamp(out);};
   if(nextOpts()[0]===ARENA&&G.keys<KEYS_NEEDED){
     const s=KEYS_NEEDED-G.keys;
@@ -2888,7 +2897,7 @@ function showIntro(){
   openModal(`<h1>ЧЁРНЫЙ ДРАКОН</h1>
   <p>Кооперативный данж-краулер. Вы ведёте отряд из четырёх героев. Классов семь: <b>Танк, Мечник, Лучник, Маг, Жрец, Разбойник и Паладин</b> — отряд выбираете перед игрой (по умолчанию классический: Танк, Мечник, Лучник, Маг).</p>
   <h2>Цель</h2>
-  <ul><li>Пройдите три локации (гекс-поля с закрытыми фишками) и найдите <b>5 ключей</b>: 2 в Тёмном лесу, 2 во второй локации (<b>Мёртвые земли</b> или <b>Гиблые топи</b> — путь выбирает хост на привале), последний хранит мини-босс третьей: <b>Ледяная королева</b> (Ледяные пещеры) или <b>Королева пауков</b> (Ядовитые катакомбы).</li><li>Особые гексы-входы («Звериное логово», «Склеп», «Алхимический погреб»…) ведут в <b>малые локации</b> с сильными врагами и щедрой наградой: входит только тот герой, кто встал на гекс.</li>
+  <ul><li>Пройдите три локации (гекс-поля с закрытыми фишками) и найдите <b>5 ключей</b>: 2 в Тёмном лесу, 2 во второй локации (<b>Мёртвые земли</b> или <b>Гиблые топи</b> — путь выбирает хост на привале), последний хранит мини-босс третьей: <b>Ледяная королева</b> (Ледяные пещеры) или <b>Королева пауков</b> (Ядовитые катакомбы).</li><li>Особые гексы-входы («Звериное логово», «Склеп», «Алхимический погреб»…) ведут в <b>малые локации</b> с сильными врагами и щедрой наградой: входит каждый герой, который встал на гекс; подземелье дорисовано справа, остальные играют на основной карте в том же раунде.</li>
   <li>Каждый ключ ломает одну печать Дракона. Можно прийти к нему раньше, но он будет сильнее.</li>
   <li>Победите Дракона в финальной битве. Если пали все герои — поражение.</li></ul>
   <h2>Ход</h2>
@@ -3185,6 +3194,7 @@ function rebuildStatic(th){
   g.beginFill(hx(th.bg));g.drawRect(0,0,W,H);g.endFill();
   const loc=G.loc;
   for(const row of G.grid)for(const cell of row){
+    if(cell.void)continue;
     const {x,y}=hc(cell.c,cell.r);
     const R=i=>{const v=Math.sin(cell.seed*1000+i*12.9898)*43758.5453;return v-Math.floor(v);};
     const base=cell.block&&!cell.barrel?th.blk:(((cell.c+cell.r)&1)?th.a:th.b);
@@ -3271,7 +3281,11 @@ function renderPixi(){
   const hl=G.hl||{move:new Map(),atk:new Set(),exp:new Set()};const hv=G.hover;
   // динамические оверлеи клеток
   for(const row of G.grid)for(const cell of row){
+    if(cell.void)continue;
     const {x,y}=hc(cell.c,cell.r);
+    if(cell.room&&!cell.block){hexFill(g,x,y,HS-.5,G.room&&G.room.opened?0x7a3aa8:0x20103a,G.room&&G.room.opened?.10:.5);}
+    if(cell.rexit){hexFill(g,x,y,HS-.5,0xffd23f,.18+.06*Math.sin(now/300));g.lineStyle(1,0xffd23f);g.drawPolygon(hexPts(x,y,HS-3));g.lineStyle(0);T('НАЗАД',x,y+HS+9,7,'#ffd23f');}
+    if(cell.portal&&!G.over){g.lineStyle(2,0xc58bff,.5+.3*Math.sin(now/260));g.drawPolygon(hexPts(x,y,HS-2));g.lineStyle(0);}
     if(cell.terr==='lava'){hexFill(g,x,y,HS-1.5,(255<<16)|(Math.round(90+40*Math.sin(now/300+cell.seed*9))<<8)|20,.55);
       g.beginFill(0xffd23f);g.drawRect(Math.round(x-6+cell.seed*8),Math.round(y-2),2,2);g.drawRect(Math.round(x+4-cell.seed*6),Math.round(y+4),2,2);g.endFill();}
     else if(cell.terr==='acid'){hexFill(g,x,y,HS-1.5,0x3ab52a,.42+.1*Math.sin(now/400+cell.seed*9));
@@ -3280,6 +3294,7 @@ function renderPixi(){
       g.lineStyle(1,ice?0xffffff:0x78aa6e,.6);g.moveTo(x-7,y+2);g.quadraticCurveTo(x-3,y-1,x,y+2);g.quadraticCurveTo(x+3,y+5,x+7,y+2);g.lineStyle(0);}
     if(cell.zone==='exit'){hexFill(g,x,y,HS-.5,0xffd23f,.16+.06*Math.sin(now/300));g.lineStyle(1,0xffd23f);g.drawPolygon(hexPts(x,y,HS-3));g.lineStyle(0);}
   }
+  if(G.room){const p=hc(G.room.c0+Math.floor(G.room.cols/2),G.room.r0);T(G.room.n+(G.room.won?' · зачищено':G.room.opened?'':' · закрыто'),p.x,p.y-HS-2,7,'#d8b0ff');}
   hl.move.forEach((cost,k)=>{const [c,r]=k.split(',').map(Number);const {x,y}=hc(c,r);hexFill(g,x,y,HS-2,0x6ed2ff,.22);});
   if(hl.abil)hl.abil.forEach((v,k)=>{const [c,r]=k.split(',').map(Number);const {x,y}=hc(c,r);hexFill(g,x,y,HS-2,0xffdc50,.2+.14*Math.sin(now/150));g.lineStyle(2,0xffd23f);g.drawPolygon(hexPts(x,y,HS-2));g.lineStyle(0);});
   if(G.tele)G.tele.cells.forEach(k=>{const [c,r]=k.split(',').map(Number);const {x,y}=hc(c,r);
@@ -3434,6 +3449,7 @@ function renderCanvas(){
   const hl=G.hl||{move:new Map(),atk:new Set(),exp:new Set()};
   const hv=G.hover;
   for(const row of G.grid)for(const cell of row){
+    if(cell.void)continue;
     const {x,y}=hc(cell.c,cell.r);
     hexPath(x,y,HS-0.5);
     ctx.fillStyle=cell.block&&!cell.barrel?th.blk:(((cell.c+cell.r)&1)?th.a:th.b);ctx.fill();
@@ -3531,8 +3547,9 @@ function renderTop(){
   const relH=(G.relics&&G.relics.length)?'<span class="relics">'+G.relics.map(id=>'<img class="ric" src="'+RICON[id]+'" data-tn="'+esc(RELICS[id].n)+'" data-tc="Реликвия" data-tip="'+esc(RELICS[id].d)+'">').join('')+'</span>':'';
   const ot=objText();const objH=ot?'<span class="chip obj '+ot.st+'" data-tn="Цель: '+esc(ot.n)+'" data-tip="'+esc(ot.d)+' Награда: золото и реликвия.">'+(ot.st==='ok'?'✓ ':ot.st==='bad'?'✗ ':'◎ ')+esc(ot.n)+(ot.prog?' '+ot.prog:'')+'</span>':'';
   const uh=G.undo&&G.heroes.find(h=>h.id===G.undo.h);const undoH=uh&&uh.alive&&mine(uh)?'<button class="btn" data-act="undo" data-tip="Вернуть героя на прежнее место и вернуть потраченные очки действия. Работает, пока ход ничем не отозвался (бой, находка, ловушка).">↶ Отмена хода</button>':'';
-  const exH=hasExit()?(atExit()?'<button class="btn act" data-act="next">'+(G.mini?'Отступить ◀':'Дальше ▶')+'</button>':'<span class="chip">Выход '+G.heroes.filter(h=>h.alive&&cellOf(h.c,h.r).zone==='exit').length+'/'+G.heroes.filter(h=>h.alive).length+'</span>'):'';
-  $('#top').innerHTML='<span class="loc">'+L.n+(G.mini?' · '+G.mini.n:'')+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+undoH+exH+
+  const roomH=(G.room&&G.room.opened&&!G.room.won)?'<span class="chip" data-tn="'+esc(G.room.n)+'" data-tip="Подземелье справа на карте. Враги внутри: '+G.monsters.filter(m=>m.alive&&inRoom(m.c)).length+'. Героев внутри: '+G.heroes.filter(h=>h.alive&&inRoom(h.c)).length+'." style="color:#d8b0ff;border-color:#5f2d8f">⛏ '+esc(G.room.n)+' · врагов '+G.monsters.filter(m=>m.alive&&inRoom(m.c)).length+'</span>':'';
+  const exH=hasExit()?(atExit()?'<button class="btn act" data-act="next">Дальше ▶</button>':'<span class="chip">Выход '+G.heroes.filter(h=>h.alive&&cellOf(h.c,h.r).zone==='exit').length+'/'+G.heroes.filter(h=>h.alive).length+'</span>'):'';
+  $('#top').innerHTML='<span class="loc">'+L.n+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+roomH+undoH+exH+
    netTop()+
    '<button class="btn" data-act="quit">Выход</button><button class="btn" data-act="rules">?</button><button class="btn" data-act="settings" data-tip="Скорость анимаций, размер интерфейса, громкость, палитра для дальтоников, меньше эффектов">⚙</button><button class="btn" data-act="music">'+(MUSIC?'♪ Музыка':'♪ выкл')+'</button><button class="btn" data-act="mute">'+(MUTE?'🔇 выкл':'🔊 Звук')+'</button>';
 }
@@ -3648,7 +3665,8 @@ function describe(cell){
   const h=heroAt(cell.c,cell.r);
   if(h){inf.innerHTML='<b>'+h.d.n+'</b> ур.'+h.lv+' · HP '+h.hp+'/'+st(h,'maxhp')+' · АТК '+st(h,'atk')+' · ЗАЩ '+st(h,'def')+lootTxt;return;}
   if(lootTxt){inf.innerHTML='<b>Предметы на земле</b>'+lootTxt+'<br><span style="color:var(--mid)">Встаньте на гекс — подходящий предмет подберётся сам (если есть место).</span>';return;}
-  if(cell.portal&&!G.mini){inf.innerHTML='<b>Вход: '+(cell.poi?cell.poi.n:'подземелье')+'</b><br><span style="color:var(--mid)">Встаньте на этот гекс — войдёт только тот герой, кто на него встал. Внутри сильные враги и щедрая награда.</span>';return;}
+  if(cell.portal){inf.innerHTML='<b>Вход: '+(cell.poi?cell.poi.n:'подземелье')+'</b><br><span style="color:var(--mid)">Встаньте на этот гекс — герой окажется в подземелье справа на карте (остальные продолжают ходить, раунд общий). Внутри сильные враги и щедрая награда.</span>';return;}
+  if(cell.rexit){inf.innerHTML='<b>Выход из подземелья</b><br><span style="color:var(--mid)">Встаньте сюда, чтобы вернуться на основную карту.</span>';return;}
   if(cell.token){inf.innerHTML='<b>Скрытая фишка'+(cell.poi?' — '+cell.poi.n:'')+'</b><br><span style="color:var(--mid)">Может скрывать монстра, предмет, ключ или событие. Откройте, стоя рядом (1 ОД).</span>';return;}
   if(cell.zone==='exit'){inf.innerHTML='<b>Выход</b><br><span style="color:var(--mid)">Все живые герои должны встать на светлые гексы, затем «Дальше».</span>';return;}
   if(cell.zone==='start'){inf.innerHTML='<b>Стартовая зона</b>';return;}
@@ -3725,13 +3743,13 @@ function runCmd(cmd,who){
 /* --- снимок состояния --- */
 function makeSnap(){
   return {
-    loc:G.loc,round:G.round,keys:G.keys,busy:G.busy,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,
-    grid:G.grid.map(row=>row.map(c=>({b:c.block,d:c.deco,s:c.seed,z:c.zone,dr:c.dragon,p:c.poi?{n:c.poi.n,spr:c.poi.spr}:null,t:c.token?1:0,lt:c.loot&&c.loot.length?c.loot:undefined,tr:c.terr||undefined,br:c.barrel?1:undefined,pt:c.portal?1:undefined,tp:c.trap&&c.trap.seen?1:undefined}))),
+    loc:G.loc,round:G.round,keys:G.keys,busy:G.busy,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,ww:G.ww,wh:G.wh,
+    grid:G.grid.map(row=>row.map(c=>({b:c.block,d:c.deco,s:c.seed,z:c.zone,dr:c.dragon,p:c.poi?{n:c.poi.n,spr:c.poi.spr}:null,t:c.token?1:0,lt:c.loot&&c.loot.length?c.loot:undefined,tr:c.terr||undefined,br:c.barrel?1:undefined,pt:c.portal?1:undefined,vd:c.void?1:undefined,rm:c.room?1:undefined,rx:c.rexit?1:undefined,tp:c.trap&&c.trap.seen?1:undefined}))),
     heroes:G.heroes.map(h=>{const {d,...rest}=h;return rest;}),
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,mini:G.mini?{n:G.mini.n,won:G.mini.won}:null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
@@ -3747,9 +3765,9 @@ function schedSnap(){
 }
 function applySnap(s){
   const old=G;
-  const ng={loc:s.loc,round:s.round,keys:s.keys,busy:s.busy,over:s.over,cols:s.cols,rows:s.rows,ox:s.ox,oy:s.oy,log:s.log,stats:s.stats,ready:s.ready,
+  const ng={loc:s.loc,round:s.round,keys:s.keys,busy:s.busy,over:s.over,cols:s.cols,rows:s.rows,ox:s.ox,oy:s.oy,ww:s.ww,wh:s.wh,log:s.log,stats:s.stats,ready:s.ready,
     exitCells:s.exitCells,startCells:s.startCells,fx:old.fx||[],hover:old.hover||null,mode:null,sel:old.sel||'sword',tele:null,monsters:[],dragon:null,hl:null};
-  ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,portal:!!c.pt,trap:c.tp?{seen:true}:null})));
+  ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,portal:!!c.pt,void:!!c.vd,room:!!c.rm,rexit:!!c.rx,trap:c.tp?{seen:true}:null})));
   ng.heroes=s.heroes.map(h=>Object.assign(h,{d:HDEF[h.id]}));
   if(!ng.heroes.some(h=>h.id===ng.sel))ng.sel=ng.heroes[0].id;
   ng.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));
@@ -3757,7 +3775,7 @@ function applySnap(s){
   if(s.tele)ng.tele={cells:new Set(s.tele),flash:0};
   Object.assign(ng,s.ext||{});ng.showInt=old.showInt;
   if(old.loc!==s.loc&&s.loc>0&&LOC_SUB[s.loc])showBanner(LOCS[s.loc].n,LOC_SUB[s.loc]);
-  G=ng;NET.owners=s.owners;NET.players=s.players;NET.freeAI=s.freeAI;
+  G=ng;syncWorld();NET.owners=s.owners;NET.players=s.players;NET.freeAI=s.freeAI;
   if(old.mode){const h=G.heroes.find(x=>x.id===old.mode.h.id);if(h)G.mode={spec:old.mode.spec,ref:old.mode.ref,h,valid:new Map()};}
   if(!NET.selInit){NET.selInit=true;const m=G.heroes.find(h=>h.alive&&mine(h));if(m)G.sel=m.id;}
   const now=performance.now();
@@ -4135,7 +4153,7 @@ function packG(){
   return {loc:G.loc,round:G.round,keys:G.keys,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,grid:G.grid,
     heroes:G.heroes.map(({d,...r})=>r),monsters:G.monsters.map(({hit,...r})=>r),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,tele:G.tele?[...G.tele.cells]:null,
-    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,mini:G.mini||null,daily:G.daily||null,horde:G.horde||null};
+    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
 }
 function unpackG(g){
   const ng=Object.assign({},g,{fx:[],hover:null,mode:null,hl:null,busy:false,ready:{}});
@@ -4143,7 +4161,7 @@ function unpackG(g){
   ng.monsters=g.monsters.map(m=>Object.assign(m,{hit:new Set()}));
   ng.dragon=g.dragon>=0?ng.monsters[g.dragon]:null;
   ng.tele=g.tele?{cells:new Set(g.tele),flash:0}:null;
-  G=ng;
+  G=ng;syncWorld();
 }
 function saveSess(){
   if(NET.quitting)return;
