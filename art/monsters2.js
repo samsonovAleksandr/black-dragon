@@ -1,0 +1,89 @@
+/* Монстры, партия 2: Мёртвые земли */
+ART.dknight=()=>{const c=tankFn({legs:'darkplate',armor:'darkplate',edge:'steel',cape:'crimson',shield:'black',trim:'crimson',plume:'crimson',eye:'#ff4040'});return c;};
+ART.orc=()=>mkArt({parts:[
+ {t:'c',x:11,y:27,w:6,h:7,m:'leather'},{t:'c',x:19,y:27,w:6,h:7,m:'leather'},{t:'r',x:10,y:32,w:8,h:3,m:'dark'},{t:'r',x:18,y:32,w:8,h:3,m:'dark'},
+ {t:'e',cx:18,cy:22,rx:11,ry:9,m:'orcgreen'},{t:'p',pts:[[10,17],[26,17],[24,26],[12,26]],m:'leather'},{t:'r',x:11,y:25,w:14,h:3,m:'brown'},{t:'r',x:16,y:25,w:4,h:3,m:'gold'},{t:'r',x:17,y:18,w:2,h:7,m:'dark'},
+ {t:'e',cx:6,cy:24,rx:3.6,ry:6,m:'orcgreen'},{t:'e',cx:30,cy:24,rx:3.6,ry:6,m:'orcgreen'},{t:'r',x:3,y:26,w:6,h:3,m:'steelD'},{t:'r',x:27,y:26,w:6,h:3,m:'steelD'},
+ {t:'e',cx:7,cy:16,rx:5,ry:4,m:'steel'},{t:'e',cx:29,cy:16,rx:5,ry:4,m:'steel'},{t:'px',x:5,y:14,c:'#d2dcf0'},{t:'px',x:7,y:12,c:'#d2dcf0'},{t:'px',x:29,y:12,c:'#d2dcf0'},{t:'px',x:31,y:14,c:'#d2dcf0'},
+ {t:'e',cx:18,cy:10,rx:7,ry:6.5,m:'orcgreen'},{t:'e',cx:18,cy:14,rx:6,ry:3.2,m:'orcgreen',b:-.05},{t:'r',x:12,y:8,w:12,h:2,m:'dark'},
+ {t:'px',x:15,y:9,c:'#ff4040'},{t:'px',x:21,y:9,c:'#ff4040'},{t:'r',x:17,y:11,w:2,h:2,m:'orcgreen',b:-.25},{t:'r',x:14,y:15,w:8,h:1,m:'dark'},
+ {t:'p',pts:[[13,15],[12,10],[15,14]],m:'bone'},{t:'p',pts:[[23,15],[24,10],[21,14]],m:'bone'},
+ {t:'p',pts:[[14,4],[18,0],[22,4],[20,6],[16,6]],m:'dark'},
+ {t:'l',x0:33,y0:33,x1:33,y1:8,w:2,m:'wood',k:.6},{t:'p',pts:[[28,3],[35,1],[36,12],[29,11],[31,7]],m:'steel'},{t:'l',x0:30,y0:4,x1:35,y1:3,w:1,m:'white',k:.9},
+]});
+ART.necro=()=>mkArt({parts:[
+ {t:'p',pts:[[12,13],[24,13],[30,34],[27,31],[24,35],[21,31],[18,35],[15,31],[12,35],[9,31],[6,34]],m:'black',b:.1},
+ {t:'p',pts:[[13,13],[16,13],[11,34],[6,34]],m:'purple',b:-.25},{t:'p',pts:[[18,16],[19,16],[22,34],[14,34]],m:'black',b:-.3},
+ {t:'r',x:12,y:24,w:12,h:1,m:'bone'},{t:'e',cx:18,cy:23,rx:2,ry:2,m:'slime'},
+ {t:'e',cx:9,cy:19,rx:3,ry:4.5,m:'black'},{t:'e',cx:27,cy:19,rx:3,ry:4.5,m:'black'},{t:'r',x:7,y:22,w:4,h:4,m:'bone'},{t:'px',x:8,y:25,c:'#05030a'},{t:'px',x:10,y:25,c:'#05030a'},
+ {t:'e',cx:18,cy:10,rx:7.4,ry:8,m:'black'},{t:'e',cx:18,cy:11,rx:4.6,ry:5,m:'bone'},{t:'e',cx:16,cy:10.5,rx:1.6,ry:1.8,m:'black'},{t:'e',cx:20.5,cy:10.5,rx:1.6,ry:1.8,m:'black'},
+ {t:'px',x:16,y:10,c:'#7dff7d'},{t:'px',x:20,y:10,c:'#7dff7d'},{t:'r',x:15,y:14,w:6,h:1,m:'bone',b:-.3},{t:'cut',x:16,y:14,w:1,h:1},{t:'cut',x:18,y:14,w:1,h:1},{t:'cut',x:20,y:14,w:1,h:1},
+ {t:'p',pts:[[18,1],[25,6],[11,6]],m:'black',b:.1},
+ {t:'l',x0:31,y0:34,x1:31,y1:8,w:2,m:'bone',k:.55},{t:'e',cx:31,cy:7,rx:3.4,ry:3.6,m:'bone'},{t:'px',x:30,y:7,c:'#05030a'},{t:'px',x:32,y:7,c:'#05030a'},
+ {t:'p',pts:[[30,5],[31,0],[33,5]],m:'slime',b:.2},{t:'px',x:28,y:2,c:'#7dff7d'},{t:'px',x:34,y:3,c:'#7dff7d'},
+]});
+ART.troll=()=>mkArt({parts:[
+ {t:'c',x:10,y:28,w:6,h:6,m:'trollskin'},{t:'c',x:20,y:28,w:6,h:6,m:'trollskin'},{t:'r',x:9,y:32,w:8,h:3,m:'dark'},{t:'r',x:19,y:32,w:8,h:3,m:'dark'},
+ {t:'e',cx:18,cy:23,rx:12,ry:10.5,m:'trollskin'},{t:'e',cx:18,cy:20,rx:9,ry:6,m:'trollskin',b:.14},{t:'e',cx:19,cy:28,rx:8,ry:4.5,m:'trollskin',b:.05},
+ {t:'p',pts:[[10,26],[26,26],[27,32],[9,32]],m:'leather'},{t:'r',x:9,y:26,w:18,h:2,m:'brown'},
+ {t:'e',cx:6,cy:17,rx:5.4,ry:4.4,m:'trollskin',b:.05},{t:'e',cx:30,cy:17,rx:5.4,ry:4.4,m:'trollskin',b:.05},
+ {t:'e',cx:5,cy:25,rx:3.6,ry:8,m:'trollskin'},{t:'e',cx:31,cy:25,rx:3.6,ry:8,m:'trollskin'},{t:'e',cx:5,cy:33,rx:3.6,ry:2.4,m:'trollskin'},{t:'e',cx:33,cy:31,rx:3.6,ry:2.4,m:'trollskin'},
+ {t:'e',cx:18,cy:10,rx:6,ry:5.4,m:'trollskin'},{t:'e',cx:18,cy:12.5,rx:3.4,ry:2.8,m:'trollskin',b:.12},{t:'px',x:15,y:9,c:'#ffe27a'},{t:'px',x:21,y:9,c:'#ffe27a'},{t:'r',x:14,y:8,w:3,h:1,m:'dark'},{t:'r',x:20,y:8,w:3,h:1,m:'dark'},
+ {t:'r',x:14,y:15,w:8,h:1,m:'dark'},{t:'p',pts:[[14,15],[15,12],[16,15]],m:'bone'},{t:'p',pts:[[22,15],[21,12],[20,15]],m:'bone'},
+ {t:'e',cx:14,cy:5,rx:3,ry:2.5,m:'moss'},{t:'e',cx:19,cy:4,rx:3.4,ry:2.6,m:'moss'},{t:'e',cx:23,cy:6,rx:2.6,ry:2.2,m:'moss'},
+ {t:'l',x0:33,y0:30,x1:34,y1:6,w:4,m:'wood',k:.55},{t:'e',cx:34,cy:6,rx:4,ry:5,m:'wood'},{t:'px',x:32,y:4,c:'#cfd6e8'},{t:'px',x:36,y:8,c:'#cfd6e8'},
+ {t:'px',x:12,y:22,c:'#8ae890'},{t:'px',x:24,y:19,c:'#8ae890'},{t:'px',x:16,y:29,c:'#8ae890'},
+]});
+ART.ghost=()=>mkArt({parts:[
+ {t:'p',pts:[[10,13],[26,13],[28,26],[27,32],[24,28],[21,33],[18,28],[15,33],[12,28],[9,32],[8,26]],m:'spirit'},
+ {t:'p',pts:[[10,14],[15,14],[13,28],[9,32],[8,26]],m:'spirit',b:.12},
+ {t:'e',cx:18,cy:12,rx:8.5,ry:8,m:'spirit',b:.08},
+ {t:'p',pts:[[8,17],[1,25],[4,28],[10,23]],m:'spirit'},{t:'p',pts:[[28,17],[35,25],[32,28],[26,23]],m:'spirit'},
+ {t:'e',cx:14.5,cy:11,rx:2.4,ry:3.2,m:'black'},{t:'e',cx:21.5,cy:11,rx:2.4,ry:3.2,m:'black'},{t:'px',x:14,y:10,c:'#9affff'},{t:'px',x:21,y:10,c:'#9affff'},
+ {t:'e',cx:18,cy:17.5,rx:2.6,ry:3.2,m:'black'},{t:'px',x:3,y:26,c:'#ffffff'},{t:'px',x:32,y:26,c:'#ffffff'},{t:'px',x:6,y:5,c:'#cde0ff'},{t:'px',x:30,y:6,c:'#cde0ff'},
+]});
+ART.ogre=()=>mkArt({parts:[
+ {t:'c',x:10,y:28,w:7,h:6,m:'ogreskin'},{t:'c',x:19,y:28,w:7,h:6,m:'ogreskin'},{t:'r',x:9,y:32,w:9,h:3,m:'leather'},{t:'r',x:18,y:32,w:9,h:3,m:'leather'},
+ {t:'e',cx:18,cy:22,rx:14,ry:11,m:'ogreskin'},{t:'e',cx:18,cy:25,rx:9,ry:6,m:'ogreskin',b:.1},{t:'p',pts:[[8,27],[28,27],[26,33],[10,33]],m:'leather'},{t:'r',x:7,y:26,w:22,h:2,m:'brown'},{t:'r',x:17,y:26,w:3,h:2,m:'gold'},
+ {t:'e',cx:5,cy:22,rx:4.2,ry:6.5,m:'ogreskin'},{t:'e',cx:31,cy:22,rx:4.2,ry:6.5,m:'ogreskin'},
+ {t:'e',cx:18,cy:10,rx:5.8,ry:5.5,m:'ogreskin'},{t:'e',cx:18,cy:13,rx:5,ry:3,m:'ogreskin',b:-.05},
+ {t:'px',x:15,y:9,c:'#ff5030'},{t:'px',x:21,y:9,c:'#ff5030'},{t:'r',x:14,y:8,w:3,h:1,m:'dark'},{t:'r',x:20,y:8,w:3,h:1,m:'dark'},{t:'r',x:14,y:14,w:8,h:1,m:'dark'},{t:'px',x:15,y:15,c:'#fff'},{t:'px',x:21,y:15,c:'#fff'},
+ {t:'p',pts:[[12,5],[10,0],[14,4]],m:'bone'},{t:'p',pts:[[24,5],[26,0],[22,4]],m:'bone'},
+ {t:'l',x0:33,y0:32,x1:34,y1:8,w:4,m:'wood',k:.55},{t:'e',cx:34,cy:8,rx:3.6,ry:5.5,m:'wood'},{t:'px',x:31,y:7,c:'#cfd6e8'},{t:'px',x:36,y:5,c:'#cfd6e8'},{t:'px',x:36,y:10,c:'#cfd6e8'},
+]});
+ART.wraith=()=>mkArt({parts:[
+ {t:'p',pts:[[11,12],[25,12],[29,27],[26,34],[23,30],[20,35],[17,30],[14,35],[11,30],[8,34],[7,27]],m:'wraithc'},
+ {t:'p',pts:[[11,13],[16,13],[11,30],[8,34],[7,27]],m:'wraithc',b:.14},
+ {t:'p',pts:[[12,2],[24,2],[27,12],[23,16],[18,13],[13,16],[9,12]],m:'wraithc'},{t:'e',cx:18,cy:10,rx:5.5,ry:5.2,m:'black'},
+ {t:'e',cx:16,cy:9.5,rx:1.6,ry:2,m:'glow'},{t:'e',cx:20.5,cy:9.5,rx:1.6,ry:2,m:'glow'},{t:'px',x:16,y:9,c:'#ffffff'},{t:'px',x:20,y:9,c:'#ffffff'},
+ {t:'e',cx:18,cy:14,rx:2.4,ry:1.8,m:'black'},
+ {t:'p',pts:[[9,18],[2,24],[3,28],[11,24]],m:'bone'},{t:'p',pts:[[27,18],[34,24],[33,28],[25,24]],m:'bone'},{t:'px',x:3,y:29,c:'#cde0ff'},{t:'px',x:33,y:29,c:'#cde0ff'},
+ {t:'px',x:6,y:8,c:'#a070e0'},{t:'px',x:30,y:6,c:'#a070e0'},{t:'px',x:4,y:16,c:'#a070e0'},
+]});
+const golemFn=c=>mkArt({parts:[
+ {t:'r',x:11,y:27,w:6,h:8,m:c.s},{t:'r',x:19,y:27,w:6,h:8,m:c.s},{t:'r',x:10,y:32,w:8,h:3,m:c.s2},{t:'r',x:18,y:32,w:8,h:3,m:c.s2},
+ {t:'r',x:8,y:12,w:20,h:17,m:c.s},{t:'r',x:11,y:15,w:14,h:10,m:c.s2},{t:'r',x:8,y:12,w:20,h:2,m:c.s,b:.15},
+ {t:'e',cx:6,cy:15,rx:5,ry:5,m:c.s},{t:'e',cx:30,cy:15,rx:5,ry:5,m:c.s},
+ {t:'r',x:1,y:16,w:6,h:14,m:c.s},{t:'r',x:29,y:16,w:6,h:14,m:c.s},{t:'r',x:0,y:29,w:8,h:5,m:c.s2},{t:'r',x:28,y:29,w:8,h:5,m:c.s2},
+ {t:'r',x:13,y:3,w:10,h:9,m:c.s},{t:'r',x:14,y:7,w:8,h:2,m:'black'},{t:'px',x:15,y:7,c:c.glow},{t:'px',x:16,y:7,c:c.glow},{t:'px',x:20,y:7,c:c.glow},{t:'px',x:21,y:7,c:c.glow},
+ {t:'p',pts:[[18,16],[21,20],[18,24],[15,20]],m:'black'},{t:'p',pts:[[18,17],[20,20],[18,23],[16,20]],m:c.rune},
+ {t:'e',cx:11,cy:14,rx:2,ry:1.4,m:c.moss},{t:'e',cx:26,cy:26,rx:2.4,ry:1.6,m:c.moss},{t:'e',cx:4,cy:20,rx:1.6,ry:2,m:c.moss},{t:'e',cx:15,cy:4,rx:2,ry:1.2,m:c.moss},
+ {t:'l',x0:9,y0:20,x1:11,y1:25,w:1,m:'black',k:.3},{t:'l',x0:26,y0:14,x1:24,y1:18,w:1,m:'black',k:.3},
+]});
+ART.golem=()=>golemFn({s:'stone',s2:'gray',glow:'#5cd6e8',rune:'glow',moss:'moss'});
+ART.cultist=()=>mkArt({parts:[
+ {t:'p',pts:[[12,14],[24,14],[28,34],[8,34]],m:'bloodrobe'},{t:'p',pts:[[12,14],[16,14],[12,34],[8,34]],m:'bloodrobe',b:.12},{t:'p',pts:[[17,18],[19,18],[21,34],[15,34]],m:'black',b:.1},
+ {t:'r',x:11,y:24,w:14,h:2,m:'black'},{t:'e',cx:18,cy:25,rx:2.2,ry:2.2,m:'orange'},{t:'px',x:18,y:25,c:'#ffe070'},{t:'r',x:8,y:32,w:20,h:2,m:'black'},
+ {t:'e',cx:9,cy:19,rx:3,ry:5,m:'bloodrobe'},{t:'e',cx:27,cy:19,rx:3,ry:5,m:'bloodrobe'},{t:'e',cx:7,cy:24,rx:2.2,ry:2.2,m:'skin'},{t:'e',cx:29,cy:23,rx:2.2,ry:2.2,m:'skin'},
+ {t:'e',cx:18,cy:9,rx:7,ry:8,m:'bloodrobe'},{t:'e',cx:18,cy:11,rx:4.6,ry:5,m:'white'},{t:'r',x:14,y:9,w:3,h:2,m:'black'},{t:'r',x:20,y:9,w:3,h:2,m:'black'},{t:'px',x:15,y:10,c:'#ff7a30'},{t:'px',x:21,y:10,c:'#ff7a30'},
+ {t:'r',x:17,y:11,w:2,h:3,m:'crimson'},{t:'r',x:15,y:15,w:6,h:1,m:'black'},{t:'p',pts:[[18,0],[25,6],[11,6]],m:'bloodrobe',b:.05},
+ {t:'p',pts:[[29,20],[31,12],[33,20]],m:'steel'},{t:'r',x:29,y:20,w:4,h:2,m:'gold'},{t:'e',cx:7,cy:27,rx:2.4,ry:2.4,m:'orange'},{t:'px',x:7,y:26,c:'#ffe070'},{t:'px',x:5,y:23,c:'#ff9a40'},{t:'px',x:9,y:22,c:'#ff9a40'},
+]});
+ART.gargoyle=()=>mkArt({parts:[
+ {t:'p',pts:[[8,12],[1,4],[3,18],[6,24],[11,20]],m:'stone',b:-.1},{t:'p',pts:[[28,12],[35,4],[33,18],[30,24],[25,20]],m:'stone',b:-.1},{t:'l',x0:9,y0:13,x1:2,y1:6,w:1,m:'black',k:.3},{t:'l',x0:27,y0:13,x1:34,y1:6,w:1,m:'black',k:.3},
+ {t:'c',x:10,y:28,w:5,h:6,m:'stone'},{t:'c',x:21,y:28,w:5,h:6,m:'stone'},{t:'r',x:9,y:32,w:7,h:3,m:'gray'},{t:'r',x:20,y:32,w:7,h:3,m:'gray'},{t:'px',x:10,y:35,c:'#05030a'},{t:'px',x:14,y:35,c:'#05030a'},
+ {t:'e',cx:18,cy:23,rx:9,ry:9,m:'stone'},{t:'e',cx:9,cy:22,rx:3,ry:5,m:'stone'},{t:'e',cx:27,cy:22,rx:3,ry:5,m:'stone'},{t:'r',x:7,y:25,w:5,h:2,m:'gray'},{t:'r',x:25,y:25,w:5,h:2,m:'gray'},
+ {t:'e',cx:18,cy:12,rx:7,ry:6.5,m:'stone'},{t:'p',pts:[[11,8],[8,1],[14,6]],m:'bone'},{t:'p',pts:[[25,8],[28,1],[22,6]],m:'bone'},
+ {t:'r',x:13,y:10,w:4,h:2,m:'black'},{t:'r',x:20,y:10,w:4,h:2,m:'black'},{t:'px',x:15,y:11,c:'#ff4040'},{t:'px',x:21,y:11,c:'#ff4040'},{t:'r',x:14,y:16,w:8,h:2,m:'black'},{t:'px',x:15,y:17,c:'#fff'},{t:'px',x:20,y:17,c:'#fff'},
+ {t:'l',x0:26,y0:30,x1:34,y1:26,w:2,m:'stone',k:.5},{t:'px',x:34,y:25,c:'#8a909e'},
+]});

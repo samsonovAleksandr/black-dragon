@@ -1,0 +1,22 @@
+# systemd: автозапуск сервера «Чёрного Дракона»
+# Установка: sudo cp deploy/black-dragon.service /etc/systemd/system/
+#            sudo systemctl daemon-reload && sudo systemctl enable --now black-dragon
+# Логи:      journalctl -u black-dragon -f
+# Перезапуск после правок server.js: sudo systemctl restart black-dragon
+# (правки index.html подхватываются без перезапуска)
+
+[Unit]
+Description=Black Dragon game server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=sima
+WorkingDirectory=/home/sima/stack/BlackDragon/server
+Environment=PORT=8090
+ExecStart=/home/sima/.local/bin/node server.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
