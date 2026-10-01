@@ -128,7 +128,7 @@ canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block;curso
 @keyframes hf{from{opacity:1}to{opacity:0}}
 body.lost #stage{filter:grayscale(.9) brightness(.65);transition:filter 1.6s}
 .sum{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0}
-.shs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.shs{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;margin-top:6px}
 .sh{display:flex;flex-direction:column;align-items:center;gap:2px;background:#0d0818;border:1px solid var(--line);padding:6px 2px}
 .sh img{width:48px;height:48px;image-rendering:pixelated}.sh b{font-family:var(--pf);font-size:7px}.sh span{color:var(--mid);font-size:12px}
 .logo{display:flex;justify-content:center}
@@ -1098,6 +1098,17 @@ ART.spiderqueen=()=>mkArt({w:44,h:44,parts:[
  {t:'p',pts:[[17,21],[19,21],[18,26]],m:'bone'},{t:'p',pts:[[25,21],[27,21],[26,26]],m:'bone'},{t:'px',x:18,y:26,c:'#8ae850'},{t:'px',x:26,y:26,c:'#8ae850'},
  {t:'p',pts:[[15,12],[17,6],[19,10],[22,3],[25,10],[27,6],[29,12]],m:'gold'},{t:'r',x:15,y:11,w:14,h:2,m:'gold',b:-.1},{t:'px',x:22,y:6,c:'#d84848'},{t:'px',x:17,y:9,c:'#4a88ec'},{t:'px',x:27,y:9,c:'#4a88ec'},
 ]});
+ART.mimic=()=>mkArt({parts:[
+ {t:'c',x:7,y:31,w:4,h:4,m:'mud',b:-.1},{t:'c',x:25,y:31,w:4,h:4,m:'mud',b:-.1},{t:'c',x:16,y:32,w:4,h:3,m:'mud',b:-.1},
+ {t:'r',x:5,y:19,w:26,h:13,m:'wood'},{t:'r',x:5,y:19,w:26,h:2,m:'leather'},{t:'r',x:5,y:29,w:26,h:2,m:'leather'},{t:'r',x:5,y:19,w:2,h:13,m:'gold',b:-.1},{t:'r',x:29,y:19,w:2,h:13,m:'gold',b:-.1},{t:'r',x:16,y:20,w:4,h:6,m:'gold'},{t:'px',x:18,y:23,c:'#3a2a10'},
+ {t:'r',x:7,y:22,w:22,h:7,m:'black'},
+ {t:'p',pts:[[8,22],[10,22],[9,27]],m:'white'},{t:'p',pts:[[12,22],[14,22],[13,27]],m:'white'},{t:'p',pts:[[22,22],[24,22],[23,27]],m:'white'},{t:'p',pts:[[26,22],[28,22],[27,27]],m:'white'},
+ {t:'p',pts:[[9,29],[11,29],[10,24]],m:'white'},{t:'p',pts:[[15,29],[17,29],[16,24]],m:'white'},{t:'p',pts:[[19,29],[21,29],[20,24]],m:'white'},{t:'p',pts:[[25,29],[27,29],[26,24]],m:'white'},
+ {t:'e',cx:18,cy:27,rx:5,ry:2.4,m:'crimson'},{t:'r',x:17,y:25,w:2,h:5,m:'red',b:-.1},
+ {t:'p',pts:[[3,19],[33,19],[31,7],[5,7]],m:'wood'},{t:'r',x:3,y:6,w:30,h:3,m:'leather'},{t:'r',x:3,y:17,w:30,h:2,m:'leather'},{t:'r',x:3,y:6,w:2,h:13,m:'gold',b:-.1},{t:'r',x:31,y:6,w:2,h:13,m:'gold',b:-.1},
+ {t:'p',pts:[[8,17],[10,17],[9,12]],m:'white'},{t:'p',pts:[[14,17],[16,17],[15,12]],m:'white'},{t:'p',pts:[[20,17],[22,17],[21,12]],m:'white'},{t:'p',pts:[[26,17],[28,17],[27,12]],m:'white'},
+ {t:'e',cx:12,cy:11,rx:2.4,ry:2.6,m:'yellow'},{t:'e',cx:24,cy:11,rx:2.4,ry:2.6,m:'yellow'},{t:'r',x:12,y:10,w:1,h:3,m:'black'},{t:'r',x:24,y:10,w:1,h:3,m:'black'},
+]});
 /* Декорации и Дракон */
 const leafBlob=(cx,cy,rx,ry,m,b)=>({t:'e',cx,cy,rx,ry,m,b:b||0});
 ART.tree=()=>mkArt({parts:[
@@ -1218,7 +1229,7 @@ ART.lab=()=>mkArt({parts:[
  {t:'p',pts:[[21,33],[23,29],[25,33]],m:'orange'},{t:'p',pts:[[26,33],[28,29],[30,33]],m:'orange'},
 ]});
 /* Покадровая анимация: из готового спрайта получаем кадры деформацией (смещение полос тела, ног, рук, волна подола, сжатие). */
-const ANIMK={priest:'robe',rogue:'hum',paladin:'hum',toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
+const ANIMK={mimic:'blob',priest:'robe',rogue:'hum',paladin:'hum',toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
 const FACE_LEFT={wolf:1,boar:1};            // спрайт нарисован мордой влево
 const NO_FLIP={dragon:1,ghost:0};
 const ANIMP={
@@ -1316,7 +1327,7 @@ const themeFor=d=>{if(isBossFloor(d))return 4;const n=d-Math.floor(d/BOSS_EVERY)
 const LOC_TIER={1:0,2:1,5:1,3:2,6:2,4:3};
 const STORY_TIERS=[[1],[2,5],[3,6]];
 const nextOpts=()=>STORY_TIERS[(LOC_TIER[G.loc]||0)+1]||[ARENA];
-const DS=()=>G.horde?{hp:1+.09*(G.horde.wave-1),atk:Math.floor((G.horde.wave-1)/4),cnt:0}:G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:(()=>{const k=Math.min(LOC_TIER[G.loc]||0,2);return {hp:1+.15*k,atk:k>=2?1:0,cnt:k};})();
+const DS=()=>G.horde?{hp:1+.09*(G.horde.wave-1)+(G.heroes.length>4?.05*(G.heroes.length-4):0),atk:Math.floor((G.horde.wave-1)/4),cnt:0}:G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:(()=>{const k=Math.min(LOC_TIER[G.loc]||0,2);return {hp:1+.15*k,atk:k>=2?1:0,cnt:k};})();
 const HORDE_LOC=7;
 const hasExit=()=>!G.horde&&(G.loc!==ARENA||!!G.floorClear);
 function loadRecords(){try{return JSON.parse(localStorage.getItem('bd_endless')||'[]');}catch(e){return [];}}
@@ -1373,7 +1384,7 @@ const HDEF={
 };
 const HORDER=['tank','sword','archer','mage','priest','rogue','paladin'];
 const SQUAD0=['tank','sword','archer','mage'];
-const squad=()=>(NET.squad&&NET.squad.length===4&&NET.squad.every(id=>HDEF[id]))?NET.squad:SQUAD0;
+const squad=()=>(NET.squad&&NET.squad.length>=4&&NET.squad.length<=7&&NET.squad.every(id=>HDEF[id]))?NET.squad:SQUAD0;
 const heroIds=()=>(G.heroes&&G.heroes.length)?G.heroes.map(h=>h.id):squad();
 const inSquad=id=>!ITEMS[id].cls||heroIds().includes(ITEMS[id].cls);
 
@@ -1417,6 +1428,7 @@ const MON={
  zombie:{n:'Зомби',undead:1,hp:15,atk:5,def:0,mv:1,rng:1,xp:3,spr:'zombie',poison:1,d:'Медленный и живучий. Укус заражает ядом.'},
  scorpion:{n:'Скорпион',hp:9,atk:5,def:1,mv:3,rng:1,xp:3,spr:'scorpion',poison:2,d:'Быстрый. Жало вызывает долгий яд (3 хода).'},
  spiderqueen:{n:'Королева пауков',hp:95,atk:7,def:2,mv:3,rng:1,xp:14,spr:'spiderqueen',poison:2,summon:'spider',sumMax:3,web:1,key:1,lair:4,d:'МИНИ-БОСС. Яд, призывает до 3 пауков, раз в 3 хода плюёт паутиной: 2 урона и −1 ОД двум героям в 4 гексах. Не оглушается. Хранит ключ.'},
+ mimic:{n:'Мимик',hp:14,atk:5,def:1,mv:2,rng:1,xp:4,spr:'mimic',d:'Сундук-обманщик: притворялся добычей. Кусается больно, после смерти оставляет настоящую добычу.'},
  whelp:{n:'Дракончик',hp:5,atk:3,def:0,mv:3,rng:1,xp:0,spr:'whelp',d:'Отродье Дракона.'},
 };
 
@@ -1549,7 +1561,7 @@ const LOCS={
         {n:'Звериное логово',spr:'cave',at:[.55,.62],tok:{t:'portal'}}],
    mon:['goblin','goblin','goblin','wolf','wolf','skel','skel','spider','bandit','slime','bat','bat','boar','shaman','shroom'],monN:10,
    items:['potion','potion','*g1','*g1','*g1','*c1','*c1'],keys:1,
-   events:['trap','spring','ambush','empty','shrine','chest'],terr:{slow:7,barrel:3,trap:2},slowName:'Болото',
+   events:['trap','spring','ambush','empty','shrine','chest','chest'],terr:{slow:7,barrel:3,trap:2},slowName:'Болото',
    mini:{n:'Звериное логово',d:'Тесная нора, где свирепые звери защищают добычу.',mon:['wolf','wolf','boar','boar','spider','orc'],terr:{slow:3}}},
  2:{n:'Мёртвые земли',cols:14,rows:10,deco:'rock',
    poi:[{n:'Кладбище',spr:'grave',at:[.3,.3],tok:{t:'key',guard:'necro'}},
@@ -1558,7 +1570,7 @@ const LOCS={
         {n:'Вход в склеп',spr:'ruins',at:[.58,.28],tok:{t:'portal'}}],
    mon:['orc','orc','orc','dknight','dknight','necro','troll','ghost','ghost','ogre','spider','wraith','golem','cultist','gargoyle','gargoyle'],monN:11,
    items:['elixir','potion','*g2','*g2','*g2','*c2','*c2'],keys:0,
-   events:['trap','trap','spring','ambush','shrine','chest'],terr:{lava:6,barrel:3,trap:3},
+   events:['trap','trap','spring','ambush','shrine','chest','chest'],terr:{lava:6,barrel:3,trap:3},
    mini:{n:'Склеп павших',d:'Древняя усыпальница: мертвецы не любят гостей.',mon:['dknight','necro','ghost','ghost','cultist','ogre'],terr:{lava:3}}},
  3:{n:'Ледяные пещеры',cols:13,rows:10,deco:'icicle',
    poi:[{n:'Замёрзший караван',spr:'frozencamp',at:[.3,.35],tok:{t:'item',it:'*a'}},
@@ -1567,7 +1579,7 @@ const LOCS={
         {n:'Ледяная цитадель',spr:'throne',at:[.5,.52],tok:{t:'portal'}}],
    mon:['yeti','yeti','icespirit','icespirit','frostspider','frostspider','icegolem','wolf','wolf','skel','bat','wraith'],monN:10,
    items:['potion','elixir','*g2','*g2','*c2','*c2'],keys:0,
-   events:['trap','spring','ambush','chest','shrine','empty'],terr:{slow:8,barrel:2,trap:3},slowName:'Сугроб',
+   events:['trap','spring','ambush','chest','shrine','empty','chest'],terr:{slow:8,barrel:2,trap:3},slowName:'Сугроб',
    mini:{n:'Ледяная цитадель',d:'Заброшенная крепость, занятая ледяными стражами.',mon:['yeti','icegolem','icespirit','icespirit','frostspider','wraith'],terr:{slow:3}}},
  5:{n:'Гиблые топи',cols:13,rows:10,deco:'mangrove',
    poi:[{n:'Хижина ведьмы',spr:'hut',at:[.3,.3],tok:{t:'key',guard:'bogwitch'}},
@@ -1576,7 +1588,7 @@ const LOCS={
         {n:'Тёмная заводь',spr:'cave',at:[.58,.6],tok:{t:'portal'}}],
    mon:['toad','toad','toad','leech','leech','croc','croc','bogwitch','wisp','wisp','spider','slime','shroom','boar'],monN:11,
    items:['elixir','potion','*g2','*g2','*g2','*c2','*c2'],keys:0,
-   events:['trap','spring','ambush','ambush','shrine','chest'],terr:{slow:16,barrel:2,trap:2},slowName:'Трясина',
+   events:['trap','spring','ambush','ambush','shrine','chest','chest'],terr:{slow:16,barrel:2,trap:2},slowName:'Трясина',
    mini:{n:'Логово крокодилов',d:'Заводь, где в тине дремлют крокодилы и подстерегают болотные твари.',mon:['croc','croc','toad','toad','leech','bogwitch'],terr:{slow:4}}},
  6:{n:'Ядовитые катакомбы',cols:14,rows:10,deco:'mushroom',
    poi:[{n:'Паучье гнездо',spr:'cave',at:[.74,.28],boss:'spiderqueen'},
@@ -1585,7 +1597,7 @@ const LOCS={
         {n:'Заброшенная лаборатория',spr:'lab',at:[.56,.55],tok:{t:'portal'}}],
    mon:['plaguerat','plaguerat','plaguerat','acidslime','acidslime','alchemist','alchemist','zombie','zombie','scorpion','scorpion','spider','shroom','wraith'],monN:12,
    items:['potion','elixir','*g2','*g2','*c2','*c2'],keys:0,
-   events:['trap','trap','spring','ambush','shrine','chest'],terr:{acid:9,barrel:3,trap:3},
+   events:['trap','trap','spring','ambush','shrine','chest','chest'],terr:{acid:9,barrel:3,trap:3},
    mini:{n:'Алхимический погреб',d:'Подвал отравителя: котлы, кислота и его верные слуги.',mon:['zombie','zombie','alchemist','alchemist','scorpion','acidslime'],terr:{acid:3}}},
  4:{n:'Логово Дракона',cols:11,rows:9,deco:'pillar'},
  7:{n:'Арена Орды',cols:13,rows:11,deco:'pillar'},
@@ -1671,8 +1683,8 @@ function makeGrid(cols,rows){
   const mw=(cols+0.5)*S3*HS,mh=(rows-1)*1.5*HS+2*HS;
   G.ox=(W-mw)/2+S3*HS/2;G.oy=(H-mh)/2+HS+6;
 }
-function zoneAround(c,r,z){
-  const cl=[[c,r],...nb(c,r).slice(0,3)];
+function zoneAround(c,r,z,n){
+  const cl=[[c,r],...nb(c,r).slice(0,n||3)];
   cl.forEach(([x,y])=>{const cell=cellOf(x,y);cell.zone=z;cell.block=false;});
   return cl;
 }
@@ -1742,10 +1754,12 @@ const HORDE_POOLS=[
  ['troll','ogre','golem','yeti','icegolem','alchemist','scorpion','dknight','wraith','bogwitch','necro'],
  ['troll','ogre','golem','icegolem','dknight','alchemist','bogwitch','necro','wraith','yeti','icespirit','scorpion']];
 const HORDE_BOSSES=['icequeen','hydra','spiderqueen'];
+const L0=LOCS[7];
 function genHorde(){
-  const L=LOCS[HORDE_LOC],cc=6,cr=5;let startCells,reach;
+  const nh=G.heroes.length,big=nh>=6,cols=big?15:L0.cols,rows=big?12:L0.rows;
+  const L=LOCS[HORDE_LOC],cc=Math.floor(cols/2),cr=Math.floor(rows/2);let startCells,reach;
   for(let tries=0;tries<80;tries++){
-    makeGrid(L.cols,L.rows);startCells=zoneAround(cc,cr,'start');
+    makeGrid(cols,rows);startCells=zoneAround(cc,cr,'start',Math.max(3,nh-1));
     for(const row of G.grid)for(const cell of row){if(cell.zone||dist(cell.c,cell.r,cc,cr)<=2)continue;cell.block=Math.random()<0.1;}
     reach=floodFrom(cc,cr);
     const total=G.grid.flat().filter(c=>!c.block).length;
@@ -1763,7 +1777,8 @@ function nextWave(){
   const H=G.horde;H.wave++;H.state='fight';const w=H.wave;
   const pool=HORDE_POOLS[Math.min(HORDE_POOLS.length-1,Math.floor((w-1)/3))];
   const boss=w%5===0;
-  const want=Math.min(26,3+Math.floor(w*1.3)+Math.max(0,D().mon)+(boss?-2:0));
+  const hf=.55+.45*G.heroes.length/4;
+  const want=Math.min(36,Math.round((3+Math.floor(w*1.3))*hf)+Math.max(0,D().mon)+(boss?-2:0));
   const spots=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.terr&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))
     .sort((a,b)=>((a.c<=1||a.c>=G.cols-2||a.r<=0||a.r>=G.rows-1)?0:1)-((b.c<=1||b.c>=G.cols-2||b.r<=0||b.r>=G.rows-1)?0:1)||0);
   let n=0;
@@ -1774,7 +1789,7 @@ function nextWave(){
   log('=== Волна '+w+(boss?' — БОСС':'')+': врагов '+n+' ===');
   showBanner('Волна '+w+(boss?' — БОСС':''),'Врагов: '+n+' · крепче на '+Math.round((DS().hp-1)*100)+'%');
   G.heroes.forEach(h=>{if(h.alive)h.ap=st(h,'ap')+(hasRelic('clock')?1:0);});
-  G.ready={};ui();
+  G.ready={};armTimer();ui();
 }
 function waveClear(){
   const H=G.horde;if(!H||H.state!=='fight')return;H.state='camp';H.cleared++;
@@ -1910,7 +1925,7 @@ function startLoc(n){
   if(G.daily)withSeed(G.daily+'|'+G.depth,build);else build();
   G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;h.bless=0;h.faith=false;});
   G.phxUsed=false;
-  G.sel=(G.heroes.find(h=>h.alive&&mine(h))||G.heroes.find(h=>h.alive)).id;
+  G.sel=(G.heroes.find(h=>h.alive&&mine(h))||G.heroes.find(h=>h.alive)).id;armTimer();
   {const ot=objText();const objLine=ot?'\nЦель: '+ot.n+(G.obj.type==='hunt'?' ('+G.obj.goal+')':G.obj.type==='alarm'?' (за '+G.obj.limit+' раундов)':''):'';
    if(G.horde){log('=== '+LOCS[n].n+' ===');}
    else if(G.endless){log('=== Этаж '+G.depth+': '+LOCS[n].n+' ===');showBanner('Этаж '+G.depth+(n===ARENA?' — БОСС':''),LOCS[n].n+' · враги сильнее на '+Math.round((DS().hp-1)*100)+'%'+objLine);}
@@ -2102,6 +2117,7 @@ function killMon(m,killer){
   if(vamp&&killer.alive&&killer.hp<st(killer,'maxhp')){const b=killer.hp;killer.hp=Math.min(st(killer,'maxhp'),killer.hp+vamp);pop(killer,'+'+(killer.hp-b),'#f66');log('Вампиризм: '+killer.d.n+' +'+(killer.hp-b)+' HP.');}
   if(m.xp>0){G.heroes.forEach(h=>{if(m.hit.has(h.id))gainXP(h,m.xp+(h===killer?1:0)+(hasRelic('warbook')?1:0));});}
   if(hasRelic('chalice')&&killer&&killer.d)G.heroes.forEach(x=>{if(x.alive&&dist(x.c,x.r,killer.c,killer.r)<=1&&x.hp<st(x,'maxhp')){x.hp++;pop(x,'+1','#f66');}});
+  if(m.id==='mimic'){const gg=evGold(Math.round((14+6*chestTier())*D().gold));pop({c:m.c,r:m.r},'+'+gg+' з','#ffd23f');dropLoot(m.c,m.r,pick(chestTier()>=1?GEN2:GEN1));log('Мимик выронил настоящую добычу: +'+gg+' золота и предмет на земле.');}
   if(m.def_&&0){}
   const base=MON[m.id];
   if(base&&base.explode){sfx('boom');fxQ({burst:'boom',c:m.c,r:m.r});log(m.n+' взрывается!');pop(m,'БУМ','#f80');G.heroes.filter(h=>h.alive&&dist(h.c,h.r,m.c,m.r)<=1).forEach(h=>hitHero(h,base.explode,null,{pierce:true}));}
@@ -2265,12 +2281,81 @@ function revealToken(h,cell){
       if(t.e==='trap'){log('Ловушка! '+h.d.n+' получает 3 урона.');pop(h,'ЛОВУШКА');h.hp-=3;sfx('trap');if(h.hp<=0)killHero(h);}
       else if(t.e==='spring'){log('Целебный родник! Герои рядом восстанавливают 4 HP.');G.heroes.filter(x=>x.alive&&dist(x.c,x.r,cell.c,cell.r)<=3).forEach(x=>{const b=x.hp;x.hp=Math.min(st(x,'maxhp'),x.hp+4);pop(x,'+'+(x.hp-b));});sfx('heal');}
       else if(t.e==='ambush'){log('Засада!');sfx('spawn');const pool=AMB_POOL[G.loc]||AMB_POOL[4];for(let i=0;i<2;i++){const f=freeNear(h.c,h.r);if(f){spawnMon(pick(pool),f[0],f[1]);}}}
-      else if(t.e==='chest'){const g=Math.round(rnd(8,15)*D().gold);G.gold+=g;sfx('item');pop(pos,'+'+g+' з','#ffd23f');log('Сундук! Найдено '+g+' золота.');}
+      else if(t.e==='chest')openChest(h,cell,t);
       else if(EXTRA_EV.includes(t.e)||t.e==='treasure')openEvent(t.e,h,cell);
       else if(t.e==='shrine'){log('Древнее святилище: '+h.d.n+' получает 2 опыта.');gainXP(h,2);sfx('shrine');}
       else{log('Пусто. Только ветер и пыль.');sfx('wind');}
       break;
   }
+}
+
+
+/* --- Сундуки: замок по классу героя, рунная головоломка, мимики --- */
+const chestTier=()=>Math.min(2,LOC_TIER[G.loc]||0)+(G.endless?Math.min(2,Math.floor((G.depth-1)/4)):0)+(G.horde?1:0);
+function chestReward(h,cell,q){
+  // q: 0 — жалкая добыча (половина золота), 1 — обычная, 2 — хорошая (+предмет), 3 — отличная (+редкий предмет и бонус)
+  const tier=chestTier();
+  const base=(10+6*tier)*(q===0?.5:q===3?1.7:1);
+  const g=evGold(Math.round(base*D().gold));
+  const pos={c:cell.c,r:cell.r};pop(pos,'+'+g+' з','#ffd23f');sfx('key');fxQ({burst:q>=2?'level':'gold',c:cell.c,r:cell.r});
+  let txt='Сундук открыт: +'+g+' золота';
+  if(q>=2){const it=pick(tier>=1?GEN2:GEN1);giveItem(h,it,cell);txt+=' и предмет «'+ITEMS[it].n+'»';}
+  if(q>=3){const it=pick(['amulet','trollheart','vampring','feather','chain','axe','elixir']);giveItem(h,it,cell);txt+=', а ещё редкость: «'+ITEMS[it].n+'»';}
+  log(txt+'.');
+}
+function mimicAttack(h,cell,calm){
+  const m=spawnMon('mimic',cell.c,cell.r);m.aggro=true;sfx('spawn');fxQ({burst:'spawn',c:cell.c,r:cell.r});pop(m,'МИМИК!','#ff8a7a');
+  m.hp=m.max=Math.round(m.hp*(1+.12*chestTier()));m.atk+=Math.floor(chestTier()/2);
+  if(calm){m.stun=true;log('МИМИК! Но '+h.d.n+' заметил подвох вовремя — враг ошеломлён.');}
+  else{log('Это был МИМИК! Сундук оживает и кусает '+h.d.n+'.');hitHero(h,m.atk,m,{pierce:false});}
+}
+function openChest(h,cell,t){
+  if(t.mimic==null)t.mimic=Math.random()<.13;
+  if(!t.kind)t.kind=Math.random()<.4?'rune':'lock';
+  const kind=t.kind,rune=kind==='rune';
+  const finish=()=>{closeModal();ui();};
+  const trigger=(how)=>{ // возвращает true, если сундук оказался мимиком
+    if(!t.mimic)return false;closeModal();mimicAttack(h,cell,how==='rogue');ui();return true;};
+  const reopen=()=>{cell.token=t;};
+  const opts=[];
+  if(h.id==='rogue'&&!rune)opts.push({t:'Вскрыть отмычкой (Разбойник)',fn:()=>{if(trigger('rogue'))return;closeModal();const ok=Math.random()<.92;log(ok?h.d.n+' ловко вскрывает замок.':'Отмычка сломалась, но замок поддался.');chestReward(h,cell,ok?2:1);ui();}});
+  if((h.id==='mage'||h.id==='priest')&&rune)opts.push({t:'Снять печать ('+h.d.n+')',fn:()=>{if(trigger('mage'))return;closeModal();log(h.d.n+' рассеивает руническую печать.');chestReward(h,cell,2);ui();}});
+  if(h.id==='paladin'&&rune)opts.push({t:'Очистить светом (Паладин)',fn:()=>{if(trigger('x'))return;closeModal();const ok=Math.random()<.8;log(ok?'Священный свет гасит печать.':'Свет гасит печать не до конца.');chestReward(h,cell,ok?2:1);ui();}});
+  opts.push({t:'Головоломка: рунные символы',fn:()=>{if(trigger('x'))return;closeModal();runePuzzle(h,chestTier(),ok=>{
+      if(ok){log(h.d.n+' подбирает верный порядок рун!');chestReward(h,cell,3);}
+      else{log('Руны вспыхнули и погасли. Печать заклинило — добыча пострадала.');pop(h,'ПРОВАЛ','#f66');sfx('trap');chestReward(h,cell,0);}
+      ui();});}});
+  const p=Math.max(.3,Math.min(.9,.35+.1*st(h,'atk')));
+  opts.push({t:'Выломать силой ('+Math.round(p*100)+'%)',fn:()=>{if(trigger('x'))return;closeModal();
+    if(Math.random()<p){log(h.d.n+' выламывает крышку.');chestReward(h,cell,1);}
+    else{log('Крышка не поддаётся, содержимое побилось. '+h.d.n+' ушибается.');sfx('trap');hitHero(h,2,null,{pierce:true});chestReward(h,cell,0);}
+    ui();}});
+  opts.push({t:'Оставить',fn:()=>{closeModal();reopen();log('Вы оставляете сундук закрытым.');ui();}});
+  openModal('<h1>Запертый сундук</h1><p>'+(rune?'На крышке мерцает <b style="color:#c58bff">рунная печать</b>.':'Крышку держит <b style="color:var(--gold)">кованый замок</b>.')+' Открывает: <b>'+h.d.n+'</b>.</p>'+
+    '<p style="color:var(--mid)">'+(rune?'Печать снимут Маг и Жрец, свет Паладина может её погасить.':'Замок вскроет Разбойник.')+' Головоломка даёт лучшую награду, но ошибка испортит добычу. Грубая сила — дёшево, но рискованно. Иногда сундуки оказываются мимиками!</p>',opts);
+}
+const RUNES=[['◆','#6ed2ff'],['▲','#ff8a7a'],['●','#8af58a'],['■','#ffd23f'],['✦','#d8a8ff'],['☾','#ffffff']];
+function runePuzzle(h,tier,done){
+  const len=3+Math.min(2,Math.floor(tier/2)+(tier>=1?1:0));  // 3..5
+  const seq=Array.from({length:len},()=>rnd(0,RUNES.length-1));
+  let pos=0,miss=0,over=false;
+  openModal('<h1>Рунная печать</h1><p id="rp">Запомните порядок рун…</p><div id="rseq" style="display:flex;gap:10px;justify-content:center;font-size:40px;min-height:56px;margin:10px 0"></div><div id="rdots" style="text-align:center;letter-spacing:6px;color:var(--gold)"></div><div class="row" id="rbtns" style="justify-content:center"></div>',[],true);
+  window.__rune={seq:seq.slice(),click:i=>clickRune(i)};
+  const box=$('#rseq'),info=$('#rp'),btns=$('#rbtns'),dots=$('#rdots');
+  const showDots=()=>{dots.textContent=seq.map((_,i)=>i<pos?'●':'○').join(' ')+(miss?'   ошибок: '+miss+'/2':'');};
+  const finish=ok=>{if(over)return;over=true;window.__rune=null;setTimeout(()=>{closeModal();done(ok);},ok?500:700);};
+  function clickRune(i){
+    if(over||!btns.children.length)return;
+    if(i===seq[pos]){pos++;sfx('click');if(pos>=seq.length){info.textContent='Верно! Печать сломана.';sfx('key');finish(true);}}
+    else{miss++;sfx('trap');info.textContent=miss>=2?'Печать заклинило…':'Не та руна! Ещё одна ошибка — и провал.';if(miss>=2)finish(false);}
+    showDots();
+  }
+  // показ последовательности
+  const step=window.FAST?10:700;
+  seq.forEach((r,k)=>{setTimeout(()=>{if(over)return;box.innerHTML='<span style="color:'+RUNES[r][1]+'">'+RUNES[r][0]+'</span>';sfx('click');},step*(k+1));setTimeout(()=>{if(!over)box.innerHTML='';},step*(k+1)+Math.round(step*.7));});
+  setTimeout(()=>{if(over)return;info.textContent='Повторите порядок рун (можно ошибиться один раз).';
+    RUNES.forEach(([ch,col],i)=>{const b=document.createElement('button');b.className='btn';b.style.cssText='font-size:30px;width:64px;height:58px;color:'+col;b.textContent=ch;b.onclick=()=>clickRune(i);btns.appendChild(b);});
+    showDots();},step*(len+1)+100);
 }
 
 /* --- Случайные события с выбором --- */
@@ -2557,8 +2642,9 @@ async function dragonTurn(){
     sfx('inhale');log('Дракон вдыхает огонь! Отмеченные гексы вспыхнут в конце раунда — уходите!');
   }
 }
+function armTimer(){G.deadline=(NET.role==='host'&&NET.started&&NET.timer>0)?Date.now()+NET.timer*1000:0;}
 function newRound(){
-  G.round++;G.ready={};G.undo=null;
+  G.round++;G.ready={};G.undo=null;armTimer();
   G.heroes.forEach(h=>{
     h.block=h.guard=h.taunt=false;h.xpFlag=false;h.rage=0;if(h.bless>0)h.bless--;
     if(h.alive){
@@ -2622,7 +2708,7 @@ function aiSafe(h){
   return !foes.some(m=>allies.some(a=>mdist(a,m)<=4))&&aiHurtFrac(h)>=.5;
 }
 // ближайший к герою «?» в радиусе 1 от него
-const aiSkipTok=c=>c.token&&c.token.t==='portal'||c.token&&c.token.t==='event'&&(EXTRA_EV.includes(c.token.e)||c.token.e==='treasure');
+const aiSkipTok=c=>c.token&&c.token.t==='portal'||c.token&&c.token.t==='event'&&(EXTRA_EV.includes(c.token.e)||c.token.e==='treasure'||c.token.e==='chest');
 const aiAdjToken=h=>nb(h.c,h.r).map(([c,r])=>cellOf(c,r)).find(c=>c&&c.token&&!aiSkipTok(c));
 function aiStep(h){
   const foes=aiFoes(),rng=st(h,'rng'),mx=st(h,'maxhp');
@@ -2816,7 +2902,7 @@ function openCamp0(out){
 const REST_COST=12;
 function campCmd(cmd,who){
   const C=G.camp;if(!C)return;
-  if(cmd.c==='campgo'){if(who!=='H')return;G.camp=null;NET.campHtml='';closeModal();if(G.horde){G.camp=null;NET.campHtml='';closeModal();G.monsters=G.monsters.filter(m=>m.alive);G.heroes.forEach(h=>{h.block=h.guard=h.taunt=h.haste=false;});nextWave();return;}
+  if(cmd.c==='campgo'){if(who!=='H')return;G.camp=null;NET.campHtml='';closeModal();if(G.horde){G.camp=null;NET.campHtml='';closeModal();G.monsters=G.monsters.filter(m=>m.alive);armTimer();G.heroes.forEach(h=>{h.block=h.guard=h.taunt=h.haste=false;});nextWave();return;}
   if(G.endless){G.depth++;startLoc(themeFor(G.depth));}else{const opts=nextOpts();startLoc(opts.includes(cmd.n)?cmd.n:opts[0]);}return;}
   if(cmd.c==='relic'){if(who!=='H'||!C.relics)return;const id=C.relics[cmd.i];if(!id)return;G.relicPending=Math.max(0,(G.relicPending||0)-1);giveRelic(id);C.relics=G.relicPending>0?pickRelics(3):null;ui();return;}
   if(cmd.c==='rest'){if(C.rested||G.gold<REST_COST)return;G.gold-=REST_COST;C.rested=true;G.heroes.forEach(h=>{if(h.alive)h.hp=st(h,'maxhp');h.poison=0;h.burn=0;h.bleed=0;});sfx('heal');log(pname(who)+' оплачивает отдых у костра: все герои полностью здоровы.');ui();return;}
@@ -3534,6 +3620,13 @@ function renderCanvas(){
 let LOOPERR=0;
 function loop(){try{if(PX)renderPixi();else renderCanvas();LOOPERR=0;}catch(e){if(LOOPERR++<3)console.error('render error',e);}requestAnimationFrame(loop);}
 setInterval(musicTick,500);
+setInterval(()=>{
+  const e=$('#tmr');
+  if(e&&G.deadline){const l=Math.max(0,Math.ceil((G.deadline-Date.now())/1000));e.textContent='⏱ '+l+' с';e.style.color=l<=10?'#ff8a7a':'#9fe0ff';}
+  if(NET.role==='host'&&NET.started&&NET.timer>0&&G.grid&&G.deadline&&!G.over&&!G.busy&&!G.camp&&!NET.gmodal&&Date.now()>=G.deadline){
+    G.deadline=0;needList().forEach(p=>{G.ready[p]=true;});log('⏱ Время раунда вышло — раунд закрывается.');endRound();
+  }
+},500);
 function bar(x,y,f,col){ctx.fillStyle='#000';ctx.fillRect(Math.round(x-11),Math.round(y),22,5);ctx.fillStyle='#3a1a1a';ctx.fillRect(Math.round(x-10),Math.round(y+1),20,3);ctx.fillStyle=col;ctx.fillRect(Math.round(x-10),Math.round(y+1),Math.max(0,Math.round(20*f)),3);}
 
 /* =========================================================
@@ -3548,8 +3641,10 @@ function renderTop(){
   const ot=objText();const objH=ot?'<span class="chip obj '+ot.st+'" data-tn="Цель: '+esc(ot.n)+'" data-tip="'+esc(ot.d)+' Награда: золото и реликвия.">'+(ot.st==='ok'?'✓ ':ot.st==='bad'?'✗ ':'◎ ')+esc(ot.n)+(ot.prog?' '+ot.prog:'')+'</span>':'';
   const uh=G.undo&&G.heroes.find(h=>h.id===G.undo.h);const undoH=uh&&uh.alive&&mine(uh)?'<button class="btn" data-act="undo" data-tip="Вернуть героя на прежнее место и вернуть потраченные очки действия. Работает, пока ход ничем не отозвался (бой, находка, ловушка).">↶ Отмена хода</button>':'';
   const roomH=(G.room&&G.room.opened&&!G.room.won)?'<span class="chip" data-tn="'+esc(G.room.n)+'" data-tip="Подземелье справа на карте. Враги внутри: '+G.monsters.filter(m=>m.alive&&inRoom(m.c)).length+'. Героев внутри: '+G.heroes.filter(h=>h.alive&&inRoom(h.c)).length+'." style="color:#d8b0ff;border-color:#5f2d8f">⛏ '+esc(G.room.n)+' · врагов '+G.monsters.filter(m=>m.alive&&inRoom(m.c)).length+'</span>':'';
+  const tleft=G.deadline&&!G.busy&&!G.camp&&!G.over?Math.max(0,Math.ceil((G.deadline-Date.now())/1000)):-1;
+  const tmH=tleft>=0?'<span class="chip" id="tmr" data-tip="Время до автоматического конца раунда" style="color:#9fe0ff;border-color:#24566b">⏱ '+tleft+' с</span>':'';
   const exH=hasExit()?(atExit()?'<button class="btn act" data-act="next">Дальше ▶</button>':'<span class="chip">Выход '+G.heroes.filter(h=>h.alive&&cellOf(h.c,h.r).zone==='exit').length+'/'+G.heroes.filter(h=>h.alive).length+'</span>'):'';
-  $('#top').innerHTML='<span class="loc">'+L.n+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+roomH+undoH+exH+
+  $('#top').innerHTML='<span class="loc">'+L.n+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+tmH+roomH+undoH+exH+
    netTop()+
    '<button class="btn" data-act="quit">Выход</button><button class="btn" data-act="rules">?</button><button class="btn" data-act="settings" data-tip="Скорость анимаций, размер интерфейса, громкость, палитра для дальтоников, меньше эффектов">⚙</button><button class="btn" data-act="music">'+(MUSIC?'♪ Музыка':'♪ выкл')+'</button><button class="btn" data-act="mute">'+(MUTE?'🔇 выкл':'🔊 Звук')+'</button>';
 }
@@ -3749,7 +3844,7 @@ function makeSnap(){
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
@@ -3773,7 +3868,7 @@ function applySnap(s){
   ng.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));
   ng.dragon=s.dragon>=0?ng.monsters[s.dragon]:null;
   if(s.tele)ng.tele={cells:new Set(s.tele),flash:0};
-  Object.assign(ng,s.ext||{});ng.showInt=old.showInt;
+  Object.assign(ng,s.ext||{});ng.showInt=old.showInt;ng.deadline=(s.ext&&s.ext.tleft)?Date.now()+s.ext.tleft*1000:0;if(s.ext)NET.timer=s.ext.timer||0;
   if(old.loc!==s.loc&&s.loc>0&&LOC_SUB[s.loc])showBanner(LOCS[s.loc].n,LOC_SUB[s.loc]);
   G=ng;syncWorld();NET.owners=s.owners;NET.players=s.players;NET.freeAI=s.freeAI;
   if(old.mode){const h=G.heroes.find(x=>x.id===old.mode.h.id);if(h)G.mode={spec:old.mode.spec,ref:old.mode.ref,h,valid:new Map()};}
@@ -3787,7 +3882,7 @@ function applySnap(s){
 
 /* --- лобби --- */
 function sendLobby(){
-  bc({t:'lobby',players:NET.players,owners:NET.owners,started:NET.started,code:NET.code,diff:NET.diff||'normal',freeAI:!!NET.freeAI,endless:!!NET.endless,horde:!!NET.horde,squad:squad()});
+  bc({t:'lobby',players:NET.players,owners:NET.owners,started:NET.started,code:NET.code,diff:NET.diff||'normal',freeAI:!!NET.freeAI,endless:!!NET.endless,horde:!!NET.horde,squad:squad(),timer:NET.timer||0});
   if(NET.lobby)showLobby();
 }
 function claim(hero,who){
@@ -3808,7 +3903,7 @@ function showLobby(){
   const link=location.href.split('#')[0]+'#room='+NET.code;
   let html='<h1>Комната '+(NET.code==='LOCAL'?'(без сервера)':esc(NET.code))+'</h1>';
   if(isHost&&NET.code!=='LOCAL')html+='<p>Ссылка для друзей (игра должна быть выложена в интернет):</p><p><b style="word-break:break-all;user-select:all">'+esc(link)+'</b></p>';
-  html+='<p>Режим: <b>'+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+'</b></p><p>Сложность: <b>'+DIFF[NET.diff||'normal'].n+'</b> — '+DIFF[NET.diff||'normal'].d+'</p>';
+  html+=(NET.timer?'<p>Таймер раунда: <b>'+NET.timer+' с</b> — когда время выйдет, раунд закроется сам (неготовые игроки пропускают остаток хода).</p>':'')+'<p>Режим: <b>'+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+'</b></p><p>Сложность: <b>'+DIFF[NET.diff||'normal'].n+'</b> — '+DIFF[NET.diff||'normal'].d+'</p>';
   html+='<h2>Игроки</h2><ul>'+Object.keys(NET.players).map(id=>'<li>'+esc(pname(id))+(id===NET.me?' (вы)':'')+(id==='H'?' — хост':'')+(NET.players[id]&&NET.players[id].spec?' — зритель':'')+(NET.players[id]&&NET.players[id].off?' — нет связи':'')+'</li>').join('')+'</ul>';
   html+=NET.spec?'<h2>Вы — зритель</h2><p>Вы видите игру, но героями не управляете. Можно пользоваться фразами и метками.</p>':'<h2>Герои — нажмите, чтобы взять или освободить</h2><p>Свободных героев ведёт: <b>'+(NET.freeAI?'ИИ':'хост')+'</b>.</p>';
   const btns=(NET.spec?[]:squad()).map(id=>{const o=NET.owners[id];const nm=HDEF[id].n;
@@ -3817,8 +3912,9 @@ function showLobby(){
   if(isHost){
     if(NET.code!=='LOCAL')btns.push({t:'Скопировать ссылку',fn:e=>{if(copyLink(link))e.target.textContent='Скопировано ✓';else window.prompt('Скопируйте ссылку (Ctrl+C):',link);}});
     if(!NET.started)btns.push({t:'Отряд: '+squad().map(id=>HDEF[id].n).join(', ')+' ▸',fn:()=>chooseSquad(()=>{NET.owners={};sendLobby();showLobby();})});
-    if(!NET.started)btns.push({t:'Режим: '+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+' ▸',fn:()=>{if(NET.horde){NET.horde=false;NET.endless=false;}else if(NET.endless){NET.endless=false;NET.horde=true;}else NET.endless=true;sendLobby();}});
+    if(!NET.started)btns.push({t:'Режим: '+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+' ▸',fn:()=>{if(NET.horde){NET.horde=false;NET.endless=false;if(squad().length>4){NET.squad=SQUAD0;NET.owners={};}}else if(NET.endless){NET.endless=false;NET.horde=true;}else NET.endless=true;sendLobby();}});
     if(!NET.started)btns.push({t:'Сложность: '+DIFF[NET.diff||'normal'].n+' ▸',fn:()=>{NET.diff=DORDER[(DORDER.indexOf(NET.diff||'normal')+1)%3];sendLobby();}});
+    btns.push({t:'Таймер раунда: '+(NET.timer?NET.timer+' с':'выкл')+' ▸',fn:()=>{const o=[0,60,90,120];NET.timer=o[(o.indexOf(NET.timer||0)+1)%o.length];if(NET.started)armTimer();sendLobby();if(NET.started)ui();}});
     btns.push({t:'Свободные герои: '+(NET.freeAI?'ИИ':'хост')+' ▸',fn:()=>{NET.freeAI=!NET.freeAI;sendLobby();if(NET.started)ui();}});
     btns.push({t:'Добавить игрока по коду',fn:addManualPlayer});
     btns.push(NET.started?{t:'Закрыть',fn:closeLobby}:{t:'НАЧАТЬ ИГРУ',fn:startMP});
@@ -3954,7 +4050,7 @@ function hostRoom(n){
 }
 function guestData(m){
   if(m.t==='you')NET.me=m.id;
-  else if(m.t==='lobby'){NET.squad=m.squad||SQUAD0;NET.diff=m.diff;NET.endless=m.endless;NET.horde=!!m.horde;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
+  else if(m.t==='lobby'){NET.timer=m.timer||0;NET.squad=m.squad||SQUAD0;NET.diff=m.diff;NET.endless=m.endless;NET.horde=!!m.horde;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
   else if(m.t==='snap'){NET.started=true;if(NET.lobby){NET.lobby=false;closeModal();}applySnap(m.s);}
   else if(m.t==='modal'){NET.lobby=false;openModal(m.html+'<p style="color:var(--gold)">Решает хост.</p>',m.labels.map(t=>({t,fn:()=>{}})),true);document.querySelectorAll('#mbox .btn').forEach(b=>b.disabled=true);}
   else if(m.t==='mclose'){NET.lobby=false;closeModal();}
@@ -4199,12 +4295,12 @@ function resumeBtns(){
   return b;
 }
 function chooseSquad(then){
-  const sel=new Set(squad());
-  const draw=()=>openModal('<h1>Состав отряда</h1><p>Выберите <b>ровно 4</b> героев из 7 (выбрано: <b style="color:var(--gold)">'+sel.size+'/4</b>). Отряд один на всю партию; в сети им делятся игроки.</p>'+
+  const sel=new Set(squad());const max=NET.horde?7:4;if(!NET.horde)while(sel.size>4)sel.delete([...sel].pop());
+  const draw=()=>openModal('<h1>Состав отряда</h1><p>Выберите '+(NET.horde?'<b>от 4 до 7</b> героев':'<b>ровно 4</b> героя из 7')+' (выбрано: <b style="color:var(--gold)">'+sel.size+'/'+max+'</b>). '+(NET.horde?'В «Орде» можно взять весь список — врагов станет больше. ':'')+'Отряд один на всю партию; в сети им делятся игроки.</p>'+
     HORDER.map(id=>'<p>'+(sel.has(id)?'★ ':'— ')+'<b>'+HDEF[id].n+'</b>: '+HDEF[id].role+'</p>').join(''),
-    [...HORDER.map(id=>({t:(sel.has(id)?'★ ':'')+HDEF[id].n,fn:()=>{if(sel.has(id))sel.delete(id);else if(sel.size<4)sel.add(id);draw();}})),
+    [...HORDER.map(id=>({t:(sel.has(id)?'★ ':'')+HDEF[id].n,fn:()=>{if(sel.has(id))sel.delete(id);else if(sel.size<max)sel.add(id);draw();}})),
      {t:'Классический отряд',fn:()=>{sel.clear();SQUAD0.forEach(x=>sel.add(x));draw();}},
-     {t:'ГОТОВО ▶',fn:()=>{if(sel.size!==4){log('Нужно выбрать ровно 4 героя.');sfx('trap');return;}NET.squad=HORDER.filter(id=>sel.has(id));NET.soloPick=null;then();}}],true);
+     {t:'ГОТОВО ▶',fn:()=>{if(sel.size<4||sel.size>max){log('Нужно выбрать '+(NET.horde?'от 4 до 7':'ровно 4')+' героев.');sfx('trap');return;}NET.squad=HORDER.filter(id=>sel.has(id));NET.soloPick=null;then();}}],true);
   draw();
 }
 function chooseHeroes(then){
@@ -4213,7 +4309,7 @@ function chooseHeroes(then){
     squad().map(id=>'<p>'+(sel.has(id)?'★ ':'— ')+'<b>'+HDEF[id].n+'</b>: '+HDEF[id].role+' — '+(sel.has(id)?'<span style="color:var(--gold)">вы</span>':'<span style="color:#8ad8ff">ИИ</span>')+'</p>').join(''),
     [...squad().map(id=>({t:(sel.has(id)?'★ ':'')+HDEF[id].n,fn:()=>{if(sel.has(id)){if(sel.size>1)sel.delete(id);}else sel.add(id);draw();}})),
      {t:'Все — мои',fn:()=>{squad().forEach(x=>sel.add(x));draw();}},
-     {t:'НАЧАТЬ ▶',fn:()=>{NET.owners={};NET.freeAI=sel.size<4;squad().forEach(id=>{if(sel.has(id))NET.owners[id]='H';});then();}}],true);
+     {t:'НАЧАТЬ ▶',fn:()=>{NET.owners={};NET.freeAI=sel.size<squad().length;squad().forEach(id=>{if(sel.has(id))NET.owners[id]='H';});then();}}],true);
   draw();
 }
 function chooseMode(then){
@@ -4339,7 +4435,7 @@ $('#top').addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{
   if($('#modal').style.display==='flex')return;
-  if(e.key>='1'&&e.key<='4'){const h=G.heroes[+e.key-1];if(h){G.sel=h.id;G.mode=null;ui();}}
+  if(e.key>='1'&&e.key<='7'){const h=G.heroes[+e.key-1];if(h){G.sel=h.id;G.mode=null;ui();}}
   else if(e.key===' '){e.preventDefault();endClick();}
   else if(e.key==='z'||e.key==='Z'||e.key==='я'||e.key==='Я'){if(G.undo)act({c:'undo',h:G.undo.h});}
   else if(e.key==='Escape'){G.mode=null;ui();}
