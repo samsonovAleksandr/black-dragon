@@ -139,6 +139,20 @@ body.lost #stage{filter:grayscale(.9) brightness(.65);transition:filter 1.6s}
 .item{background:#0d0818;border:1px solid var(--line);padding:6px 7px;display:flex;flex-direction:column;gap:4px}
 .item .ih{display:flex;align-items:center;gap:7px}.item .ih>div{flex:1;min-width:0}.item b{font-size:13px}.item .ty{color:var(--mid);font-size:11px}
 .item .ds{color:#c3b9e0;font-size:12px;line-height:1.25}.item .row{margin-top:0}.item .pr{font-size:8px}
+body.big{font-size:16px}
+body.big #app{grid-template-columns:minmax(0,1fr) 430px}
+body.big #info{font-size:16.5px}body.big #log{font-size:15px;height:150px}
+body.big .btn{font-size:15px}body.big #top .btn,body.big #zoombtns .btn{font-size:14px}
+body.big .chip{font-size:10px}body.big #top{font-size:10px}body.big #top .loc{font-size:12px}
+body.big .card .role,body.big .next,body.big .xpl,body.big .perks,body.big .st{font-size:14px}
+body.big .chips .chip,body.big .apline{font-size:9px}body.big .hp span{font-size:9px}
+body.big #modal p,body.big #modal li,body.big .item .ds{font-size:15.5px}body.big .item b{font-size:15px}
+body.cb .hp i{background:linear-gradient(#a8d4ff,#2f78e0 60%,#1f55a8)}
+body.cb .hp i.y{background:linear-gradient(#ffd27a,#f09a10 60%,#b86e00)}
+body.cb .hp i.r{background:linear-gradient(#f0a8f0,#c030b8 60%,#7a1a78)}
+body.calm .hurtflash{display:none}body.calm #banner.show{animation:none;opacity:1}
+body.calm *{transition:none!important}
+input[type=range]{padding:0!important;height:26px;accent-color:#ffd23f}
 @media(max-width:900px){
   #app{grid-template-columns:1fr;height:auto;overflow:visible;padding:6px;gap:6px}
   body{overflow:auto;font-size:12.5px}
@@ -182,7 +196,14 @@ const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
-const sleep=ms=>new Promise(r=>setTimeout(r,window.FAST?0:ms));
+const SET=Object.assign({speed:1,big:false,calm:false,cb:false,vol:90,confirm:false},(()=>{try{return JSON.parse(localStorage.getItem('bd_set')||'{}');}catch(e){return {};}})());
+function saveSet(){try{localStorage.setItem('bd_set',JSON.stringify(SET));}catch(e){}}
+function applySet(){
+  const b=document.body;if(!b)return;
+  b.classList.toggle('big',!!SET.big);b.classList.toggle('cb',!!SET.cb);b.classList.toggle('calm',!!SET.calm);
+  if(typeof A_BUS!=='undefined'&&A_BUS)A_BUS.gain.value=SET.vol/100;
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,window.FAST?0:ms*SET.speed));
 const key=(c,r)=>c+','+r;
 const NET={role:'solo',me:'H',peer:null,conn:null,conns:{},players:{H:{name:'Хост'}},owners:{},started:false,code:'',sq:[],fq:[],bq:0,gmodal:false,lobby:false,myName:'Игрок',selInit:false,toks:{},playing:false};
 let REMOTE=false;
@@ -195,7 +216,7 @@ function audioInit(){
   try{
     if(!AC){
       AC=new (window.AudioContext||window.webkitAudioContext)();
-      A_BUS=AC.createGain();A_BUS.gain.value=0.9;
+      A_BUS=AC.createGain();A_BUS.gain.value=SET.vol/100;
       const comp=AC.createDynamicsCompressor();A_BUS.connect(comp);comp.connect(AC.destination);
       A_SFX=AC.createGain();A_SFX.gain.value=0.55;A_SFX.connect(A_BUS);
       A_MUS=AC.createGain();A_MUS.gain.value=0.16;A_MUS.connect(A_BUS);
@@ -1435,7 +1456,7 @@ function enterMini(cell){
   const L=LOCS[G.loc],M=L.mini;if(!M||G.mini)return;
   G.mini={n:M.n,won:false,st:{grid:G.grid,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,monsters:G.monsters.map(stripHit),exitCells:G.exitCells,startCells:G.startCells,
     cell:[cell.c,cell.r],pos:G.heroes.map(h=>[h.c,h.r])}};
-  G.tele=null;G.mode=null;G.monsters=[];genMini(L,M);
+  G.tele=null;G.mode=null;G.undo=null;G.monsters=[];genMini(L,M);
   G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i%G.startCells.length];h.c=c;h.r=r;h.block=h.guard=h.taunt=false;});
   const want=5+(D().mon>=2?1:0)+Math.floor(DS().cnt/2);
   let mons=shuffle(M.mon.slice());while(mons.length<want)mons.push(pick(M.mon));mons=mons.slice(0,want);
@@ -1460,7 +1481,7 @@ function winMini(){
 function leaveMini(won){
   const M=G.mini;if(!M)return;const s=M.st;
   G.grid=s.grid;G.cols=s.cols;G.rows=s.rows;G.ox=s.ox;G.oy=s.oy;G.exitCells=s.exitCells;G.startCells=s.startCells;
-  G.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));G.tele=null;G.mode=null;
+  G.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));G.tele=null;G.mode=null;G.undo=null;
   G.heroes.forEach((h,i)=>{const p=s.pos[i];if(p){h.c=p[0];h.r=p[1];}});
   const cell=cellOf(s.cell[0],s.cell[1]);if(won&&cell){cell.token=null;if(cell.poi)cell.poi=Object.assign({},cell.poi,{done:1});}
   G.mini=null;log(won?'Отряд возвращается на карту с добычей.':'Отряд отступает из подземелья. Вход остаётся открытым.');sfx('travel');ui();
@@ -1509,7 +1530,7 @@ function newGame(){
   startLoc(1);
 }
 function startLoc(n){
-  G.loc=n;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
+  G.loc=n;G.undo=null;G.mini=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
   if(n<ARENA)genField(n);else genArena();
   G.obj=null;if(n<ARENA&&LOCS[n].mon)rollObjective();
   G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;});
@@ -2045,7 +2066,7 @@ async function dragonTurn(){
   }
 }
 function newRound(){
-  G.round++;G.ready={};
+  G.round++;G.ready={};G.undo=null;
   G.heroes.forEach(h=>{
     h.block=h.guard=h.taunt=false;h.xpFlag=false;h.rage=0;
     if(h.alive){
@@ -2065,7 +2086,7 @@ function newRound(){
 }
 async function endRound(){
   if(G.busy||G.over)return;
-  G.busy=true;G.mode=null;ui();
+  G.busy=true;G.mode=null;G.undo=null;ui();
   if(G.heroes.some(h=>h.alive&&isAI(h))){await aiPhase();if(checkEnd()||G.over)return;}
   log('— Ход врагов —');sfx('drum');
   await monstersPhase();
@@ -2319,6 +2340,28 @@ function closeModal(){
   $('#modal').style.display='none';NET.lobby=false;
   if(NET.gmodal){NET.gmodal=false;bc({t:'mclose'});}
 }
+function endClick(){
+  if(!SET.confirm||G.busy||G.over||G.camp||(G.ready&&G.ready[NET.me])){act({c:'end'});return;}
+  const idle=G.heroes.filter(h=>h.alive&&mine(h)&&h.ap>0);
+  if(!idle.length){act({c:'end'});return;}
+  openModal('<h1>Завершить раунд?</h1><p>У героев остались очки действия: '+idle.map(h=>'<b>'+h.d.n+'</b> ('+h.ap+')').join(', ')+'.</p>',
+    [{t:'Всё равно завершить',fn:()=>{closeModal();act({c:'end'});}},{t:'Продолжить ход',fn:closeModal}],true);
+}
+function showSettings(){
+  const sp=[[1,'обычная'],[.5,'быстрая'],[.2,'очень быстрая']];
+  const cur=Math.max(0,sp.findIndex(x=>x[0]===SET.speed));
+  const oo=v=>v?'вкл':'выкл';
+  openModal('<h1>Настройки</h1><p style="color:var(--mid)">Сохраняются в этом браузере и действуют только у вас.</p>'+
+    '<h2>Громкость: <span id="volv">'+SET.vol+'%</span></h2><input type="range" id="vol" min="0" max="100" step="5" value="'+SET.vol+'">'+
+    '<p>Скорость анимаций — ходы врагов и ИИ быстрее. Крупный интерфейс — увеличенные шрифты. Меньше эффектов — без тряски экрана, вспышек и частиц. Палитра для дальтоников — полоски здоровья синие/оранжевые/пурпурные. Подтверждение — спрашивать, если у героя остались очки действия.</p>',
+    [{t:'Скорость: '+sp[cur][1],fn:()=>{SET.speed=sp[(cur+1)%sp.length][0];saveSet();showSettings();}},
+     {t:'Крупный интерфейс: '+oo(SET.big),fn:()=>{SET.big=!SET.big;saveSet();applySet();fit();showSettings();}},
+     {t:'Меньше эффектов: '+oo(SET.calm),fn:()=>{SET.calm=!SET.calm;saveSet();applySet();showSettings();}},
+     {t:'Палитра для дальтоников: '+oo(SET.cb),fn:()=>{SET.cb=!SET.cb;saveSet();applySet();ui();showSettings();}},
+     {t:'Подтверждать конец раунда: '+oo(SET.confirm),fn:()=>{SET.confirm=!SET.confirm;saveSet();showSettings();}},
+     {t:'Готово',fn:closeModal}],true);
+  const v=$('#vol');if(v)v.oninput=()=>{SET.vol=+v.value;$('#volv').textContent=SET.vol+'%';saveSet();applySet();};
+}
 function showIntro(){
   openModal(`<h1>ЧЁРНЫЙ ДРАКОН</h1>
   <p>Кооперативный данж-краулер. Вы ведёте отряд из четырёх героев: <b>Танка, Мечника, Лучника и Мага</b>.</p>
@@ -2365,7 +2408,7 @@ const THEME={
  2:{a:'#3c3548',b:'#443c52',line:'#29222f',blk:'#1a1522',acc:['#6d627f','#bdb59e','#9a52b0'],bg:'#0e0a14'},
  3:{a:'#34506a',b:'#3a5a76',line:'#223648',blk:'#16222e',acc:['#cfefff','#8ad8ff','#ffffff'],bg:'#070d14'},
  4:{a:'#4d2c2c',b:'#593434',line:'#331c1c',blk:'#1d0f0f',acc:['#ff7a30','#ffc040','#8c3a2a'],bg:'#120707'}};
-const hpCol=f=>f>.5?'#5ad15a':f>.25?'#f0c020':'#e24444';
+const hpCol=f=>SET.cb?(f>.5?'#4a90e8':f>.25?'#f0a020':'#d040c8'):(f>.5?'#5ad15a':f>.25?'#f0c020':'#e24444');
 function ell(x,y,rx,ry){ctx.fillStyle='rgba(0,0,0,.38)';ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);ctx.fill();}
 function drawTerr(cell,x,y,now){
   hexPath(x,y,HS-1.5);
@@ -2531,7 +2574,7 @@ function focusHero(){const h=selHero();if(!h)return;const p=hc(h.c,h.r);CAM.tgt=
 function spawnP(x,y,vx,vy,life,col,size,g){if(PART.length>520)return;PART.push({x,y,vx,vy,t:0,life,col:typeof col==='string'?hx(col):col,size:size||2,g:g||0});}
 const rr=(a,b)=>a+Math.random()*(b-a);
 function burstAt(x,y,kind){
-  const n=(k,f)=>{for(let i=0;i<k;i++)f(i);};
+  const n=(k,f)=>{if(SET.calm)k=Math.ceil(k/4);for(let i=0;i<k;i++)f(i);};
   switch(kind){
     case 'hit':n(9,()=>{const a=rr(0,6.28),v=rr(40,120);spawnP(x,y,Math.cos(a)*v,Math.sin(a)*v-20,rr(.25,.45),Math.random()<.5?'#ffffff':'#ff5a4a',2,260);});break;
     case 'kill':n(20,()=>{const a=rr(0,6.28),v=rr(30,130);spawnP(x,y,Math.cos(a)*v,Math.sin(a)*v-30,rr(.5,.95),['#d3d8e2','#8b92a3','#e34540','#4b5162'][Math.floor(Math.random()*4)],rr(2,3.5),140);});break;
@@ -2551,7 +2594,7 @@ function burstAt(x,y,kind){
 function efx(k,x,y,dur,col,extra){EFX.push(Object.assign({k,x,y,t:performance.now(),dur,col},extra||{}));}
 function fxLocal(o){
   if(!PX)return;
-  if(o.burst==='shake'){CAM.shake=Math.max(CAM.shake,o.mag||4);return;}
+  if(o.burst==='shake'){if(!SET.calm)CAM.shake=Math.max(CAM.shake,o.mag||4);return;}
   if(o.burst==='lunge'){const a=hc(o.c,o.r),b=hc(o.tc,o.tr),d=Math.hypot(b.x-a.x,b.y-a.y)||1;const dx=(b.x-a.x)/d,dy=(b.y-a.y)/d;const n=performance.now();LUNGE[o.c+','+o.r]={dx,dy,t:n};faceUnit(o.c,o.r,o.tc,o.tr,n);RECOIL[o.tc+','+o.tr]={dx,dy,t:n+120};EFX.push({k:'slash',x:b.x,y:b.y-4,ang:Math.atan2(dy,dx),t:n+90,dur:240,col:0xffffff});return;}
   if(o.burst==='confetti'){burstAt(0,0,'confetti');return;}
   const p=hc(o.c,o.r);
@@ -2808,7 +2851,7 @@ function renderPixi(){
     f.lineStyle(2,col,1-k);f.drawCircle(x,y,6+k*18);f.lineStyle(2,col);f.drawPolygon(hexPts(x,y,HS-2));f.lineStyle(0);
     f.beginFill(col);f.drawPolygon([x,y-4,x-5,y-13,x+5,y-13]);f.endFill();T(p.name,x,y-HS-4,7,col);}
   // фон: частицы окружения
-  const amb=({1:['#e8f070',16],2:['#c58bff',18],3:['#ffffff',26],4:['#ff8a20',22]})[G.loc]||['#fff',0];
+  const amb=SET.calm?['#fff',0]:({1:['#e8f070',16],2:['#c58bff',18],3:['#ffffff',26],4:['#ff8a20',22]})[G.loc]||['#fff',0];
   while(AMB.length<amb[1])AMB.push({x:rr(0,W),y:rr(0,H),ph:rr(0,6.28),v:rr(6,18)});
   AMB.length=Math.min(AMB.length,amb[1]);
   for(const a of AMB){
@@ -2947,10 +2990,11 @@ function renderTop(){
   const keysH=G.endless?'<span class="chip" data-tn="Бесконечное подземелье" data-tip="Каждый этаж сложнее предыдущего. Каждые 5 этажей — босс. Враги: +'+Math.round((DS().hp-1)*100)+'% HP." style="color:#ffb0a0;border-color:#7a2a2a">Этаж '+G.depth+(isBossFloor(G.depth)?' · БОСС':'')+'</span>':'<span class="keys"><span class="lb">КЛЮЧИ</span>'+Array.from({length:KEYS_NEEDED},(_,i)=>'<i class="gem'+(i<G.keys?' on':'')+'"></i>').join('')+'</span>';
   const relH=(G.relics&&G.relics.length)?'<span class="relics">'+G.relics.map(id=>'<img class="ric" src="'+RICON[id]+'" data-tn="'+esc(RELICS[id].n)+'" data-tc="Реликвия" data-tip="'+esc(RELICS[id].d)+'">').join('')+'</span>':'';
   const ot=objText();const objH=ot?'<span class="chip obj '+ot.st+'" data-tn="Цель: '+esc(ot.n)+'" data-tip="'+esc(ot.d)+' Награда: золото и реликвия.">'+(ot.st==='ok'?'✓ ':ot.st==='bad'?'✗ ':'◎ ')+esc(ot.n)+(ot.prog?' '+ot.prog:'')+'</span>':'';
+  const uh=G.undo&&G.heroes.find(h=>h.id===G.undo.h);const undoH=uh&&uh.alive&&mine(uh)?'<button class="btn" data-act="undo" data-tip="Вернуть героя на прежнее место и вернуть потраченные очки действия. Работает, пока ход ничем не отозвался (бой, находка, ловушка).">↶ Отмена хода</button>':'';
   const exH=hasExit()?(atExit()?'<button class="btn act" data-act="next">'+(G.mini?'Отступить ◀':'Дальше ▶')+'</button>':'<span class="chip">Выход '+G.heroes.filter(h=>h.alive&&cellOf(h.c,h.r).zone==='exit').length+'/'+G.heroes.filter(h=>h.alive).length+'</span>'):'';
-  $('#top').innerHTML='<span class="loc">'+L.n+(G.mini?' · '+G.mini.n:'')+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+exH+
+  $('#top').innerHTML='<span class="loc">'+L.n+(G.mini?' · '+G.mini.n:'')+'</span><span class="chip">Раунд '+G.round+'</span><span class="chip gold"><i class="coin"></i>'+(G.gold||0)+'</span>'+keysH+objH+relH+bossH+'<span class="sp"></span>'+undoH+exH+
    netTop()+
-   '<button class="btn" data-act="quit">Выход</button><button class="btn" data-act="rules">?</button><button class="btn" data-act="music">'+(MUSIC?'♪ Музыка':'♪ выкл')+'</button><button class="btn" data-act="mute">'+(MUTE?'🔇 выкл':'🔊 Звук')+'</button>';
+   '<button class="btn" data-act="quit">Выход</button><button class="btn" data-act="rules">?</button><button class="btn" data-act="settings" data-tip="Скорость анимаций, размер интерфейса, громкость, палитра для дальтоников, меньше эффектов">⚙</button><button class="btn" data-act="music">'+(MUSIC?'♪ Музыка':'♪ выкл')+'</button><button class="btn" data-act="mute">'+(MUTE?'🔇 выкл':'🔊 Звук')+'</button>';
 }
 let LOGHTML='';
 function renderLog(){
@@ -3105,13 +3149,16 @@ function runCmd(cmd,who){
   const h=G.heroes.find(x=>x.id===cmd.h);
   if(!h||!h.alive||ownerOf(h)!==who)return;
   REMOTE=who!=='H';
+  const keepUndo=cmd.c==='mv'||cmd.c==='undo';if(!keepUndo)G.undo=null;
   try{
     switch(cmd.c){
+      case 'undo':{const u=G.undo;if(!u||u.h!==h.id)break;G.undo=null;h.c=u.c;h.r=u.r;h.ap=u.ap;sfx('whoosh');log(h.d.n+' отменяет ход.');afterAction();break;}
       case 'atk':{const bc=cellOf(cmd.x,cmd.y);if(bc&&bc.barrel&&h.ap>=1&&dist(h.c,h.r,bc.c,bc.r)<=st(h,'rng')){h.ap-=1;explodeBarrel(h,bc);afterAction();break;}
         const m=monsterAt(cmd.x,cmd.y);if(m&&h.ap>=1&&mdist(h,m)<=st(h,'rng'))doAttack(h,m);break;}
       case 'exp':{const cell=cellOf(cmd.x,cmd.y);if(cell&&cell.token&&h.ap>=1&&dist(h.c,h.r,cell.c,cell.r)<=1)doExplore(h,cell);break;}
       case 'mv':{const cell=cellOf(cmd.x,cmd.y);if(!cell||heroAt(cell.c,cell.r))break;const spd=st(h,'spd');const d=reach(h,h.ap*spd).get(key(cell.c,cell.r));
-        if(d>0){const cost=Math.ceil(d/spd);if(h.ap>=cost)doMove(h,cell,cost);}break;}
+        if(d>0){const cost=Math.ceil(d/spd);if(h.ap>=cost){const pre={h:h.id,c:h.c,r:h.r,ap:h.ap,ll:G.log.length};G.undo=pre;doMove(h,cell,cost);
+          if(G.log.length!==pre.ll||!h.alive)G.undo=null;ui();}}break;}
       case 'abil':{if(!habils(h).includes(cmd.id))break;runSpec(h,ABIL[cmd.id],{id:cmd.id},cmd);break;}
       case 'drop':{const id=h.items[cmd.slot];if(!id)break;h.items.splice(cmd.slot,1);fixHp(h);dropLoot(h.c,h.r,id);log(h.d.n+' кладёт на землю: '+ITEMS[id].n+'.');sfx('item');afterAction();break;}
       case 'take':{const cell=cellOf(h.c,h.r);const id=cell.loot&&cell.loot[cmd.i];if(!id||!canUse(h,id)||h.items.length>=3)break;cell.loot.splice(cmd.i,1);takeItem(h,id);log(h.d.n+' подбирает: '+ITEMS[id].n+'.');afterAction();break;}
@@ -3132,7 +3179,7 @@ function makeSnap(){
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,mini:G.mini?{n:G.mini.n,won:G.mini.won}:null},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,mini:G.mini?{n:G.mini.n,won:G.mini.won}:null,undo:G.undo?{h:G.undo.h}:null},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
@@ -3691,19 +3738,22 @@ $('#heroes').addEventListener('click',e=>{
 });
 $('#top').addEventListener('click',e=>{
   const b=e.target.closest('[data-act]');if(!b)return;
-  if(b.dataset.act==='end')act({c:'end'});
+  if(b.dataset.act==='end')endClick();
   else if(b.dataset.act==='next')act({c:'next'});
   else if(b.dataset.act==='lobby')showLobby();
   else if(b.dataset.act==='say')showPhrases();
   else if(b.dataset.act==='quit')askQuit();
   else if(b.dataset.act==='rules')showIntro();
+  else if(b.dataset.act==='settings')showSettings();
+  else if(b.dataset.act==='undo'){if(G.undo)act({c:'undo',h:G.undo.h});}
   else if(b.dataset.act==='mute'){MUTE=!MUTE;saveAudio();renderTop();}
   else if(b.dataset.act==='music'){MUSIC=!MUSIC;saveAudio();musicTick();renderTop();}
 });
 document.addEventListener('keydown',e=>{
   if($('#modal').style.display==='flex')return;
   if(e.key>='1'&&e.key<='4'){const h=G.heroes[+e.key-1];if(h){G.sel=h.id;G.mode=null;ui();}}
-  else if(e.key===' '){e.preventDefault();act({c:'end'});}
+  else if(e.key===' '){e.preventDefault();endClick();}
+  else if(e.key==='z'||e.key==='Z'||e.key==='я'||e.key==='Я'){if(G.undo)act({c:'undo',h:G.undo.h});}
   else if(e.key==='Escape'){G.mode=null;ui();}
 });
 function fit(){
@@ -3719,7 +3769,7 @@ $('#log').addEventListener('scroll',()=>{$('#log').dataset.touched=1;});
 $('#logtg').addEventListener('click',()=>{const l=$('#log');l.classList.toggle('big');$('#logtg').textContent=l.classList.contains('big')?'Свернуть':'Развернуть';l.scrollTop=l.scrollHeight;fit();});
 
 /* старт */
-newGame();fit();loop();showMenu();
+applySet();newGame();fit();loop();showMenu();
 </script>
 </body>
 </html>
