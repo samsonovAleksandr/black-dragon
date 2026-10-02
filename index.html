@@ -1782,7 +1782,7 @@ function nextWave(){
   const spots=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.terr&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))
     .sort((a,b)=>((a.c<=1||a.c>=G.cols-2||a.r<=0||a.r>=G.rows-1)?0:1)-((b.c<=1||b.c>=G.cols-2||b.r<=0||b.r>=G.rows-1)?0:1)||0);
   let n=0;
-  const put=(id,bossy)=>{const c=spots.shift();if(!c)return;const m=spawnMon(id,c.c,c.r);m.aggro=true;fxQ({burst:'spawn',c:c.c,r:c.r});if(bossy){m.elite=true;m.home=[c.c,c.r];}n++;};
+  const put=(id,bossy)=>{const c=spots.shift();if(!c)return;const m=bossy?spawnMon(id,c.c,c.r):maybeAffix(spawnMon(id,c.c,c.r));m.aggro=true;fxQ({burst:'spawn',c:c.c,r:c.r});if(bossy){m.elite=true;m.home=[c.c,c.r];}n++;};
   if(boss)put(HORDE_BOSSES[(w/5-1)%HORDE_BOSSES.length],true);
   while(n<want&&spots.length)put(pick(pool),false);
   sfx(boss?'roar':'spawn');
@@ -2084,7 +2084,8 @@ function dmgMon(h,m,raw,o={}){
   const dmg=Math.max(1,raw-d);
   if(mdist(h,m)>1&&!o.noproj)shoot(h,m,o.burn?'fire':(o.magic||h.id==='mage')?'magic':'arrow');
   else if(!o.noproj)fxQ({burst:'lunge',c:h.c,r:h.r,tc:m.c,tr:m.r});
-  m.hp-=dmg;m.hit.add(h.id);pop(m,'-'+dmg);sfx(o.magic||h.id==='mage'?'zap':h.id==='archer'?'arrow':'slash');
+  m.hp-=dmg;m.hit.add(h.id);pop(m,'-'+dmg);
+  if(m.affix==='thorns'&&h.alive&&mdist(h,m)<=1&&!o.noproj){log('Шипы ранят '+h.d.n+'.');hitHero(h,2,null,{pierce:true});}sfx(o.magic||h.id==='mage'?'zap':h.id==='archer'?'arrow':'slash');
   log(h.d.n+' → '+m.n+': '+dmg+' урона'+(m.hp>0?' ('+m.hp+' HP осталось)':'')+'.');
   if(m.hp>0&&!m.boss){if(hasRelic('venom')&&!o.noproj)m.bleed=Math.max(m.bleed||0,2);if(o.burn)m.burn=Math.max(m.burn||0,o.burn);if(o.bleed)m.bleed=Math.max(m.bleed||0,o.bleed);if(hasPerk(h,'venom')&&!o.noproj)m.bleed=Math.max(m.bleed||0,2);}
   if(m.hp<=0)killMon(m,h);
@@ -2130,6 +2131,34 @@ function bossCleared(){
   G.floorClear=true;const g=evGold(40+G.depth*4);G.relicPending=(G.relicPending||0)+1;sfx('victory');fxQ({burst:'confetti',c:0,r:0});
   log('★ ЭТАЖ '+G.depth+': БОСС ПОВЕРЖЕН! +'+g+' золота, реликвия ждёт на привале. Дальше — выход!');showBanner('Босс повержен!','Выход открыт: соберитесь на светлых гексах');
   const dc=G.grid.flat().filter(c=>c.dragon);dc.forEach(c=>{c.dragon=false;c.zone='exit';});G.exitCells=dc.map(c=>[c.c,c.r]);
+}
+
+/* --- Элитные модификаторы обычных врагов --- */
+const AFFIX={
+ venom:{n:'Яд',d:'удары отравляют',col:0x52bb4e,css:'#8af58a',mods:{poison:1}},
+ fire:{n:'Огонь',d:'удары поджигают',col:0xff8a20,css:'#ffb060',mods:{burn:1}},
+ armor:{n:'Броня',d:'+2 ЗАЩ и больше HP — бейте магией или пробивающими ударами',col:0xa0b4d0,css:'#c8d4e8'},
+ vamp:{n:'Вампир',d:'лечится нанесённым уроном',col:0xd03050,css:'#ff7a90',mods:{drain:1}},
+ swift:{n:'Скорость',d:'ходит на 2 гекса дальше',col:0xffe27a,css:'#ffe27a'},
+ frost:{n:'Лёд',d:'удары промораживают (−1 ОД)',col:0x66deef,css:'#9df',mods:{chill:1}},
+ thorns:{n:'Шипы',d:'ударивший его в ближнем бою получает 2 урона',col:0xc08050,css:'#e0a070'},
+ regen:{n:'Живучесть',d:'восстанавливает 2 HP за ход',col:0x8ae850,css:'#b8f080',mods:{regen:2}}
+};
+const monB=m=>m.mods?Object.assign({},MON[m.id],m.mods):MON[m.id];
+function applyAffix(m,k){
+  const A=AFFIX[k];if(!A)return m;
+  m.affix=k;m.mods=Object.assign({},A.mods||{});
+  let mx=Math.round(m.max*1.15);if(k==='armor'){m.def+=2;mx=Math.round(mx*1.3);}
+  if(k==='swift')m.mv+=2;
+  m.hp=m.max=mx;m.xp=Math.round(m.xp*1.5)+1;m.n=m.n+' ['+A.n+']';
+  return m;
+}
+function maybeAffix(m){
+  if(!m||m.boss||m.elite||m.summoned||!MON[m.id]||!MON[m.id].xp||m.id==='mimic'||m.affix)return m;
+  const tier=Math.min(2,LOC_TIER[G.loc]||0)+(G.endless?Math.floor((G.depth-1)/3):0)+(G.horde?Math.floor((G.horde.wave-1)/3):0);
+  const ch=Math.min(.45,.08+.05*tier+(G.diff==='hard'?.07:G.diff==='easy'?-.04:0));
+  if(Math.random()<ch){applyAffix(m,pick(Object.keys(AFFIX)));pop(m,AFFIX[m.affix].n.toUpperCase(),AFFIX[m.affix].css);}
+  return m;
 }
 function spawnMon(id,c,r){
   const b=MON[id];
@@ -2272,7 +2301,7 @@ function revealToken(h,cell){
   const pos={c:cell.c,r:cell.r};
   if(cell.poi)log('Осматриваем: '+cell.poi.n+'...');
   switch(t.t){
-    case 'monster':{const m=spawnMon(t.m,cell.c,cell.r);log('Из фишки выходит: '+m.n+'!');sfx('spawn');fxQ({burst:'spawn',c:cell.c,r:cell.r});pop(m,'!');break;}
+    case 'monster':{const m=maybeAffix(spawnMon(t.m,cell.c,cell.r));log('Из фишки выходит: '+m.n+'!');sfx('spawn');fxQ({burst:'spawn',c:cell.c,r:cell.r});pop(m,'!');break;}
     case 'item':giveItem(h,t.it,cell);break;
     case 'key':{if(G.endless){const g=evGold(18+G.depth*2);sfx('key');log('Тайник! Найдено '+g+' золота.');pop(pos,'+'+g+' з','#ffd23f');G.heroes.forEach(x=>{if(x.alive)gainXP(x,1);});}else{G.keys++;sfx('key');log('КЛЮЧ найден! Ключей: '+G.keys+'/'+KEYS_NEEDED+'. Печать Дракона ослабла.');pop(pos,'КЛЮЧ');}
       if(t.guard){const f=freeNear(cell.c,cell.r);if(f){const m=spawnMon(t.guard,f[0],f[1]);log('Хранитель пробуждается: '+m.n+'!');sfx('spawn');}}
@@ -2280,7 +2309,7 @@ function revealToken(h,cell){
     case 'event':
       if(t.e==='trap'){log('Ловушка! '+h.d.n+' получает 3 урона.');pop(h,'ЛОВУШКА');h.hp-=3;sfx('trap');if(h.hp<=0)killHero(h);}
       else if(t.e==='spring'){log('Целебный родник! Герои рядом восстанавливают 4 HP.');G.heroes.filter(x=>x.alive&&dist(x.c,x.r,cell.c,cell.r)<=3).forEach(x=>{const b=x.hp;x.hp=Math.min(st(x,'maxhp'),x.hp+4);pop(x,'+'+(x.hp-b));});sfx('heal');}
-      else if(t.e==='ambush'){log('Засада!');sfx('spawn');const pool=AMB_POOL[G.loc]||AMB_POOL[4];for(let i=0;i<2;i++){const f=freeNear(h.c,h.r);if(f){spawnMon(pick(pool),f[0],f[1]);}}}
+      else if(t.e==='ambush'){log('Засада!');sfx('spawn');const pool=AMB_POOL[G.loc]||AMB_POOL[4];for(let i=0;i<2;i++){const f=freeNear(h.c,h.r);if(f){maybeAffix(spawnMon(pick(pool),f[0],f[1]));}}}
       else if(t.e==='chest')openChest(h,cell,t);
       else if(EXTRA_EV.includes(t.e)||t.e==='treasure')openEvent(t.e,h,cell);
       else if(t.e==='shrine'){log('Древнее святилище: '+h.d.n+' получает 2 опыта.');gainXP(h,2);sfx('shrine');}
@@ -2363,7 +2392,7 @@ const EXTRA_EV=['merchant','altar','prisoner','riddle','gambler','campfire'];
 const AMB_POOL={1:['goblin','wolf','goblin','bat','boar'],2:['orc','ghost','orc','cultist','gargoyle'],3:['yeti','icespirit','frostspider','wolf'],4:['orc','wraith','gargoyle'],5:['toad','leech','croc','wisp','toad'],6:['plaguerat','acidslime','scorpion','zombie','plaguerat']};
 function ambushAt(h,n){
   const pool=AMB_POOL[G.loc]||AMB_POOL[4];
-  sfx('spawn');for(let i=0;i<n;i++){const f=freeNear(h.c,h.r);if(f){const m=spawnMon(pick(pool),f[0],f[1]);fxQ({burst:'spawn',c:f[0],r:f[1]});pop(m,'!');}}
+  sfx('spawn');for(let i=0;i<n;i++){const f=freeNear(h.c,h.r);if(f){const m=maybeAffix(spawnMon(pick(pool),f[0],f[1]));fxQ({burst:'spawn',c:f[0],r:f[1]});pop(m,'!');}}
 }
 function evGold(g){g=Math.round(g*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1));G.gold+=g;return g;}
 function openRelicChoice(n,title,intro){
@@ -2411,7 +2440,7 @@ function alarmTick(){
   if(G.round>o.limit){
     if(!o.fail){o.fail=true;log('ТРЕВОГА! Враги почуяли отряд — подкрепление прибывает каждый раунд!');showBanner('ТРЕВОГА!','Подкрепление врага на подходе');sfx('roar');}
     const c=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!inRoom(c.c)&&!heroAt(c.c,c.r)&&!monsterAt(c.c,c.r)&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))[0];
-    if(c){const L=LOCS[G.loc];const m=spawnMon(pick(L.mon.filter(id=>MON[id]&&!MON[id].split&&MON[id].hp<=14)),c.c,c.r);fxQ({burst:'spawn',c:c.c,r:c.r});log('Подкрепление: '+m.n+'.');}
+    if(c){const L=LOCS[G.loc];const m=maybeAffix(spawnMon(pick(L.mon.filter(id=>MON[id]&&!MON[id].split&&MON[id].hp<=14)),c.c,c.r));fxQ({burst:'spawn',c:c.c,r:c.r});log('Подкрепление: '+m.n+'.');}
   }
 }
 function openEvent(k,h,cell){
@@ -2523,7 +2552,7 @@ function moveToward(m,t){const b=chooseDest(m,t,true);if(b){m.c=b[0];m.r=b[1];en
 /* намерения врагов: что сделает монстр в свой ход (для подсказки на карте) */
 function computeIntents(){
   for(const m of G.monsters){
-    m.int=null;if(!m.alive||m.boss)continue;const b=MON[m.id];if(!b)continue;
+    m.int=null;if(!m.alive||m.boss)continue;const b=monB(m);if(!b)continue;
     if(m.stun){m.int={k:'stun'};continue;}
     const lairR=m.lair||b.lair;if(lairR&&!m.aggro&&!(m.hit&&m.hit.size)){m.int={k:'sleep'};continue;}
     const t=pickTarget(m);if(!t)continue;
@@ -2547,7 +2576,7 @@ async function monsterAct(m){
   if(!monTick(m))return;
   const rooted=m.root;m.root=false;
   if(m.stun){m.stun=false;log(m.n+' оглушён и пропускает ход.');return;}
-  const b=MON[m.id];
+  const b=monB(m);
   const lairR=m.lair||b.lair;
   if(lairR&&!m.aggro){const near=G.heroes.some(h=>h.alive&&dist(h.c,h.r,m.c,m.r)<=lairR);if(!near&&!m.hit.size)return;m.aggro=true;log(m.n+' поднимается с трона!');sfx('roar');}
   if(b.regen&&m.hp<m.max){m.hp=Math.min(m.max,m.hp+b.regen);pop(m,'+'+b.regen);}
@@ -3423,6 +3452,7 @@ function renderPixi(){
     const ap=animPos('m'+G.monsters.indexOf(m),m.id,m.c,m.r,dt),ux=unitFx(m.c,m.r,now);const x=ap.x+ux[0],y=ap.y+ux[1];
     const br=Math.sin(now/340+m.c*1.7+m.r*.9);
     shadow(g,x-ux[0],y-ux[1]+10,11-br*.6,4-br*.2);
+    if(m.affix&&AFFIX[m.affix]){const aa=PX.pGlow.get(PX.glowTex);aa.position.set(Math.round(x),Math.round(y));aa.scale.set(2.3);aa.tint=AFFIX[m.affix].col;aa.alpha=.5+.15*Math.sin(now/260+m.c);}
     if(m.elite){const ea=PX.pGlow.get(PX.glowTex);ea.position.set(Math.round(x),Math.round(y));ea.scale.set(2.4);ea.tint=m.leader?0xff6a6a:0x88ddff;ea.alpha=.28+.08*Math.sin(now/300);}
     const ut=unitTexOf(m.spr,'m'+G.monsters.indexOf(m),m,ap,now,false),s=PX.p2.get(ut.t);s.scale.set(ut.flip,1);
     s.position.set(Math.round(x),Math.round(y-4-Math.round(ap.hop*.5)));
@@ -3430,6 +3460,7 @@ function renderPixi(){
     if(m.stun)T('zZ',x+10,y-10,8,'#ffd23f');
     pbar(f,x,y+12,m.hp/m.max,'#e24444');pStatus(f,m,x,y);
     if(m.elite)T(m.hp+'/'+m.max,x,y-32,7,'#99ddff');
+    if(m.affix&&AFFIX[m.affix]){f.beginFill(0);f.drawRect(Math.round(x+7),Math.round(y-25),7,7);f.endFill();f.beginFill(AFFIX[m.affix].col);f.drawRect(Math.round(x+8),Math.round(y-24),5,5);f.endFill();}
     if(m.burn&&Math.random()<.2)spawnP(x+rr(-6,6),y-6,rr(-6,6),rr(-40,-20),rr(.3,.5),'#ff8a20',2,-20);
   }
   // призраки погибших
@@ -3755,7 +3786,7 @@ function describe(cell){
   if(!cell){ui();return;}
   const m=monsterAt(cell.c,cell.r);
   if(m){const it=m.int;let itx='';if(it){const th=it.tc!=null?heroAt(it.tc,it.tr):null;itx=it.k==='stun'?'пропустит ход (оглушён)':it.k==='sleep'?'спит, пока не подойдёте близко':it.k==='summon'?'призовёт помощника':it.k==='heal'?'вылечит союзника':it.k==='move'?'идёт к '+(th?th.d.n:'герою'):(it.k==='ranged'?'стреляет в ':'бьёт ')+(th?th.d.n:'героя')+(it.dmg?' (≈'+it.dmg+' урона)':'');}
-    inf.innerHTML='<b>'+m.n+'</b> · HP '+m.hp+'/'+m.max+' · АТК '+m.atk+' · ЗАЩ '+m.def+' · ХОД '+m.mv+' · ДАЛЬН '+m.rng+(m.xp?' · опыт '+m.xp:'')+statusTxt(m)+(itx?'<br><span style="color:#ffb0a0">Намерение: '+itx+'</span>':'')+'<br><span style="color:var(--mid)">'+m.d+'</span>';return;}
+    inf.innerHTML='<b>'+m.n+'</b>'+(m.affix&&AFFIX[m.affix]?' <span style="color:'+AFFIX[m.affix].css+'">('+AFFIX[m.affix].d+')</span>':'')+' · HP '+m.hp+'/'+m.max+' · АТК '+m.atk+' · ЗАЩ '+m.def+' · ХОД '+m.mv+' · ДАЛЬН '+m.rng+(m.xp?' · опыт '+m.xp:'')+statusTxt(m)+(itx?'<br><span style="color:#ffb0a0">Намерение: '+itx+'</span>':'')+'<br><span style="color:var(--mid)">'+m.d+'</span>';return;}
   const lootTxt=cell.loot&&cell.loot.length?'<br><span style="color:var(--gold)">На земле: '+cell.loot.map(id=>ITEMS[id].n+' ('+(ITEMS[id].cls?'только '+HDEF[ITEMS[id].cls].n:ITEMS[id].type)+': '+ITEMS[id].d+')').join('; ')+'</span>':'';
   const h=heroAt(cell.c,cell.r);
   if(h){inf.innerHTML='<b>'+h.d.n+'</b> ур.'+h.lv+' · HP '+h.hp+'/'+st(h,'maxhp')+' · АТК '+st(h,'atk')+' · ЗАЩ '+st(h,'def')+lootTxt;return;}
