@@ -756,6 +756,15 @@ ART.paladin=()=>mkArt({parts:[
  {t:'r',x:29,y:3,w:3,h:18,m:'glow'},{t:'r',x:30,y:3,w:1,h:17,m:'white'},{t:'r',x:27,y:20,w:7,h:2,m:'gold'},{t:'r',x:29,y:22,w:3,h:4,m:'leather'},{t:'e',cx:30.5,cy:27,rx:2,ry:1.5,m:'gold'},
  {t:'c',x:26,y:19,w:5,h:5,m:'steelD'},
 ]});
+/* Пленник (цель «Спасти пленника») */
+ART.captive=()=>mkArt({parts:[
+ {t:'c',x:13,y:27,w:4,h:6,m:'skin',b:-.15},{t:'c',x:19,y:27,w:4,h:6,m:'skin',b:-.15},{t:'r',x:12,y:32,w:6,h:3,m:'brown'},{t:'r',x:18,y:32,w:6,h:3,m:'brown'},
+ {t:'p',pts:[[11,15],[25,15],[26,29],[23,31],[20,28],[17,31],[13,29],[10,29]],m:'bone',b:-.1},{t:'l',x0:12,y0:22,x1:24,y1:23,w:1,m:'brown',k:.4},
+ {t:'e',cx:10,cy:21,rx:2.6,ry:4.5,m:'bone',b:-.1},{t:'e',cx:26,cy:21,rx:2.6,ry:4.5,m:'bone',b:-.1},
+ {t:'e',cx:14,cy:25,rx:2.2,ry:2.2,m:'skin'},{t:'e',cx:22,cy:25,rx:2.2,ry:2.2,m:'skin'},{t:'r',x:13,y:24,w:10,h:2,m:'leather'},{t:'px',x:18,y:24,c:'#c89558'},
+ {t:'e',cx:18,cy:10,rx:5.6,ry:6,m:'skin'},{t:'e',cx:18,cy:6,rx:6,ry:3.4,m:'hair'},{t:'p',pts:[[13,11],[23,11],[22,16],[18,18],[14,16]],m:'hair',b:-.05},
+ {t:'px',x:16,y:10,c:'#1a1424'},{t:'px',x:20,y:10,c:'#1a1424'},{t:'r',x:17,y:13,w:2,h:1,m:'skin',b:-.3},
+]});
 /* Монстры, партия 1: Тёмный лес */
 const eyes2=(x1,x2,y,c)=>[{t:'px',x:x1,y,c},{t:'px',x:x2,y,c}];
 ART.goblin=()=>mkArt({parts:[
@@ -1659,7 +1668,7 @@ const monsterAt=(c,r)=>G.monsters.find(m=>m.alive&&cellsOf(m).some(x=>x[0]===c&&
 function mdist(h,m){let b=99;for(const [c,r] of cellsOf(m))b=Math.min(b,dist(h.c,h.r,c,r));return b;}
 const pc=e=>e.big?{c:e.c,r:e.r}:{c:e.c,r:e.r};
 function freeNear(c,r,avoid){
-  const l=shuffle(nb(c,r)).filter(([x,y])=>{const cl=cellOf(x,y);return !cl.block&&!cl.token&&!cl.dragon&&!heroAt(x,y)&&!monsterAt(x,y)&&!(avoid&&avoid.some(a=>a[0]===x&&a[1]===y));});
+  const l=shuffle(nb(c,r)).filter(([x,y])=>{const cl=cellOf(x,y);return !cl.block&&!cl.token&&!cl.dragon&&!heroAt(x,y)&&!monsterAt(x,y)&&!npcAt(x,y)&&!(avoid&&avoid.some(a=>a[0]===x&&a[1]===y));});
   return l[0]||null;
 }
 
@@ -1920,7 +1929,7 @@ function newGame(){
   if(G.horde){G.keys=KEYS_NEEDED;startLoc(HORDE_LOC);nextWave();}else startLoc(1);
 }
 function startLoc(n){
-  G.loc=n;G.undo=null;G.room=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
+  G.loc=n;G.undo=null;G.room=null;G.npc=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
   const build=()=>{if(n===HORDE_LOC)genHorde();else if(n!==ARENA)genField(n);else genArena();G.obj=null;if(n!==ARENA&&LOCS[n].mon)rollObjective();};
   if(G.daily)withSeed(G.daily+'|'+G.depth,build);else build();
   G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;h.bless=0;h.faith=false;});
@@ -2178,6 +2187,7 @@ function reviveHero(t,frac){
   sfx('revive');pop(t,'ВОСКРЕС');log(t.d.n+' возвращается к жизни с '+t.hp+' HP!');
 }
 function killHero(h){
+  if(h.npc){h.hp=0;h.alive=false;sfx('death');pop(h,'ПАЛ');log('Пленник погибает!');escortFail();return;}
   if(hasPerk(h,'faith')&&!h.faith){h.faith=true;h.hp=1;h.alive=true;pop(h,'ВЕРА','#fff8c0');fxQ({burst:'level',c:h.c,r:h.r});sfx('revive');log(h.d.n+' удерживается на грани силой веры!');return;}
   if(hasRelic('phoenix')&&!G.phxUsed){G.phxUsed=true;h.hp=Math.max(1,Math.ceil(st(h,'maxhp')*.3));h.alive=true;pop(h,'ВОЗРОЖДЕНИЕ','#ffb060');fxQ({burst:'level',c:h.c,r:h.r});sfx('revive');log('Перо-оберег возрождает: '+h.d.n+'!');return;}
   h.hp=0;h.alive=false;h.ap=0;h.block=h.guard=h.taunt=h.haste=false;G.stats.deaths++;
@@ -2238,7 +2248,7 @@ function reach(h,maxSteps){
     const [c,r]=q.shift();const d=dm.get(key(c,r));if(d>=maxSteps)continue;
     for(const [x,y] of nb(c,r)){
       const k=key(x,y);const cl=cellOf(x,y);
-      if(cl.block||cl.token||cl.dragon||monsterAt(x,y)||(cl.trap&&cl.trap.seen))continue;
+      if(cl.block||cl.token||cl.dragon||monsterAt(x,y)||npcAt(x,y)||(cl.trap&&cl.trap.seen))continue;
       const nd=d+(cl.terr==='slow'?2:1);if(nd>maxSteps||(dm.has(k)&&dm.get(k)<=nd))continue;
       dm.set(k,nd);q.push([x,y]);
     }
@@ -2247,7 +2257,7 @@ function reach(h,maxSteps){
 }
 function moveHero(h,c,r,noFree){
   const adj=(noFree||h.id==='rogue')?[]:G.monsters.filter(m=>m.alive&&!m.big&&m.rng===1&&!m.stun&&mdist(h,m)<=1);
-  h.c=c;h.r=r;sfx(noFree?'whoosh':'step');pickupHere(h);enterCell(h,true);scoutTraps(h);
+  h.c=c;h.r=r;sfx(noFree?'whoosh':'step');pickupHere(h);enterCell(h,true);scoutTraps(h);npcCheckFree(h);
   for(const m of adj){
     if(!h.alive)break;
     if(dist(h.c,h.r,m.c,m.r)>1){log(m.n+' бьёт вдогонку!');hitHero(h,m.atk+rnd(0,1),m,{pierce:false});}
@@ -2318,6 +2328,34 @@ function revealToken(h,cell){
   }
 }
 
+
+
+/* --- Эскорт: пленник следует за отрядом, враги охотятся на него --- */
+const npcAt=(c,r)=>!!(G.npc&&G.npc.alive&&G.npc.c===c&&G.npc.r===r);
+const escortOn=()=>!!(G.npc&&G.npc.alive&&G.obj&&G.obj.type==='escort'&&!G.obj.done&&!G.obj.fail);
+function npcCheckFree(h){
+  const n=G.npc;if(!n||!n.alive||n.freed||!h||!h.alive||dist(h.c,h.r,n.c,n.r)>1)return;
+  n.freed=true;sfx('key');pop(n,'СВОБОДЕН','#9fe0ff');fxQ({burst:'level',c:n.c,r:n.r});
+  log(h.d.n+' ломает клетку! Пленник идёт за отрядом — доведите его до выхода живым.');showBanner('Пленник освобождён','Доведите его до выхода');
+}
+const npcNearExit=()=>!!(G.npc&&G.npc.alive&&G.exitCells.some(([c,r])=>dist(c,r,G.npc.c,G.npc.r)<=1));
+function npcMove(){
+  const n=G.npc;if(!n||!n.alive||!n.freed)return;
+  const alive=G.heroes.filter(h=>h.alive&&!inRoom(h.c));if(!alive.length)return;
+  const exitMode=alive.some(h=>cellOf(h.c,h.r).zone==='exit');
+  const goal=(c,r)=>exitMode?Math.min(...G.exitCells.map(([x,y])=>dist(c,r,x,y))):Math.max(0,Math.min(...alive.map(h=>dist(c,r,h.c,h.r)))-1);
+  if(goal(n.c,n.r)===0)return;
+  const dm=new Map([[key(n.c,n.r),0]]),q=[[n.c,n.r]];
+  while(q.length){const [c,r]=q.shift();const d=dm.get(key(c,r));if(d>=3)continue;
+    for(const [x,y] of nb(c,r)){const k=key(x,y);if(dm.has(k))continue;const cl=cellOf(x,y);
+      if(cl.block||cl.token||cl.dragon||heroAt(x,y)||monsterAt(x,y)||cl.terr==='lava'||cl.terr==='acid')continue;dm.set(k,d+1);q.push([x,y]);}}
+  let best=null,bs=goal(n.c,n.r)*10;
+  dm.forEach((d,k)=>{const [c,r]=k.split(',').map(Number);const sc=goal(c,r)*10+d;if(sc<bs){bs=sc;best=[c,r];}});
+  if(best){n.c=best[0];n.r=best[1];enterCell(n,false);log('Пленник идёт за отрядом.');}
+}
+function escortFail(){
+  const o=G.obj;if(o&&o.type==='escort'&&!o.done&&!o.fail){o.fail=true;sfx('defeat');log('✗ Пленник погиб. Цель провалена.');showBanner('Пленник погиб','Цель провалена');}
+}
 
 /* --- Сундуки: замок по классу героя, рунная головоломка, мимики --- */
 const chestTier=()=>Math.min(2,LOC_TIER[G.loc]||0)+(G.endless?Math.min(2,Math.floor((G.depth-1)/4)):0)+(G.horde?1:0);
@@ -2405,10 +2443,11 @@ const OBJ={
  leader:{n:'Убить вожака',d:'На карте засел усиленный Вожак (красное свечение). Убейте его.'},
  hunt:{n:'Охота',d:'Убейте нужное число врагов.'},
  treasure:{n:'Найти сокровище',d:'Одна из фишек «?» скрывает сундук с сокровищами.'},
+ escort:{n:'Спасти пленника',d:'Найдите пленника (он в клетке), подойдите к нему вплотную, чтобы освободить, и доведите до выхода живым. Враги будут охотиться на него.'},
  alarm:{n:'Тревога',d:'Дойдите до выхода за отведённое число раундов, иначе придёт подкрепление врага.'}
 };
 function rollObjective(){
-  const L=LOCS[G.loc];const t=pick(['leader','hunt','treasure','alarm']);
+  const L=LOCS[G.loc];const t=pick(['leader','hunt','treasure','alarm','escort']);G.npc=null;
   const o=G.obj={type:t,done:false,fail:false,prog:0,goal:t==='hunt'?rnd(6,9)+(G.endless?Math.floor(G.depth/3):0):1,limit:t==='alarm'?rnd(11,15):0};
   const empty=()=>shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!c.poi&&!c.barrel&&!inRoom(c.c)&&!monsterAt(c.c,c.r)&&dist(c.c,c.r,G.startCells[0][0],G.startCells[0][1])>=7));
   if(t==='leader'){
@@ -2416,10 +2455,20 @@ function rollObjective(){
     if(c){const m=spawnMon(base,c.c,c.r);m.hp=m.max=Math.round(m.hp*2.4);m.atk+=2;m.def+=1;m.n='Вожак: '+m.n;m.elite=true;m.leader=true;m.lair=5;m.xp=m.xp*3+3;}
     else o.type='hunt',o.goal=7;
   }else if(t==='treasure'){const c=empty()[0];if(c)c.token={t:'event',e:'treasure'};else{o.type='hunt';o.goal=7;}}
+  else if(t==='escort'){
+    const ex=G.exitCells[0];const c=empty().filter(x=>dist(x.c,x.r,ex[0],ex[1])>=4)[0]||empty()[0];
+    if(c){
+      const hp=12+4*Math.min(2,LOC_TIER[G.loc]||0)+(G.endless?Math.floor(G.depth/2):0);
+      G.npc={npc:true,id:'npc',c:c.c,r:c.r,hp,alive:true,freed:false,items:[],lv:1,perks:{},block:false,poison:0,burn:0,bleed:0,chill:0,
+        d:{n:'Пленник',hp,atk:0,def:0,ap:0,rng:1,spr:'captive',abil:[],lv:{}}};
+      const pool=L.mon.filter(id=>MON[id]&&MON[id].mv>=1&&!MON[id].split&&MON[id].hp<=14);
+      for(let i=0;i<2;i++){const f=freeNear(c.c,c.r);if(f){const m=spawnMon(pick(pool),f[0],f[1]);m.n='Стражник: '+m.n;}}
+    }else{o.type='hunt';o.goal=7;}
+  }
 }
 function objText(){
   const o=G.obj;if(!o)return null;const d=OBJ[o.type];
-  const prog=o.type==='hunt'?o.prog+'/'+o.goal:o.type==='alarm'&&!o.done?'раунд '+G.round+'/'+o.limit:'';
+  const prog=o.type==='hunt'?o.prog+'/'+o.goal:o.type==='alarm'&&!o.done?'раунд '+G.round+'/'+o.limit:o.type==='escort'&&!o.done&&!o.fail&&G.npc?(G.npc.freed?'HP '+Math.max(0,G.npc.hp)+'/'+G.npc.d.hp:'найти'):'';
   return {n:d.n,prog,st:o.done?'ok':o.fail?'bad':'',d:d.d+(o.type==='hunt'?' Нужно: '+o.goal+'.':o.type==='alarm'?' Лимит: '+o.limit+' раундов.':'')};
 }
 function objDone(){
@@ -2432,6 +2481,7 @@ function objProgress(k){
   else if(k==='leader'&&o.type==='leader')o.prog=1;
   else if(k==='treasure'&&o.type==='treasure')o.prog=1;
   else if(k==='exit'&&o.type==='alarm'&&G.round<=o.limit)o.prog=1;
+  else if(k==='escort'&&o.type==='escort')o.prog=1;
   else return;
   if(o.prog>=o.goal)objDone();
 }
@@ -2524,17 +2574,18 @@ function execSpec(h,spec,tgt,ref){
    ХОД ВРАГОВ
    ========================================================= */
 function pickTarget(m){
-  const hs=G.heroes.filter(h=>h.alive);if(!hs.length)return null;
+  const hs=G.heroes.filter(h=>h.alive);if(G.npc&&G.npc.alive&&G.npc.freed)hs.push(G.npc);if(!hs.length)return null;
   const tank=hs.find(h=>h.id==='tank'&&h.taunt);
   if(tank&&dist(m.c,m.r,tank.c,tank.r)<=m.mv+m.rng+3)return tank;
-  hs.sort((a,b)=>dist(m.c,m.r,a.c,a.r)-dist(m.c,m.r,b.c,b.r)||a.hp-b.hp);
+  const pd=x=>dist(m.c,m.r,x.c,x.r)-(x.npc?2:0);
+  hs.sort((a,b)=>pd(a)-pd(b)||a.hp-b.hp);
   return hs[0];
 }
 function monReach(m){
   const dm=new Map([[key(m.c,m.r),0]]),q=[[m.c,m.r]];
   while(q.length){const [c,r]=q.shift();const d=dm.get(key(c,r));if(d>=m.mv)continue;
     for(const [x,y] of nb(c,r)){const k=key(x,y);if(dm.has(k))continue;const cl=cellOf(x,y);
-      if(cl.block||cl.token||cl.dragon||heroAt(x,y)||monsterAt(x,y))continue;dm.set(k,d+1);q.push([x,y]);}}
+      if(cl.block||cl.token||cl.dragon||heroAt(x,y)||monsterAt(x,y)||npcAt(x,y))continue;dm.set(k,d+1);q.push([x,y]);}}
   return dm;
 }
 function chooseDest(m,t,rand){
@@ -2696,6 +2747,7 @@ async function endRound(){
   if(G.busy||G.over)return;
   G.busy=true;G.mode=null;G.undo=null;ui();
   if(G.heroes.some(h=>h.alive&&isAI(h))){await aiPhase();if(checkEnd()||G.over)return;}
+  if(G.npc&&G.npc.alive&&G.npc.freed){npcMove();ui();await sleep(200);}
   log('— Ход врагов —');sfx('drum');
   await monstersPhase();
 }
@@ -2964,6 +3016,11 @@ function renderCamp(){
 }
 function goNext(){
   if(G.busy||G.over||!atExit())return;
+  if(escortOn()&&G.npc.freed&&!G.mini){
+    if(npcNearExit()){objProgress('escort');const it=pick(['amulet','trollheart','vampring','feather','elixir']);const hh=G.heroes.find(h=>h.alive&&canUse(h,it))||G.heroes.find(h=>h.alive);if(hh)giveItem(hh,it,cellOf(hh.c,hh.r));log('Спасённый пленник благодарит отряд и дарит: '+ITEMS[it].n+'.');}
+    else if(!G.escAsk){G.escAsk=1;openModal('<h1>Пленник отстал</h1><p>Пленник не у выхода. Уйти без него? Цель «Спасти пленника» будет провалена.</p>',[{t:'Уйти без него',fn:()=>{closeModal();escortFail();goNext();}},{t:'Подождать',fn:()=>{closeModal();G.escAsk=0;}}]);return;}
+  }
+  G.escAsk=0;
   const go=()=>{ach(({1:'forest',5:'swamp',6:'poison'})[G.loc]||'forest');objProgress('exit');G.relicPending=(G.relicPending||0)+1;const out=campRest();openCamp(out);};
   if(nextOpts()[0]===ARENA&&G.keys<KEYS_NEEDED){
     const s=KEYS_NEEDED-G.keys;
@@ -3437,6 +3494,11 @@ function renderPixi(){
     if(cell.zone==='exit'&&G.exitCells.length&&cell.c===G.exitCells[0][0]&&cell.r===G.exitCells[0][1])T('ВЫХОД',x,y+HS+9,7,'#ffd23f');
   }
   G.heroes.filter(h=>!h.alive).forEach(h=>{const {x,y}=hc(h.c,h.r);shadow(g,x,y+10,11,4);const s=PX.p1.get(tex('grave'));s.position.set(Math.round(x),Math.round(y-4));});
+  if(G.npc&&G.npc.alive){const n=G.npc;const {x,y}=hc(n.c,n.r);shadow(g,x,y+10,10,4);
+    if(n.freed){const ga=PX.pGlow.get(PX.glowTex);ga.position.set(Math.round(x),Math.round(y));ga.scale.set(2);ga.tint=0x6ed2ff;ga.alpha=.3+.1*Math.sin(now/300);}
+    const t=tex('captive');if(t){const sp=PX.p2.get(t);sp.scale.set(1,1);sp.tint=0xffffff;sp.position.set(Math.round(x),Math.round(y-4+Math.round(Math.sin(now/500)*1)));}
+    pbar(f,x,y+12,Math.max(0,n.hp)/n.d.hp,'#6ed2ff');pStatus(f,n,x,y);
+    if(!n.freed){f.lineStyle(2,0x8b92a3,.95);for(let i=-2;i<=2;i++){f.moveTo(x+i*5,y-20);f.lineTo(x+i*5,y+8);}f.moveTo(x-12,y-20);f.lineTo(x+12,y-20);f.lineStyle(0);T('ПЛЕННИК',x,y-28,6,'#9fe0ff');}}
   // монстры
   const flash=(c,r)=>{const t=FLASH[c+','+r];return t&&now-t<150;};
   for(const m of G.monsters){
@@ -3607,6 +3669,7 @@ function renderCanvas(){
     if(cell.zone==='exit'&&G.exitCells.length&&cell.c===G.exitCells[0][0]&&cell.r===G.exitCells[0][1]){ctx.fillStyle='#ffd23f';ctx.font='7px "Press Start 2P",monospace';ctx.textAlign='center';ctx.fillText('ВЫХОД',x,y+HS+9);}
   }
   G.heroes.filter(h=>!h.alive).forEach(h=>{const {x,y}=hc(h.c,h.r);ell(x,y+10,11,4);spr('grave',x,y,-4);});
+  if(G.npc&&G.npc.alive){const {x,y}=hc(G.npc.c,G.npc.r);ell(x,y+10,10,4);spr('captive',x,y,-4);bar(x,y+12,Math.max(0,G.npc.hp)/G.npc.d.hp,'#6ed2ff');}
   for(const m of G.monsters){
     if(!m.alive)continue;
     if(m.big){
@@ -3791,6 +3854,7 @@ function describe(cell){
   const h=heroAt(cell.c,cell.r);
   if(h){inf.innerHTML='<b>'+h.d.n+'</b> ур.'+h.lv+' · HP '+h.hp+'/'+st(h,'maxhp')+' · АТК '+st(h,'atk')+' · ЗАЩ '+st(h,'def')+lootTxt;return;}
   if(lootTxt){inf.innerHTML='<b>Предметы на земле</b>'+lootTxt+'<br><span style="color:var(--mid)">Встаньте на гекс — подходящий предмет подберётся сам (если есть место).</span>';return;}
+  if(npcAt(cell.c,cell.r)){const n=G.npc;inf.innerHTML='<b>Пленник</b> · HP '+n.hp+'/'+n.d.hp+'<br><span style="color:var(--mid)">'+(n.freed?'Идёт за ближайшим героем, а когда кто-то встанет на выход — к выходу. Враги охотятся на него в первую очередь.':'Сидит в клетке. Подойдите вплотную любым героем, чтобы освободить.')+'</span>';return;}
   if(cell.portal){inf.innerHTML='<b>Вход: '+(cell.poi?cell.poi.n:'подземелье')+'</b><br><span style="color:var(--mid)">Встаньте на этот гекс — герой окажется в подземелье справа на карте (остальные продолжают ходить, раунд общий). Внутри сильные враги и щедрая награда.</span>';return;}
   if(cell.rexit){inf.innerHTML='<b>Выход из подземелья</b><br><span style="color:var(--mid)">Встаньте сюда, чтобы вернуться на основную карту.</span>';return;}
   if(cell.token){inf.innerHTML='<b>Скрытая фишка'+(cell.poi?' — '+cell.poi.n:'')+'</b><br><span style="color:var(--mid)">Может скрывать монстра, предмет, ключ или событие. Откройте, стоя рядом (1 ОД).</span>';return;}
@@ -3875,7 +3939,7 @@ function makeSnap(){
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,npc:G.npc||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
@@ -4280,7 +4344,7 @@ function packG(){
   return {loc:G.loc,round:G.round,keys:G.keys,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,grid:G.grid,
     heroes:G.heroes.map(({d,...r})=>r),monsters:G.monsters.map(({hit,...r})=>r),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,tele:G.tele?[...G.tele.cells]:null,
-    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
+    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,npc:G.npc||null,ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
 }
 function unpackG(g){
   const ng=Object.assign({},g,{fx:[],hover:null,mode:null,hl:null,busy:false,ready:{}});
