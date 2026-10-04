@@ -169,7 +169,6 @@
 
 - Каждый гость получает токен: после обрыва связи он возвращается на своё место с теми же героями.
 - Если хост закрыл вкладку, партия сохраняется у него в браузере, а комната поднимается с тем же кодом.
-- Запасные способы без сервера (PeerJS и ручной обмен кодами) есть в меню «P2P / без сервера».
 
 ## 🧱 Устройство проекта
 
@@ -216,7 +215,7 @@ python3 art/inject.py
 
 ## 🙏 Благодарности
 
-[PixiJS](https://pixijs.com/) (MIT) · шрифты [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) и [Rubik](https://fonts.google.com/specimen/Rubik) (SIL OFL) · [PeerJS](https://peerjs.com/) для запасного P2P-режима. Вся графика, анимации, музыка и звуки созданы кодом в этом репозитории.
+[PixiJS](https://pixijs.com/) (MIT) · шрифты [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) и [Rubik](https://fonts.google.com/specimen/Rubik) (SIL OFL). Вся графика, анимации, музыка и звуки созданы кодом в этом репозитории.
 
 ---
 

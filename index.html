@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" async></script>
 <script src="/vendor/pixi.min.js"></script>
 <title>Чёрный Дракон — пиксельный данж-краулер</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -4146,7 +4145,7 @@ function describe(cell){
 }
 
 /* =========================================================
-   МУЛЬТИПЛЕЕР (P2P через PeerJS, хост — авторитет)
+   МУЛЬТИПЛЕЕР (комнаты через свой сервер WebSocket, хост — авторитет)
    ========================================================= */
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pname=id=>(NET.players[id]&&NET.players[id].name)||'—';
@@ -4271,8 +4270,8 @@ function showLobby(){
   NET.lobby=true;
   const isHost=NET.role==='host';
   const link=location.href.split('#')[0]+'#room='+NET.code;
-  let html='<h1>Комната '+(NET.code==='LOCAL'?'(без сервера)':esc(NET.code))+'</h1>';
-  if(isHost&&NET.code!=='LOCAL')html+='<p>Ссылка для друзей (игра должна быть выложена в интернет):</p><p><b style="word-break:break-all;user-select:all">'+esc(link)+'</b></p>';
+  let html='<h1>Комната '+esc(NET.code)+'</h1>';
+  if(isHost)html+='<p>Ссылка для друзей (игра должна быть выложена в интернет):</p><p><b style="word-break:break-all;user-select:all">'+esc(link)+'</b></p>';
   html+=((NET.pacts||[]).length?'<p>Договоры: <b>'+NET.pacts.map(k=>PACTS[k].n).join(', ')+'</b></p>':'')+(NET.timer?'<p>Таймер раунда: <b>'+NET.timer+' с</b> — когда время выйдет, раунд закроется сам (неготовые игроки пропускают остаток хода).</p>':'')+'<p>Режим: <b>'+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+'</b></p><p>Сложность: <b>'+DIFF[NET.diff||'normal'].n+'</b> — '+DIFF[NET.diff||'normal'].d+'</p>';
   html+='<h2>Игроки</h2><ul>'+Object.keys(NET.players).map(id=>'<li>'+esc(pname(id))+(id===NET.me?' (вы)':'')+(id==='H'?' — хост':'')+(NET.players[id]&&NET.players[id].spec?' — зритель':'')+(NET.players[id]&&NET.players[id].off?' — нет связи':'')+'</li>').join('')+'</ul>';
   html+=NET.spec?'<h2>Вы — зритель</h2><p>Вы видите игру, но героями не управляете. Можно пользоваться фразами и метками.</p>':'<h2>Герои — нажмите, чтобы взять или освободить</h2><p>Свободных героев ведёт: <b>'+(NET.freeAI?'ИИ':'хост')+'</b>.</p>';
@@ -4280,14 +4279,13 @@ function showLobby(){
     const t=o?nm+' — '+pname(o)+(o===NET.me?' [освободить]':''):nm+' — свободен [взять]';
     return {t,fn:()=>{if(isHost)claim(id,'H');else NET.conn.send({t:'claim',hero:id});}};});
   if(isHost){
-    if(NET.code!=='LOCAL')btns.push({t:'Скопировать ссылку',fn:e=>{if(copyLink(link))e.target.textContent='Скопировано ✓';else window.prompt('Скопируйте ссылку (Ctrl+C):',link);}});
+    btns.push({t:'Скопировать ссылку',fn:e=>{if(copyLink(link))e.target.textContent='Скопировано ✓';else window.prompt('Скопируйте ссылку (Ctrl+C):',link);}});
     if(!NET.started)btns.push({t:'Отряд: '+squad().map(id=>HDEF[id].n).join(', ')+' ▸',fn:()=>chooseSquad(()=>{NET.owners={};sendLobby();showLobby();})});
     if(!NET.started)btns.push({t:'Договоры: '+((NET.pacts||[]).length||'нет')+' ▸',fn:()=>choosePacts(()=>{sendLobby();showLobby();})});
     if(!NET.started)btns.push({t:'Режим: '+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+' ▸',fn:()=>{if(NET.horde){NET.horde=false;NET.endless=false;if(squad().length>4){NET.squad=SQUAD0;NET.owners={};}}else if(NET.endless){NET.endless=false;NET.horde=true;}else NET.endless=true;sendLobby();}});
     if(!NET.started)btns.push({t:'Сложность: '+DIFF[NET.diff||'normal'].n+' ▸',fn:()=>{NET.diff=DORDER[(DORDER.indexOf(NET.diff||'normal')+1)%3];sendLobby();}});
     btns.push({t:'Таймер раунда: '+(NET.timer?NET.timer+' с':'выкл')+' ▸',fn:()=>{const o=[0,60,90,120];NET.timer=o[(o.indexOf(NET.timer||0)+1)%o.length];if(NET.started)armTimer();sendLobby();if(NET.started)ui();}});
     btns.push({t:'Свободные герои: '+(NET.freeAI?'ИИ':'хост')+' ▸',fn:()=>{NET.freeAI=!NET.freeAI;sendLobby();if(NET.started)ui();}});
-    btns.push({t:'Добавить игрока по коду',fn:addManualPlayer});
     btns.push(NET.started?{t:'Закрыть',fn:closeLobby}:{t:'НАЧАТЬ ИГРУ',fn:startMP});
     btns.push({t:'Закрыть комнату',fn:askQuit});
   }else{
@@ -4315,12 +4313,10 @@ function netTop(){
 }
 
 /* --- соединение --- */
-function netError(msg,manual){
+function netError(msg){
   const btns=[{t:'В меню',fn:()=>{location.reload();}}];
-  if(manual)btns.push({t:'Играть без сервера',fn:showManualMenu});
   openModal('<h1>Нет связи</h1><p>'+esc(msg)+'</p>',btns,true);
 }
-const NETMSG='Не удаётся связаться с бесплатным сервером соединений PeerJS (0.peerjs.com). Возможно, он заблокирован у вас, включён VPN/блокировщик или пропал интернет. Попробуйте VPN или режим «Играть без сервера».';
 function saveName(){const v=($('#pname')&&$('#pname').value.trim())||'Игрок';NET.myName=v.slice(0,14);try{localStorage.setItem('bd_name',NET.myName);}catch(e){}}
 function dropPlayer(id){
   if(!NET.conns[id]&&!NET.players[id])return;
@@ -4353,7 +4349,7 @@ function toast(html){
 function goMenu(){location.href=location.pathname;}
 function askQuit(){
   const role=NET.role;
-  const txt=role==='host'?(NET.code==='LOCAL'?'Игра будет завершена для всех.':'Комната '+esc(NET.code)+' будет закрыта для всех игроков, сохранение удалится.')
+  const txt=role==='host'?('Комната '+esc(NET.code)+' будет закрыта для всех игроков, сохранение удалится.')
     :role==='guest'?'Вы покинете комнату. Ваши герои перейдут под управление хоста; вернуться можно будет только как новый игрок.'
     :'Текущая игра будет завершена, сохранение удалится.';
   openModal('<h1>Завершить игру?</h1><p>'+txt+'</p>',[{t:'Да, выйти',fn:quitSession},{t:'Отмена',fn:()=>{closeModal();if(NET.lobby||(!NET.started&&NET.role!=='solo'))showLobby();}}],true);
@@ -4363,7 +4359,7 @@ function quitSession(){
   try{localStorage.removeItem(NET.role==='guest'?'bd_guest':'bd_host');}catch(e){}
   if(NET.role==='host'){bc({t:'closed'});}
   else if(NET.role==='guest'){try{NET.conn&&NET.conn.send({t:'leave'});}catch(e){}}
-  setTimeout(()=>{try{NET.ws&&NET.ws.close();}catch(e){}try{NET.peer&&NET.peer.destroy();}catch(e){}goMenu();},300);
+  setTimeout(()=>{try{NET.ws&&NET.ws.close();}catch(e){}goMenu();},300);
 }
 function showPhrases(){
   openModal('<h1>Быстрые фразы</h1><p style="color:var(--mid)">Метка на карте: правый клик (или Alt+клик) по гексу, на телефоне — долгое касание.</p>',
@@ -4401,24 +4397,6 @@ function hookHostConn(conn){
   conn.on('close',()=>dropPlayer(conn.peer));
   conn.on('error',()=>dropPlayer(conn.peer));
 }
-const NETERR=['network','server-error','socket-error','socket-closed','browser-incompatible'];
-function hostRoom(n){
-  n=n||0;
-  if(typeof Peer==='undefined'){netError('Не загрузилась библиотека PeerJS (нужен доступ к unpkg.com).',true);return;}
-  openModal('<h1>Создаём комнату...</h1>'+(n?'<p>Повтор '+n+'/3</p>':''),[],true);
-  const code=Math.random().toString(36).replace(/[^a-z0-9]/g,'').slice(0,4).toUpperCase().padEnd(4,'X');
-  const peer=new Peer('bdragon-'+code);
-  NET.peer=peer;
-  let opened=false;
-  peer.on('open',()=>{opened=true;NET.role='host';NET.me='H';NET.code=code;NET.players={H:{name:NET.myName}};NET.owners={};NET.started=false;showLobby();});
-  peer.on('connection',hookHostConn);
-  peer.on('error',e=>{
-    if(e.type==='unavailable-id'){peer.destroy();hostRoom(n);}
-    else if(!opened&&NETERR.includes(e.type)){peer.destroy();if(n<3)setTimeout(()=>hostRoom(n+1),1500);else netError(NETMSG,true);}
-    else if(!opened)netError('Ошибка соединения: '+e.type,true);
-  });
-  peer.on('disconnected',()=>{if(opened)try{peer.reconnect();}catch(e){}});
-}
 function guestData(m){
   if(m.t==='you')NET.me=m.id;
   else if(m.t==='lobby'){NET.timer=m.timer||0;NET.pacts=m.pacts||[];NET.squad=m.squad||SQUAD0;NET.diff=m.diff;NET.endless=m.endless;NET.horde=!!m.horde;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
@@ -4428,98 +4406,6 @@ function guestData(m){
   else if(m.t==='soc')showSocial(m);
   else if(m.t==='closed'){NET.quitting=true;try{localStorage.removeItem('bd_guest');}catch(e){}try{NET.ws&&NET.ws.close();}catch(e){}
     openModal('<h1>Игра завершена</h1><p>Хост закрыл комнату.</p>',[{t:'В меню',fn:goMenu}],true);}
-}
-function joinRoom(code,n){
-  n=n||0;
-  code=String(code||'').trim().toUpperCase();
-  if(!code){netError('Введите код комнаты.');return;}
-  if(typeof Peer==='undefined'){netError('Не загрузилась библиотека PeerJS (нужен доступ к unpkg.com).',true);return;}
-  openModal('<h1>Подключаемся к '+esc(code)+'...</h1>'+(n?'<p>Повтор '+n+'/3</p>':''),[],true);
-  const peer=new Peer();
-  NET.peer=peer;
-  let connected=false,failed=false;
-  const fail=(msg,man)=>{if(failed)return;failed=true;clearTimeout(to);netError(msg,man);};
-  const to=setTimeout(()=>{if(!connected){try{peer.destroy();}catch(e){}fail('Хост не отвечает. Проверьте код и что хост не закрыл вкладку.',true);}},15000);
-  peer.on('open',id=>{
-    NET.me=id;NET.role='guest';G.busy=true;
-    const conn=peer.connect('bdragon-'+code,{reliable:true,serialization:'json'});
-    NET.conn=conn;
-    conn.on('open',()=>{connected=true;clearTimeout(to);conn.send({t:'hello',name:NET.myName});});
-    conn.on('data',guestData);
-    conn.on('close',()=>netError('Соединение с хостом потеряно.'));
-    conn.on('error',()=>fail('Ошибка соединения с хостом.',true));
-  });
-  peer.on('error',e=>{
-    if(failed)return;
-    if(e.type==='peer-unavailable')fail('Комната '+code+' не найдена.');
-    else if(!connected&&NETERR.includes(e.type)){clearTimeout(to);failed=true;peer.destroy();if(n<3)setTimeout(()=>joinRoom(code,n+1),1500);else netError(NETMSG,true);}
-    else if(!connected)fail('Ошибка соединения: '+e.type,true);
-  });
-}
-
-/* --- режим без сервера: обмен кодами вручную (WebRTC) --- */
-const ICE=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}];
-NET.pcs=[];
-const encD=d=>btoa(JSON.stringify({type:d.type,sdp:d.sdp}));
-const decD=t=>JSON.parse(atob(t.replace(/\s+/g,'')));
-function gather(pc){return new Promise(res=>{
-  if(pc.iceGatheringState==='complete')return res();
-  const f=()=>{if(pc.iceGatheringState==='complete'){pc.removeEventListener('icegatheringstatechange',f);res();}};
-  pc.addEventListener('icegatheringstatechange',f);setTimeout(res,5000);});}
-function copyText(id){const t=$('#'+id);t.select();try{navigator.clipboard.writeText(t.value);}catch(e){document.execCommand('copy');}}
-function mkConn(dc,id){
-  const hs={};
-  const o={peer:id,open:false,on(ev,fn){(hs[ev]=hs[ev]||[]).push(fn);},send(m){if(dc.readyState==='open')dc.send(JSON.stringify(m));},close(){try{dc.close();}catch(e){}}};
-  const emit=(ev,a)=>(hs[ev]||[]).forEach(f=>f(a));
-  dc.onopen=()=>{o.open=true;emit('open');};
-  dc.onmessage=e=>{try{emit('data',JSON.parse(e.data));}catch(x){}};
-  dc.onclose=()=>{o.open=false;emit('close');};
-  if(dc.readyState==='open')setTimeout(()=>{o.open=true;emit('open');});
-  return o;
-}
-function showManualMenu(){
-  openModal('<h1>Игра без сервера</h1><p>Игроки обмениваются текстовыми кодами через любой мессенджер. Общий сервер не нужен (используется только STUN для прямого соединения).</p>'+
-   '<p>Хост создаёт комнату и для каждого друга получает код-приглашение. Друг вставляет его и присылает ответный код.</p>',
-   [{t:'Создать комнату (хост)',fn:hostManual},{t:'Войти по приглашению',fn:joinManualUI},{t:'Назад',fn:showMenu}],true);
-}
-function hostManual(){
-  NET.role='host';NET.me='H';NET.code='LOCAL';NET.players={H:{name:NET.myName}};NET.owners={};NET.started=false;
-  showLobby();
-}
-async function addManualPlayer(){
-  if(typeof RTCPeerConnection==='undefined'){alert('Браузер не поддерживает WebRTC');return;}
-  const pc=new RTCPeerConnection({iceServers:ICE});NET.pcs.push(pc);
-  const id='m'+Math.random().toString(36).slice(2,7);
-  const dc=pc.createDataChannel('g');
-  const conn=mkConn(dc,id);hookHostConn(conn);
-  conn.on('open',()=>{NET.conns[id]=conn;});
-  openModal('<h1>Приглашение игрока</h1><p>Готовим код...</p>',[],true);NET.lobby=false;
-  await pc.setLocalDescription(await pc.createOffer());
-  await gather(pc);
-  openModal('<h1>Приглашение игрока</h1><p>1. Отправьте другу этот код:</p><textarea id="mo" readonly rows="4">'+encD(pc.localDescription)+'</textarea><p id="mst">2. Друг пришлёт ответный код — вставьте его сюда:</p><textarea id="ma" rows="4"></textarea>',
-   [{t:'Скопировать код',fn:()=>copyText('mo')},
-    {t:'Принять ответ',fn:async()=>{try{await pc.setRemoteDescription(decD($('#ma').value));$('#mst').textContent='Соединяемся... (лобби откроется само)';}catch(e){alert('Неверный ответный код');}}},
-    {t:'Назад',fn:()=>{try{pc.close();}catch(e){}showLobby();}}],true);
-  conn.on('open',()=>{setTimeout(showLobby,300);});
-}
-function joinManualUI(){
-  openModal('<h1>Вход без сервера</h1><p>Вставьте код-приглашение от хоста:</p><textarea id="mi" rows="5"></textarea>',
-   [{t:'Создать ответ',fn:joinManual},{t:'Назад',fn:showManualMenu}],true);
-}
-async function joinManual(){
-  let offer;try{offer=decD($('#mi').value);}catch(e){alert('Неверный код приглашения');return;}
-  const pc=new RTCPeerConnection({iceServers:ICE});NET.pcs.push(pc);
-  pc.ondatachannel=e=>{
-    const conn=mkConn(e.channel,'H');
-    NET.role='guest';NET.conn=conn;G.busy=true;
-    conn.on('data',guestData);
-    conn.on('close',()=>netError('Соединение с хостом потеряно.'));
-    conn.on('open',()=>conn.send({t:'hello',name:NET.myName}));
-  };
-  openModal('<h1>Вход без сервера</h1><p>Готовим ответ...</p>',[],true);
-  try{await pc.setRemoteDescription(offer);await pc.setLocalDescription(await pc.createAnswer());}catch(e){alert('Не удалось обработать приглашение');showManualMenu();return;}
-  await gather(pc);
-  openModal('<h1>Вход без сервера</h1><p>Отправьте этот ответ хосту и ждите — когда он его примет, откроется лобби:</p><textarea id="mo" readonly rows="5">'+encD(pc.localDescription)+'</textarea>',[{t:'Скопировать ответ',fn:()=>copyText('mo')}],true);
 }
 /* --- игра через свой сервер (WebSocket) --- */
 function mkEm(){const hs={};return {on(ev,fn){(hs[ev]=hs[ev]||[]).push(fn);},emit(ev,a){(hs[ev]||[]).forEach(f=>f(a));}};}
@@ -4650,14 +4536,6 @@ function resumeHost(o){
   for(const id in NET.players)if(id!=='H')NET.players[id].off=true;
   hostWS({resume:true});
 }
-function showP2PMenu(){
-  openModal('<h1>P2P и без сервера</h1><p>Запасные способы, если свой сервер недоступен. Могут не работать за строгим роутером.</p>'+
-   '<h2>Код комнаты (для PeerJS)</h2><input id="pcode" maxlength="6" placeholder="ABCD">',
-   [{t:'Создать комнату (PeerJS)',fn:()=>hostRoom()},
-    {t:'Войти по коду (PeerJS)',fn:()=>joinRoom($('#pcode').value)},
-    {t:'Без сервера (вручную)',fn:showManualMenu},
-    {t:'Назад',fn:showMenu}],true);
-}
 function resumeBtns(){
   const b=[],ago=t=>Math.max(1,Math.round((Date.now()-t)/60000))+' мин назад';
   const sh=loadSaved('bd_host'),sg=loadSaved('bd_guest');
@@ -4706,7 +4584,6 @@ function showMenu(){
     {t:'Создать комнату',fn:()=>{saveName();saveSrv();NET.daily=null;hostWS();}},
     {t:'Войти по коду',fn:()=>{saveName();saveSrv();NET.spec=false;joinWS($('#pcode').value);}},
     {t:'Смотреть игру (зритель)',fn:()=>{saveName();saveSrv();joinWS($('#pcode').value,{spec:true});}},
-    {t:'P2P / без сервера',fn:()=>{saveName();showP2PMenu();}},
     {t:'Достижения и дары',fn:showMeta},
     {t:'Правила',fn:showIntro}],true);
 }
