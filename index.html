@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" async></script>
 <script src="/vendor/pixi.min.js"></script>
 <title>Чёрный Дракон — пиксельный данж-краулер</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{--bg:#0b0813;--panel:#171027;--panel2:#20173a;--line:#3b3556;--line2:#5a4e86;--fg:#f4f0ff;--mid:#a99fc9;--dim:#4a4268;--gold:#ffd23f;--gold2:#c58b2b;--red:#e34540;--green:#52bb4e;--blue:#4283ea;--purple:#a95bdc;--pf:'Press Start 2P','Courier New',monospace;--tx:'Rubik','Segoe UI',Arial,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1118,6 +1118,18 @@ ART.mimic=()=>mkArt({parts:[
  {t:'p',pts:[[8,17],[10,17],[9,12]],m:'white'},{t:'p',pts:[[14,17],[16,17],[15,12]],m:'white'},{t:'p',pts:[[20,17],[22,17],[21,12]],m:'white'},{t:'p',pts:[[26,17],[28,17],[27,12]],m:'white'},
  {t:'e',cx:12,cy:11,rx:2.4,ry:2.6,m:'yellow'},{t:'e',cx:24,cy:11,rx:2.4,ry:2.6,m:'yellow'},{t:'r',x:12,y:10,w:1,h:3,m:'black'},{t:'r',x:24,y:10,w:1,h:3,m:'black'},
 ]});
+ART.stalker=()=>mkArt({parts:[
+ {t:'p',pts:[[9,14],[27,14],[31,34],[5,34]],m:'dark',b:-.12},
+ {t:'c',x:12,y:27,w:5,h:7,m:'darkplate'},{t:'c',x:19,y:27,w:5,h:7,m:'darkplate'},{t:'r',x:11,y:32,w:7,h:3,m:'leather'},{t:'r',x:18,y:32,w:7,h:3,m:'leather'},
+ {t:'c',x:12,y:15,w:12,h:13,m:'moss'},{t:'l',x0:12,y0:16,x1:24,y1:27,w:2,m:'leather',k:.45},{t:'r',x:12,y:25,w:12,h:2,m:'leather'},{t:'r',x:16,y:25,w:4,h:2,m:'bone'},
+ {t:'e',cx:10,cy:20,rx:3,ry:5,m:'moss'},{t:'e',cx:26,cy:20,rx:3,ry:5,m:'moss'},
+ {t:'p',pts:[[25,6],[30,8],[29,26],[25,24]],m:'leather'},{t:'px',x:27,y:5,c:'#e34540'},{t:'px',x:29,y:6,c:'#e34540'},
+ {t:'e',cx:18,cy:9,rx:7,ry:7.6,m:'moss',b:-.05},{t:'e',cx:18,cy:11,rx:4.6,ry:4.2,m:'black'},{t:'r',x:15,y:10,w:2,h:1,m:'red'},{t:'r',x:20,y:10,w:2,h:1,m:'red'},
+ {t:'p',pts:[[18,0],[24,5],[23,9],[18,4],[13,9],[12,5]],m:'moss',b:.08},
+ {t:'p',pts:[[14,1],[11,0],[13,4]],m:'bone'},{t:'p',pts:[[22,1],[25,0],[23,4]],m:'bone'},
+ {t:'r',x:1,y:20,w:12,h:3,m:'wood'},{t:'l',x0:2,y0:15,x1:2,y1:28,w:2,m:'wood',k:.6},{t:'l',x0:2,y0:15,x1:7,y1:21,w:1,m:'white',k:.7},{t:'l',x0:2,y0:28,x1:7,y1:22,w:1,m:'white',k:.7},
+ {t:'l',x0:0,y0:21,x1:10,y1:21,w:1,m:'steel',k:.8},{t:'px',x:0,y:21,c:'#cfd6e8'},{t:'e',cx:8,cy:23,rx:2.2,ry:2.2,m:'skin',b:-.2},
+]});
 /* Декорации и Дракон */
 const leafBlob=(cx,cy,rx,ry,m,b)=>({t:'e',cx,cy,rx,ry,m,b:b||0});
 ART.tree=()=>mkArt({parts:[
@@ -1238,7 +1250,7 @@ ART.lab=()=>mkArt({parts:[
  {t:'p',pts:[[21,33],[23,29],[25,33]],m:'orange'},{t:'p',pts:[[26,33],[28,29],[30,33]],m:'orange'},
 ]});
 /* Покадровая анимация: из готового спрайта получаем кадры деформацией (смещение полос тела, ног, рук, волна подола, сжатие). */
-const ANIMK={mimic:'blob',priest:'robe',rogue:'hum',paladin:'hum',toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
+const ANIMK={stalker:'hum',mimic:'blob',priest:'robe',rogue:'hum',paladin:'hum',toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
 const FACE_LEFT={wolf:1,boar:1};            // спрайт нарисован мордой влево
 const NO_FLIP={dragon:1,ghost:0};
 const ANIMP={
@@ -1324,8 +1336,8 @@ const KEYS_NEEDED=5;
 const LOC_SUB={7:'Держитесь! Волны врагов идут одна за другой',1:'Найдите ключи и доберитесь до выхода',2:'Земля мертвецов, орков и тёмных рыцарей',3:'Ледяная королева охраняет последний ключ',5:'Трясина, болотные твари и логово Гидры',6:'Яды, кислота и Королева пауков в глубине',4:'Разбейте печати. Сразите Дракона!'};
 const DIFF={
  easy:{n:'Лёгкая',hp:.75,atk:-1,mon:-2,gold:1.4,boss:.8,d:'Монстры слабее и их меньше, больше золота. Для знакомства с игрой.'},
- normal:{n:'Обычная',hp:1.25,atk:0,mon:1,gold:1,boss:1.2,d:'Задуманный баланс.'},
- hard:{n:'Героическая',hp:1.8,atk:2,mon:4,gold:.7,boss:1.6,d:'Монстры сильнее и их больше, золота меньше. Для опытной команды.'}};
+ normal:{n:'Обычная',hp:1.4,atk:0,mon:2,gold:1,boss:1.4,d:'Задуманный баланс.'},
+ hard:{n:'Героическая',hp:1.9,atk:2,mon:4,gold:.7,boss:1.7,d:'Монстры сильнее и их больше, золота меньше. Для опытной команды.'}};
 const DORDER=['easy','normal','hard'];
 const D=()=>DIFF[G.diff]||DIFF.normal;
 /* --- Бесконечное подземелье --- */
@@ -1336,7 +1348,7 @@ const themeFor=d=>{if(isBossFloor(d))return 4;const n=d-Math.floor(d/BOSS_EVERY)
 const LOC_TIER={1:0,2:1,5:1,3:2,6:2,4:3};
 const STORY_TIERS=[[1],[2,5],[3,6]];
 const nextOpts=()=>STORY_TIERS[(LOC_TIER[G.loc]||0)+1]||[ARENA];
-const DS=()=>G.horde?{hp:1+.09*(G.horde.wave-1)+(G.heroes.length>4?.05*(G.heroes.length-4):0),atk:Math.floor((G.horde.wave-1)/4),cnt:0}:G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:(()=>{const k=Math.min(LOC_TIER[G.loc]||0,2);return {hp:1+.15*k,atk:k>=2?1:0,cnt:k};})();
+const DS=()=>G.horde?{hp:1+.09*(G.horde.wave-1)+(G.heroes.length>4?.05*(G.heroes.length-4):0),atk:Math.floor((G.horde.wave-1)/4),cnt:0}:G.endless?{hp:1+.11*(G.depth-1),atk:Math.floor((G.depth-1)/3),cnt:Math.floor((G.depth-1)/2)}:(()=>{const k=Math.min(LOC_TIER[G.loc]||0,2);return {hp:1+.18*k,atk:k,cnt:k};})();
 const HORDE_LOC=7;
 const hasExit=()=>!G.horde&&(G.loc!==ARENA||!!G.floorClear);
 function loadRecords(){try{return JSON.parse(localStorage.getItem('bd_endless')||'[]');}catch(e){return [];}}
@@ -1437,6 +1449,7 @@ const MON={
  zombie:{n:'Зомби',undead:1,hp:15,atk:5,def:0,mv:1,rng:1,xp:3,spr:'zombie',poison:1,d:'Медленный и живучий. Укус заражает ядом.'},
  scorpion:{n:'Скорпион',hp:9,atk:5,def:1,mv:3,rng:1,xp:3,spr:'scorpion',poison:2,d:'Быстрый. Жало вызывает долгий яд (3 хода).'},
  spiderqueen:{n:'Королева пауков',hp:95,atk:7,def:2,mv:3,rng:1,xp:14,spr:'spiderqueen',poison:2,summon:'spider',sumMax:3,web:1,key:1,lair:4,d:'МИНИ-БОСС. Яд, призывает до 3 пауков, раз в 3 хода плюёт паутиной: 2 урона и −1 ОД двум героям в 4 гексах. Не оглушается. Хранит ключ.'},
+ stalker:{n:'Охотник',hp:30,atk:6,def:2,mv:3,rng:2,xp:8,spr:'stalker',bleed:2,d:'Выследил отряд и преследует его по всей карте. Арбалет бьёт на 2 гекса и вызывает кровотечение. Не оглушается. За его голову — щедрая награда.'},
  mimic:{n:'Мимик',hp:14,atk:5,def:1,mv:2,rng:1,xp:4,spr:'mimic',d:'Сундук-обманщик: притворялся добычей. Кусается больно, после смерти оставляет настоящую добычу.'},
  whelp:{n:'Дракончик',hp:5,atk:3,def:0,mv:3,rng:1,xp:0,spr:'whelp',d:'Отродье Дракона.'},
 };
@@ -1936,7 +1949,8 @@ function newGame(){
 function startLoc(n){
   if(G.heroes&&G.heroes.some(h=>h.temp)){G.heroes.filter(h=>h.temp).forEach(h=>{delete NET.owners[h.id];log(h.d.n+' прощается с отрядом и уходит своей дорогой.');});G.heroes=G.heroes.filter(h=>!h.temp);}
   G.loc=n;G.undo=null;G.room=null;G.npc=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
-  const build=()=>{if(n===HORDE_LOC)genHorde();else if(n!==ARENA)genField(n);else genArena();G.obj=null;if(n!==ARENA&&LOCS[n].mon)rollObjective();};
+  const build=()=>{if(n===HORDE_LOC)genHorde();else if(n!==ARENA)genField(n);else genArena();G.obj=null;if(n!==ARENA&&LOCS[n].mon)rollObjective();
+    G.hunt=(n!==ARENA&&n!==HORDE_LOC&&Math.random()<(G.endless?.7:.6))?{at:rnd(5,8),warned:false,spawned:false}:null;};
   if(G.daily)withSeed(G.daily+'|'+G.depth,build);else build();
   G.heroes.forEach((h,i)=>{const [c,r]=G.startCells[i];h.c=c;h.r=r;h.ap=st(h,'ap')+(hasRelic('clock')?1:0);h.block=h.guard=h.taunt=h.haste=false;h.poison=0;h.burn=0;h.bleed=0;h.chill=0;h.reviveUsed=false;h.xpFlag=false;h.bless=0;h.faith=false;});
   G.phxUsed=false;
@@ -2133,6 +2147,7 @@ function killMon(m,killer){
   if(vamp&&killer.alive&&killer.hp<st(killer,'maxhp')){const b=killer.hp;killer.hp=Math.min(st(killer,'maxhp'),killer.hp+vamp);pop(killer,'+'+(killer.hp-b),'#f66');log('Вампиризм: '+killer.d.n+' +'+(killer.hp-b)+' HP.');}
   if(m.xp>0){G.heroes.forEach(h=>{if(m.hit.has(h.id))gainXP(h,m.xp+(h===killer?1:0)+(hasRelic('warbook')?1:0));});}
   if(hasRelic('chalice')&&killer&&killer.d)G.heroes.forEach(x=>{if(x.alive&&dist(x.c,x.r,killer.c,killer.r)<=1&&x.hp<st(x,'maxhp')){x.hp++;pop(x,'+1','#f66');}});
+  if(m.hunter){const gg=evGold(Math.round((30+10*Math.min(2,LOC_TIER[G.loc]||0))*D().gold));pop({c:m.c,r:m.r},'+'+gg+' з','#ffd23f');const it=pick(['amulet','trollheart','vampring','feather','chain','axe','elixir']);dropLoot(m.c,m.r,it);log('Охотник повержен! Награда за голову: +'+gg+' золота, на земле — '+ITEMS[it].n+'.');showBanner('Охотник повержен','+'+gg+' золота и трофей');}
   if(m.id==='mimic'){const gg=evGold(Math.round((14+6*chestTier())*D().gold));pop({c:m.c,r:m.r},'+'+gg+' з','#ffd23f');dropLoot(m.c,m.r,pick(chestTier()>=1?GEN2:GEN1));log('Мимик выронил настоящую добычу: +'+gg+' золота и предмет на земле.');}
   if(m.def_&&0){}
   const base=MON[m.id];
@@ -2335,6 +2350,22 @@ function revealToken(h,cell){
 }
 
 
+
+
+/* --- Охотник: появляется посреди локации и преследует отряд --- */
+function huntTick(){
+  const H=G.hunt;if(!H||H.spawned||G.over)return;
+  if(!H.warned&&G.round>=H.at-1){H.warned=true;sfx('roar');log('Вдалеке трубит рог: отряд выследил Охотник! Он появится в следующем раунде.');showBanner('Вас выследили!','Охотник появится в следующем раунде');return;}
+  if(G.round<H.at)return;
+  const alive=G.heroes.filter(h=>h.alive&&!inRoom(h.c));if(!alive.length)return;
+  const edge=c=>c.c<=1||c.r<=0||c.r>=G.rows-1||(G.room?c.c>=G.room.c0-2:c.c>=G.cols-2);
+  const cand=G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!c.terr&&!c.portal&&!inRoom(c.c)&&!monsterAt(c.c,c.r)&&!npcAt(c.c,c.r)&&alive.every(h=>dist(h.c,h.r,c.c,c.r)>=6));
+  const pool=cand.filter(edge).length?cand.filter(edge):cand;if(!pool.length)return;
+  const c=pick(pool);H.spawned=true;
+  const m=spawnMon('stalker',c.c,c.r);m.elite=true;m.hunter=true;m.aggro=true;m.xp=m.xp+2*Math.min(2,LOC_TIER[G.loc]||0);
+  sfx('spawn');fxQ({burst:'spawn',c:c.c,r:c.r});pop(m,'ОХОТНИК','#ff8a7a');
+  log('Появился Охотник! Он идёт по следу отряда — убейте его, пока он не перебил вас по одному.');showBanner('Охотник','Он преследует отряд по всей карте');
+}
 
 /* --- Эскорт: пленник следует за отрядом, враги охотятся на него --- */
 const capAt=(c,r)=>!!(G.room&&G.room.captive&&!G.room.captive.freed&&G.room.captive.c===c&&G.room.captive.r===r);
@@ -2602,14 +2633,14 @@ function monReach(m){
   const dm=new Map([[key(m.c,m.r),0]]),q=[[m.c,m.r]];
   while(q.length){const [c,r]=q.shift();const d=dm.get(key(c,r));if(d>=m.mv)continue;
     for(const [x,y] of nb(c,r)){const k=key(x,y);if(dm.has(k))continue;const cl=cellOf(x,y);
-      if(cl.block||cl.token||cl.dragon||heroAt(x,y)||monsterAt(x,y)||npcAt(x,y))continue;dm.set(k,d+1);q.push([x,y]);}}
+      if(cl.block||(cl.token&&!m.hunter)||cl.dragon||heroAt(x,y)||monsterAt(x,y)||npcAt(x,y))continue;dm.set(k,d+1);q.push([x,y]);}}
   return dm;
 }
 function chooseDest(m,t,rand){
   const dm=monReach(m);let best=null,bs=1e9;
   const cur=dist(m.c,m.r,t.c,t.r);
   dm.forEach((steps,k)=>{
-    const [c,r]=k.split(',').map(Number);const d=dist(c,r,t.c,t.r);
+    const [c,r]=k.split(',').map(Number);if(m.hunter&&cellOf(c,r).token)return;const d=dist(c,r,t.c,t.r);
     const s=Math.max(0,d-m.rng)*10+steps+(rand?Math.random()*0.5:(c*7+r)*0.0001);
     if(s<bs){bs=s;best=[c,r,d];}
   });
@@ -2755,7 +2786,7 @@ function newRound(){
     }
   });
   G.heroes.filter(p=>p.alive&&hasPerk(p,'halo')).forEach(p=>G.heroes.forEach(x=>{if(x.alive&&dist(p.c,p.r,x.c,x.r)<=2&&x.hp<st(x,'maxhp'))healHero(p,x,2);}));
-  alarmTick();
+  alarmTick();huntTick();
   G.busy=false;
   if(!checkEnd()){log('— Раунд '+G.round+' —');sfx('round');}
   ui();
@@ -4366,7 +4397,7 @@ function packG(){
   return {loc:G.loc,round:G.round,keys:G.keys,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,grid:G.grid,
     heroes:G.heroes.map(({d,...r})=>r),monsters:G.monsters.map(({hit,...r})=>r),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,tele:G.tele?[...G.tele.cells]:null,
-    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,npc:G.npc||null,ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
+    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,npc:G.npc||null,hunt:G.hunt||null,ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
 }
 function unpackG(g){
   const ng=Object.assign({},g,{fx:[],hover:null,mode:null,hl:null,busy:false,ready:{}});
