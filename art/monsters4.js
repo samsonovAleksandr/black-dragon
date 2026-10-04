@@ -131,3 +131,11 @@ ART.stalker=()=>mkArt({parts:[
  {t:'r',x:1,y:20,w:12,h:3,m:'wood'},{t:'l',x0:2,y0:15,x1:2,y1:28,w:2,m:'wood',k:.6},{t:'l',x0:2,y0:15,x1:7,y1:21,w:1,m:'white',k:.7},{t:'l',x0:2,y0:28,x1:7,y1:22,w:1,m:'white',k:.7},
  {t:'l',x0:0,y0:21,x1:10,y1:21,w:1,m:'steel',k:.8},{t:'px',x:0,y:21,c:'#cfd6e8'},{t:'e',cx:8,cy:23,rx:2.2,ry:2.2,m:'skin',b:-.2},
 ]});
+ART.hydrahead=()=>mkArt({parts:[
+ {t:'e',cx:14,cy:30,rx:10,ry:4,m:'crocgreen',b:-.15},{t:'l',x0:10,y0:30,x1:16,y1:18,w:6,m:'crocgreen',k:.55},
+ {t:'e',cx:20,cy:14,rx:9,ry:6.5,m:'crocgreen',b:.06},{t:'p',pts:[[26,12],[35,15],[27,19]],m:'crocgreen'},{t:'r',x:24,y:16,w:11,h:1,m:'dark'},
+ {t:'px',x:26,y:17,c:'#fff'},{t:'px',x:29,y:17,c:'#fff'},{t:'px',x:32,y:17,c:'#fff'},{t:'px',x:27,y:15,c:'#fff'},{t:'px',x:31,y:15,c:'#fff'},
+ {t:'e',cx:21,cy:11,rx:2,ry:2,m:'yellow'},{t:'px',x:21,y:11,c:'#05030a'},
+ {t:'p',pts:[[14,9],[16,4],[18,9]],m:'bog'},{t:'p',pts:[[18,8],[20,3],[22,8]],m:'bog'},
+ {t:'px',x:8,y:30,c:'#c42a2a'},{t:'px',x:11,y:31,c:'#c42a2a'},{t:'px',x:16,y:32,c:'#8ae850'},
+]});
