@@ -523,6 +523,7 @@ const ICON_OF={potion:['potion','r'],elixir:['potion','b'],rustsword:['sword','o
  duelist:['buckler','r'],claymore:['claymore','l'],spikeshield:['spike','b'],towershield:['tower','b'],
  helmet:['helmet','g'],dagger:['dagger','l'],axe:['axe','g'],cloak:['cloak','E'],vampring:['ring','R'],trollheart:['heart','e'],antidote:['potion','e'],ragepot:['potion','o'],
  mace:['staff','y'],holysymbol:['amulet','y'],twindagger:['dagger','r'],assassinblade:['dagger','R'],shadowcloak:['cloak','p'],holyshield:['tower','y'],lighthammer:['axe','y'],
+ c_blade:['sword','p'],p_blade:['sword','w'],c_mask:['helmet','p'],p_mask:['helmet','c'],c_plate:['armor','R'],p_plate:['armor','y'],c_ring:['ring','p'],p_ring:['ring','y'],c_crown:['amulet','R'],p_crown:['amulet','y'],
  icerune:['rune','c'],stormrune:['rune','y'],blink:['scroll','p'],elvencloak:['cloak','e'],crystal:['staff','p'],bloodblade:['sword','R'],platelegs:['armor','l']};
 const ICA={
  power:a=>{ICN.sword(a,'l');a.put(13,12,'r');a.put(14,13,'r');a.put(12,13,'o');a.rect(1,1,2,1,'y');a.rect(2,0,1,3,'y');},
@@ -1356,7 +1357,10 @@ function saveRecord(r){const a=loadRecords();a.push(r);a.sort((x,y)=>y.score-x.s
 const endlessScore=()=>G.depth*100+G.stats.kills*5+Math.floor((G.gold||0)/5);
 const PRICE={potion:8,antidote:8,ragepot:9,scroll:10,icerune:11,bomb:12,elixir:14,blink:14,stormrune:14,feather:22,
  leather:12,rustsword:12,helmet:14,dagger:14,cloak:14,boots:16,chain:18,axe:18,ringhp:15,vampring:22,trollheart:22,amulet:30};
-const priceOf=id=>PRICE[id]||(ITEMS[id].cls?20:15);
+const priceOf=id=>PRICE[id]||(ITEMS[id].pure?0:/^p_/.test(id)?30:ITEMS[id].cls?20:15);
+const CURSED=['c_blade','c_mask','c_plate','c_ring','c_crown'];
+const isCursed=id=>!!(ITEMS[id]&&ITEMS[id].curse);
+const PURIFY_COST=25;
 const DRAGON_HP=250, SEAL_HP=28, ARENA=4;
 
 const HDEF={
@@ -1475,6 +1479,16 @@ const ITEMS={
  shadowcloak:{n:'Плащ теней',type:'Класс: Разбойник',cls:'rogue',d:'+1 ЗАЩ, +1 гекс за ОД движения',mods:{def:1,spd:1}},
  holyshield:{n:'Святой щит',type:'Класс: Паладин',cls:'paladin',d:'+1 ЗАЩ, +2 макс. HP',mods:{def:1,hp:2}},
  lighthammer:{n:'Молот света',type:'Класс: Паладин',cls:'paladin',d:'+1 АТК, +1 ЗАЩ',mods:{atk:1,def:1}},
+ c_blade:{n:'Проклятый клинок',type:'Проклятый предмет',d:'+3 АТК. Проклятие: −1 HP в начале каждого раунда (не ниже 1). Нельзя выбросить или продать — только очистить на привале.',mods:{atk:3},curse:'bleed',pure:'p_blade'},
+ p_blade:{n:'Очищенный клинок',type:'Оружие',d:'+3 АТК',mods:{atk:3}},
+ c_mask:{n:'Маска безумия',type:'Проклятый предмет',d:'+1 очко действия. Проклятие: −2 ЗАЩ. Нельзя выбросить или продать — только очистить на привале.',mods:{ap:1,def:-2},curse:'mask',pure:'p_mask'},
+ p_mask:{n:'Маска провидца',type:'Артефакт',d:'+1 очко действия',mods:{ap:1}},
+ c_plate:{n:'Латы демона',type:'Проклятый предмет',d:'+3 ЗАЩ, +4 HP. Проклятие: −1 гекс за ОД движения. Нельзя выбросить или продать — только очистить на привале.',mods:{def:3,hp:4,spd:-1},curse:'slow',pure:'p_plate'},
+ p_plate:{n:'Латы света',type:'Броня',d:'+3 ЗАЩ, +4 HP',mods:{def:3,hp:4}},
+ c_ring:{n:'Кольцо алчности',type:'Проклятый предмет',d:'+40% золота отряду. Проклятие: −4 макс. HP. Нельзя выбросить или продать — только очистить на привале.',mods:{hp:-4},greed:1,curse:'greed',pure:'p_ring'},
+ p_ring:{n:'Кольцо удачи',type:'Артефакт',d:'+40% золота отряду',greed:1},
+ c_crown:{n:'Корона костей',type:'Проклятый предмет',d:'+2 АТК, +2 ЗАЩ. Проклятие: враги в первую очередь нападают на этого героя. Нельзя выбросить или продать — только очистить на привале.',mods:{atk:2,def:2},curse:'lure',pure:'p_crown'},
+ p_crown:{n:'Корона воителя',type:'Артефакт',d:'+2 АТК, +2 ЗАЩ',mods:{atk:2,def:2}},
  barbed:{n:'Зазубренные стрелы',type:'Класс: Лучник',cls:'archer',d:'+1 АТК',mods:{atk:1}},
  longbow:{n:'Длинный лук',type:'Класс: Лучник',cls:'archer',d:'+1 дальность',mods:{rng:1}},
  oakstaff:{n:'Дубовый посох',type:'Класс: Маг',cls:'mage',d:'+1 АТК',mods:{atk:1}},
@@ -1520,8 +1534,8 @@ const ABIL={
    run:(h,m)=>{for(let i=0;i<3&&m.alive;i++)dmgMon(h,m,st(h,'atk')-1+roll());}},
  dash:{n:'Рывок',cost:2,t:'hex',steps:5,d:'Переместиться до 5 гексов без ударов вдогонку.',
    run:(h,cell)=>{moveHero(h,cell.c,cell.r,true);}},
- aimed:{n:'Меткий выстрел',cost:2,t:'enemy',rng:'weapon',d:'АТК+3 урона, игнорирует броню.',
-   run:(h,m)=>dmgMon(h,m,st(h,'atk')+3+roll(),{pierce:1})},
+ aimed:{n:'Меткий выстрел',cost:2,t:'enemy',rng:'weapon',d:'АТК+3 урона, игнорирует броню. Помечает цель: следующий удар ДРУГОГО героя по ней +3.',
+   run:(h,m)=>{dmgMon(h,m,st(h,'atk')+3+roll(),{pierce:1});markMon(h,m);}},
  heal:{n:'Лечение',cost:2,t:'ally',rng:3,d:'Восстановить союзнику 3+уровень HP (дальность 3).',
    run:(h,t)=>healHero(h,t,3+h.lv+st(h,'heal'),true)},
  haste:{n:'Ускорение',cost:2,t:'ally',rng:3,d:'Союзник получает +1 ОД в следующем раунде.',
@@ -1538,15 +1552,15 @@ const ABIL={
      l.forEach(m=>{dmgMon(h,m,st(h,'atk')+1+roll());if(m.alive&&!ccImmune(m)){m.stun=true;pop(m,'ОГЛУШЁН');}});}},
  execute:{n:'Казнь',cost:2,t:'enemy',rng:'melee',d:'Если у врага ≤50% HP — тройной урон (3×АТК), иначе обычный удар.',
    run:(h,m)=>{const low=m.hp<=m.max/2;if(low)log('КАЗНЬ!');dmgMon(h,m,(low?3:1)*st(h,'atk')+roll());}},
- pin:{n:'Пригвоздить',cost:2,t:'enemy',rng:'weapon',d:'АТК+1 урона; враг не может двигаться в свой следующий ход.',
-   run:(h,m)=>{dmgMon(h,m,st(h,'atk')+1+roll());if(m.alive&&!ccImmune(m)){m.root=true;pop(m,'ПРИГВОЖДЁН');}}},
+ pin:{n:'Пригвоздить',cost:2,t:'enemy',rng:'weapon',d:'АТК+1 урона; враг не может двигаться в свой следующий ход. Помечает цель: следующий удар ДРУГОГО героя по ней +3.',
+   run:(h,m)=>{dmgMon(h,m,st(h,'atk')+1+roll());if(m.alive&&!ccImmune(m)){m.root=true;pop(m,'ПРИГВОЖДЁН');}markMon(h,m);}},
  volley:{n:'Град стрел',cost:3,t:'self',d:'Выстрел по каждому врагу в дальности (АТК−1).',
    run:h=>{const l=G.monsters.filter(m=>m.alive&&mdist(h,m)<=st(h,'rng'));if(!l.length)log('Нет врагов в дальности.');
      l.forEach(m=>{if(m.alive)dmgMon(h,m,st(h,'atk')-1+roll());});}},
- frost:{n:'Ледяная стрела',cost:2,t:'enemy',rng:3,d:'АТК+1 магического урона; враг заморожен и пропускает ход (Дракон — нет).',
-   run:(h,m)=>{sfx('zap');dmgMon(h,m,st(h,'atk')+1+roll(),{magic:1});if(m.alive&&!ccImmune(m)){m.stun=true;pop(m,'ЗАМОРОЖЕН','#9df');}}},
- smite:{n:'Кара',cost:2,t:'enemy',rng:3,d:'АТК+2 магического урона (дальность 3). По нежити — скелетам, призракам, зомби, банши — вдвое больше.',
-   run:(h,m)=>{sfx('zap');let b=st(h,'atk')+2+roll();if(MON[m.id]&&MON[m.id].undead){b*=2;log('Свет жжёт нежить!');}dmgMon(h,m,b,{magic:1});}},
+ frost:{n:'Ледяная стрела',cost:2,t:'enemy',rng:3,d:'АТК+1 магического урона; враг заморожен и пропускает ход (Дракон — нет). Помечает цель: следующий удар ДРУГОГО героя по ней +3.',
+   run:(h,m)=>{sfx('zap');dmgMon(h,m,st(h,'atk')+1+roll(),{magic:1});if(m.alive&&!ccImmune(m)){m.stun=true;pop(m,'ЗАМОРОЖЕН','#9df');}markMon(h,m);}},
+ smite:{n:'Кара',cost:2,t:'enemy',rng:3,d:'АТК+2 магического урона (дальность 3). По нежити — скелетам, призракам, зомби, банши — вдвое больше. Помечает цель: следующий удар ДРУГОГО героя по ней +3.',
+   run:(h,m)=>{sfx('zap');let b=st(h,'atk')+2+roll();if(MON[m.id]&&MON[m.id].undead){b*=2;log('Свет жжёт нежить!');}dmgMon(h,m,b,{magic:1});markMon(h,m);}},
  mend:{n:'Целительный свет',cost:1,t:'ally',rng:2,d:'Восстановить союзнику 2+уровень HP (дальность 2, всего 1 ОД).',
    run:(h,t)=>healHero(h,t,2+h.lv+st(h,'heal'),true)},
  cleanse:{n:'Очищение',cost:1,t:'ally',rng:2,d:'Снять с союзника яд, горение, кровотечение и холод и вылечить 2 HP.',
@@ -1558,8 +1572,8 @@ const ABIL={
  backstab:{n:'Удар в спину',cost:2,t:'enemy',rng:'melee',d:'АТК+3 урона, игнорирует броню. Если враг оглушён, пригвождён или спит — тройной урон (3×АТК).',
    run:(h,m)=>{const sleeping=(m.lair||(MON[m.id]&&MON[m.id].lair))&&!m.aggro;const sneak=m.stun||m.root||sleeping;
      if(sneak)log('Удар в спину!');dmgMon(h,m,sneak?3*st(h,'atk')+roll():st(h,'atk')+3+roll(),{pierce:1});}},
- knives:{n:'Метание ножей',cost:1,t:'enemy',rng:3,d:'Бросок ножа: АТК−1 урона, дальность 3 (всего 1 ОД).',
-   run:(h,m)=>{dmgMon(h,m,Math.max(1,st(h,'atk')-1)+roll());}},
+ knives:{n:'Метание ножей',cost:1,t:'enemy',rng:3,d:'Бросок ножа: АТК−1 урона, дальность 3 (всего 1 ОД). Помечает цель: следующий удар ДРУГОГО героя по ней +3.',
+   run:(h,m)=>{dmgMon(h,m,Math.max(1,st(h,'atk')-1)+roll());markMon(h,m);}},
  smoke:{n:'Дымовая завеса',cost:2,t:'self',d:'Все враги в радиусе 2 оглушены и пропускают ход (боссы и вожаки не оглушаются).',
    run:h=>{sfx('whoosh');const l=G.monsters.filter(m=>m.alive&&mdist(h,m)<=2&&!ccImmune(m));if(!l.length)log('Дым рассеялся впустую.');l.forEach(m=>{m.stun=true;pop(m,'ОГЛУШЁН');});}},
  holystrike:{n:'Священный удар',cost:2,t:'enemy',rng:'melee',d:'АТК+2 урона. Паладин и союзники рядом с ним исцеляются на 2 HP.',
@@ -1668,8 +1682,8 @@ function st(h,k){
     case 'atk':return d.atk+lvSum(h,'atk')+itemMods(h,'atk')+(h.rage||0)+(h.atkb||0)+(h.bless>0?2:0)+(hasRelic('whetstone')?1:0)+(hasRelic('crown')?2:0);
     case 'def':return Math.max(0,d.def+lvSum(h,'def')+itemMods(h,'def')+(guardOn(h)?1:0)+(h.bless>0?1:0)+(G.heroes.some(x=>x!==h&&x.alive&&x.id==='paladin'&&hasPerk(x,'aura')&&dist(h.c,h.r,x.c,x.r)<=1)?1:0)+(hasRelic('ancestor')?1:0)+(hasRelic('banner')&&G.heroes.some(x=>x!==h&&x.alive&&dist(h.c,h.r,x.c,x.r)<=1)?1:0));
     case 'maxhp':return d.hp+(h.hpb||0)+lvSum(h,'hp')+itemMods(h,'hp')+(hasRelic('ironwill')?4:0);
-    case 'ap':return d.ap+lvSum(h,'ap')+itemMods(h,'ap');
-    case 'spd':return 2+(d.spd||0)+itemMods(h,'spd')+(hasRelic('windboots')?1:0);
+    case 'ap':return Math.max(1,d.ap+lvSum(h,'ap')+itemMods(h,'ap'));
+    case 'spd':return Math.max(1,2+(d.spd||0)+itemMods(h,'spd')+(hasRelic('windboots')?1:0));
     case 'rng':return d.rng+lvSum(h,'rng')+itemMods(h,'rng')+(hasRelic('eagle')&&(h.id==='archer'||h.id==='mage')?1:0);
     case 'heal':return itemMods(h,'heal');
   }
@@ -1892,7 +1906,7 @@ function winRoom(){
   const inside=G.heroes.filter(h=>h.alive&&inRoom(h.c));
   const g=evGold(35+(G.endless?G.depth*3:0));sfx('victory');fxQ({burst:'confetti',c:0,r:0});
   inside.forEach(h=>gainXP(h,3));
-  const rare=pick(['amulet','trollheart','vampring','chain','axe','elixir']);
+  const rare=Math.random()<.3?pick(CURSED):pick(['amulet','trollheart','vampring','chain','axe','elixir']);
   const hh=inside.find(h=>canUse(h,rare))||inside[0];if(hh)giveItem(hh,rare,cellOf(hh.c,hh.r));
   log('★ '+R.n+' зачищено! +'+g+' золота, +3 опыта вошедшим, награда: '+ITEMS[rare].n+'.');
   const en=G.grid.flat().find(x=>x.portal);if(en){en.portal=false;if(en.poi)en.poi=Object.assign({},en.poi,{done:1});}
@@ -2095,6 +2109,7 @@ function gainXP(h,n){
    ========================================================= */
 /* --- Тактические бонусы: фланг, оглушённый враг, поджог + стрела --- */
 function dirIdx(a,b){return DIRS[a.r&1].findIndex(([dc,dr])=>a.c+dc===b.c&&a.r+dr===b.r);}
+function markMon(h,m){if(m&&m.alive&&!m.boss){m.mark={by:h.id,until:G.round+1};pop(m,'МЕТКА','#ffd23f');}}
 function comboBonus(h,m,o){
   if(o.noproj||!h.d)return [0,[]];
   let b=0;const t=[];
@@ -2104,6 +2119,7 @@ function comboBonus(h,m,o){
     if(i>=0){const [dc,dr]=DIRS[m.r&1][(i+3)%6];const ally=heroAt(m.c+dc,m.r+dr);if(ally&&ally!==h&&ally.alive){b+=2;t.push('ФЛАНГ');}}
   }
   if(m.stun&&!m.boss){b+=2;t.push('ОГЛУШЁН');}
+  if(m.mark&&m.mark.by!==h.id&&G.round<=m.mark.until){b+=3;t.push('МЕТКА');m.mark=null;}
   if(m.burn>0&&dd>1&&!o.magic&&!o.burn&&h.id==='archer'){b+=2;t.push('ПОДЖОГ');}
   return [b,t];
 }
@@ -2147,7 +2163,7 @@ function killMon(m,killer){
   if(vamp&&killer.alive&&killer.hp<st(killer,'maxhp')){const b=killer.hp;killer.hp=Math.min(st(killer,'maxhp'),killer.hp+vamp);pop(killer,'+'+(killer.hp-b),'#f66');log('Вампиризм: '+killer.d.n+' +'+(killer.hp-b)+' HP.');}
   if(m.xp>0){G.heroes.forEach(h=>{if(m.hit.has(h.id))gainXP(h,m.xp+(h===killer?1:0)+(hasRelic('warbook')?1:0));});}
   if(hasRelic('chalice')&&killer&&killer.d)G.heroes.forEach(x=>{if(x.alive&&dist(x.c,x.r,killer.c,killer.r)<=1&&x.hp<st(x,'maxhp')){x.hp++;pop(x,'+1','#f66');}});
-  if(m.hunter){const gg=evGold(Math.round((30+10*Math.min(2,LOC_TIER[G.loc]||0))*D().gold));pop({c:m.c,r:m.r},'+'+gg+' з','#ffd23f');const it=pick(['amulet','trollheart','vampring','feather','chain','axe','elixir']);dropLoot(m.c,m.r,it);log('Охотник повержен! Награда за голову: +'+gg+' золота, на земле — '+ITEMS[it].n+'.');showBanner('Охотник повержен','+'+gg+' золота и трофей');}
+  if(m.hunter){const gg=evGold(Math.round((30+10*Math.min(2,LOC_TIER[G.loc]||0))*D().gold));pop({c:m.c,r:m.r},'+'+gg+' з','#ffd23f');const it=Math.random()<.4?pick(CURSED):pick(['amulet','trollheart','vampring','feather','chain','axe','elixir']);dropLoot(m.c,m.r,it);log('Охотник повержен! Награда за голову: +'+gg+' золота, на земле — '+ITEMS[it].n+'.');showBanner('Охотник повержен','+'+gg+' золота и трофей');}
   if(m.id==='mimic'){const gg=evGold(Math.round((14+6*chestTier())*D().gold));pop({c:m.c,r:m.r},'+'+gg+' з','#ffd23f');dropLoot(m.c,m.r,pick(chestTier()>=1?GEN2:GEN1));log('Мимик выронил настоящую добычу: +'+gg+' золота и предмет на земле.');}
   if(m.def_&&0){}
   const base=MON[m.id];
@@ -2238,14 +2254,15 @@ function hitHero(h,raw,src,o={}){
    ПРЕДМЕТЫ
    ========================================================= */
 const canUse=(h,id)=>!ITEMS[id].cls||ITEMS[id].cls===h.id;
-function takeItem(h,id){h.items.push(id);const it=ITEMS[id];if(it.mods&&it.mods.hp>0)h.hp+=it.mods.hp;sfx('item');pop(h,it.n);}
+function takeItem(h,id){h.items.push(id);const it=ITEMS[id];if(it.mods&&it.mods.hp>0)h.hp+=it.mods.hp;fixHp(h);sfx('item');pop(h,it.n);
+  if(it.curse){pop(h,'ПРОКЛЯТО','#c58bff');log('Предмет «'+it.n+'» проклят! Выбросить или продать его нельзя — очистить можно на привале ('+PURIFY_COST+' з).');}}
 function dropLoot(c,r,id){const cell=cellOf(c,r);(cell.loot=cell.loot||[]).push(id);}
 // поднять с земли всё, что герою подходит и влезает
 function pickupHere(h){
   const cell=cellOf(h.c,h.r);if(!cell||!cell.loot||!cell.loot.length||!h.alive)return;
   const left=[];
   for(const id of cell.loot){
-    if(canUse(h,id)&&h.items.length<3){takeItem(h,id);log(h.d.n+' подбирает: '+ITEMS[id].n+'.');}
+    if(canUse(h,id)&&h.items.length<3&&!isCursed(id)){takeItem(h,id);log(h.d.n+' подбирает: '+ITEMS[id].n+'.');}
     else left.push(id);
   }
   if(left.length&&left.length===cell.loot.length&&h.items.length>=3&&left.some(id=>canUse(h,id)))log(h.d.n+': нет места. Выбросьте предмет (✕ на карточке), чтобы подобрать.');
@@ -2253,6 +2270,7 @@ function pickupHere(h){
 }
 function giveItem(h,id,cell){
   const it=ITEMS[id];
+  if(isCursed(id)){dropLoot(cell.c,cell.r,id);sfx('item');pop(cell,it.n,'#c58bff');log('Найден проклятый предмет: «'+it.n+'». Он лежит на земле — поднимите кнопкой на карточке героя, если рискнёте ('+it.d.split(' Нельзя')[0]+').');return;}
   if(canUse(h,id)&&h.items.length<3){takeItem(h,id);log('Найден предмет: '+it.n+' → '+h.d.n+'.');return;}
   dropLoot(cell.c,cell.r,id);sfx('item');pop(cell,it.n,'#ffd23f');
   if(!canUse(h,id))log('Найден предмет: '+it.n+' ('+it.type+'). Он остаётся на земле — '+G.heroes.find(x=>x.id===it.cls).d.n+' может прийти и забрать.');
@@ -2414,7 +2432,7 @@ function chestReward(h,cell,q){
   const g=evGold(Math.round(base*D().gold));
   const pos={c:cell.c,r:cell.r};pop(pos,'+'+g+' з','#ffd23f');sfx('key');fxQ({burst:q>=2?'level':'gold',c:cell.c,r:cell.r});
   let txt='Сундук открыт: +'+g+' золота';
-  if(q>=2){const it=pick(tier>=1?GEN2:GEN1);giveItem(h,it,cell);txt+=' и предмет «'+ITEMS[it].n+'»';}
+  if(q>=2){const it=Math.random()<.22?pick(CURSED):pick(tier>=1?GEN2:GEN1);giveItem(h,it,cell);txt+=' и предмет «'+ITEMS[it].n+'»';}
   if(q>=3){const it=pick(['amulet','trollheart','vampring','feather','chain','axe','elixir']);giveItem(h,it,cell);txt+=', а ещё редкость: «'+ITEMS[it].n+'»';}
   log(txt+'.');
 }
@@ -2480,7 +2498,7 @@ function ambushAt(h,n){
   const pool=AMB_POOL[G.loc]||AMB_POOL[4];
   sfx('spawn');for(let i=0;i<n;i++){const f=freeNear(h.c,h.r);if(f){const m=maybeAffix(spawnMon(pick(pool),f[0],f[1]));fxQ({burst:'spawn',c:f[0],r:f[1]});pop(m,'!');}}
 }
-function evGold(g){g=Math.round(g*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1));G.gold+=g;return g;}
+function evGold(g){g=Math.round(g*(G.heroes&&G.heroes.some(h=>h.alive&&h.items.some(id=>ITEMS[id].greed))?1.4:1)*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1));G.gold+=g;return g;}
 function openRelicChoice(n,title,intro){
   const ids=pickRelics(n);if(!ids.length){const g=evGold(30);log('Реликвий больше нет — получено '+g+' золота.');ui();return;}
   openModal('<h1>'+title+'</h1><p>'+intro+'</p><div class="shop">'+ids.map(id=>'<div class="item"><div class="ih"><img class="ic" src="'+RICON[id]+'"><div><b>'+RELICS[id].n+'</b><div class="ty">Реликвия</div></div></div><div class="ds">'+RELICS[id].d+'</div></div>').join('')+'</div>',
@@ -2625,7 +2643,7 @@ function pickTarget(m){
   const hs=G.heroes.filter(h=>h.alive);if(G.npc&&G.npc.alive&&G.npc.freed)hs.push(G.npc);if(!hs.length)return null;
   const tank=hs.find(h=>h.id==='tank'&&h.taunt);
   if(tank&&dist(m.c,m.r,tank.c,tank.r)<=m.mv+m.rng+3)return tank;
-  const pd=x=>dist(m.c,m.r,x.c,x.r)-(x.npc?2:0);
+  const pd=x=>dist(m.c,m.r,x.c,x.r)-(x.npc?2:0)-(x.items&&x.items.includes('c_crown')?3:0);
   hs.sort((a,b)=>pd(a)-pd(b)||a.hp-b.hp);
   return hs[0];
 }
@@ -2775,6 +2793,7 @@ function newRound(){
   G.round++;G.ready={};G.undo=null;armTimer();
   G.heroes.forEach(h=>{
     h.block=h.guard=h.taunt=false;h.xpFlag=false;h.rage=0;if(h.bless>0)h.bless--;
+    if(h.alive&&h.items.includes('c_blade')&&h.hp>1){h.hp--;pop(h,'ПРОКЛЯТИЕ -1','#c58bff');}
     if(h.alive){
       const rg=itemFx(h,'regen');if(rg&&h.hp<st(h,'maxhp')){h.hp=Math.min(st(h,'maxhp'),h.hp+rg);pop(h,'+'+rg);}
       h.ap=st(h,'ap')+(h.haste?1:0);h.haste=false;
@@ -2890,7 +2909,8 @@ function aiStep(h){
   const inR=foes.filter(m=>mdist(h,m)<=rng);
   const adj=foes.filter(m=>mdist(h,m)<=1).length;
   if(inR.length){
-    const t=inR.slice().sort((a,b)=>(a.hp-b.hp)||(a.boss?1:-1))[0];
+    const mk=x=>x.mark&&x.mark.by!==h.id&&G.round<=x.mark.until?1:0;
+    const t=inR.slice().sort((a,b)=>(mk(b)-mk(a))||(a.hp-b.hp)||(a.boss?1:-1))[0];
     const clus=m=>foes.filter(x=>x!==m&&cellsOf(x).some(([c,r])=>cellsOf(m).some(([a,b])=>dist(a,b,c,r)<=1))).length;
     const tough=m=>m.boss||m.elite||m.hp>=10||m.def>=2;
     const reserve=(h.id==='tank'&&allies.length>1)?1:0;
@@ -3038,7 +3058,8 @@ function campCmd(cmd,who){
   const h=G.heroes.find(x=>x.id===cmd.h);if(!h||(ownerOf(h)!==who&&!(isAI(h)&&who==='H')))return;
   if(cmd.c==='buy'){const id=C.stock[cmd.i];if(!id||!canUse(h,id)||h.items.length>=3||G.gold<priceOf(id))return;
     G.gold-=priceOf(id);C.stock.splice(cmd.i,1);takeItem(h,id);log(h.d.n+' покупает: '+ITEMS[id].n+' (−'+priceOf(id)+' з).');ui();return;}
-  if(cmd.c==='sell'){const id=h.items[cmd.slot];if(!id)return;const g=Math.floor(priceOf(id)/2);
+  if(cmd.c==='purify'){const id=h.items[cmd.slot];if(!id||!isCursed(id)||G.gold<PURIFY_COST)return;G.gold-=PURIFY_COST;const np=ITEMS[id].pure;h.items[cmd.slot]=np;fixHp(h);sfx('heal');log(h.d.n+': проклятие снято! «'+ITEMS[id].n+'» → «'+ITEMS[np].n+'» (−'+PURIFY_COST+' з).');ui();return;}
+  if(cmd.c==='sell'){const id=h.items[cmd.slot];if(!id||isCursed(id))return;const g=Math.floor(priceOf(id)/2);
     h.items.splice(cmd.slot,1);fixHp(h);G.gold+=g;sfx('item');log(h.d.n+' продаёт: '+ITEMS[id].n+' (+'+g+' з).');ui();return;}
 }
 function renderCamp(){
@@ -3051,7 +3072,9 @@ function renderCamp(){
   html+='<h2>Торговец</h2><div class="shop">'+C.stock.map((id,i)=>{const it=ITEMS[id];
     const bt=my.filter(h=>canUse(h,id)).map(h=>{const dis=h.items.length>=3||G.gold<priceOf(id);return '<button class="btn" data-camp="buy" data-h="'+h.id+'" data-i="'+i+'"'+(dis?' disabled':'')+'>→ '+h.d.n+'</button>';}).join('');
     return '<div class="item"><div class="ih"><img class="ic" src="'+ICON[id]+'"><div><b>'+it.n+'</b><div class="ty">'+it.type+'</div></div><span class="chip gold pr"><i class="coin"></i>'+priceOf(id)+'</span></div><div class="ds">'+it.d+'</div><div class="row">'+(bt||'<span class="st">не для ваших героев</span>')+'</div></div>';}).join('')+'</div>';
-  const sells=my.flatMap(h=>h.items.map((id,s)=>'<button class="btn" data-camp="sell" data-h="'+h.id+'" data-slot="'+s+'">'+h.d.n+': '+ITEMS[id].n+' +'+Math.floor(priceOf(id)/2)+' з</button>'));
+  const curses=my.flatMap(h=>h.items.map((id,s)=>isCursed(id)?'<button class="btn" data-camp="purify" data-h="'+h.id+'" data-slot="'+s+'"'+(G.gold<PURIFY_COST?' disabled':'')+'>'+h.d.n+': очистить «'+ITEMS[id].n+'» → «'+ITEMS[ITEMS[id].pure].n+'» ('+PURIFY_COST+' з)</button>':'')).filter(Boolean);
+  if(curses.length)html+='<h2>Снять проклятие</h2><p>Очищенный предмет сохраняет силу, но теряет проклятие.</p><div class="row">'+curses.join('')+'</div>';
+  const sells=my.flatMap(h=>h.items.filter(id=>!isCursed(id)).length?h.items.map((id,s)=>isCursed(id)?'':'<button class="btn" data-camp="sell" data-h="'+h.id+'" data-slot="'+s+'">'+h.d.n+': '+ITEMS[id].n+' +'+Math.floor(priceOf(id)/2)+' з</button>').filter(Boolean):[]);
   if(sells.length)html+='<h2>Продать</h2><div class="row">'+sells.join('')+'</div>';
   html+='<h2>Костёр</h2><p>'+(C.rested?'Отряд уже отдохнул.':'Полное лечение всех героев и снятие ядов — '+REST_COST+' з.')+'</p>';
   html+='<div class="row">'+(C.rested?'':'<button class="btn" data-camp="rest"'+(G.gold<REST_COST?' disabled':'')+'>Отдохнуть ('+REST_COST+' з)</button>')+
@@ -3060,7 +3083,7 @@ function renderCamp(){
   if(html===NET.campHtml&&$('#modal').style.display==='flex')return;
   NET.campHtml=html;openModal(html,[],true);
   $('#mbox').querySelectorAll('[data-camp]').forEach(b=>b.onclick=()=>{sfx('click');const d=b.dataset;
-    act(d.camp==='relic'?{c:'relic',i:+d.i}:d.camp==='buy'?{c:'buy',h:d.h,i:+d.i}:d.camp==='sell'?{c:'sell',h:d.h,slot:+d.slot}:{c:d.camp,n:d.n!=null?+d.n:undefined});});
+    act(d.camp==='relic'?{c:'relic',i:+d.i}:d.camp==='buy'?{c:'buy',h:d.h,i:+d.i}:d.camp==='sell'?{c:'sell',h:d.h,slot:+d.slot}:d.camp==='purify'?{c:'purify',h:d.h,slot:+d.slot}:{c:d.camp,n:d.n!=null?+d.n:undefined});});
 }
 function goNext(){
   if(G.busy||G.over||!atExit())return;
@@ -3571,6 +3594,7 @@ function renderPixi(){
     s.position.set(Math.round(x),Math.round(y-4-Math.round(ap.hop*.5)));
     if(flash(m.c,m.r))s.tint=0xff8888;
     if(m.stun)T('zZ',x+10,y-10,8,'#ffd23f');
+    if(m.mark&&G.round<=m.mark.until)T('◎',x-11,y-12,10,'#ffd23f');
     pbar(f,x,y+12,m.hp/m.max,'#e24444');pStatus(f,m,x,y);
     if(m.elite)T(m.hp+'/'+m.max,x,y-32,7,'#99ddff');
     if(m.affix&&AFFIX[m.affix]){f.beginFill(0);f.drawRect(Math.round(x+7),Math.round(y-25),7,7);f.endFill();f.beginFill(AFFIX[m.affix].col);f.drawRect(Math.round(x+8),Math.round(y-24),5,5);f.endFill();}
@@ -3846,7 +3870,7 @@ function renderHeroes(){
       const it=ITEMS[id];const usable=!!it.use;const dis=!usable||!h.alive||G.busy||!mine(h)||h.ap<it.use.cost;
       const act=G.mode&&G.mode.h===h&&G.mode.ref&&G.mode.ref.slot===s;
       return '<span class="slotw"><button class="btn slot'+(act?' act':'')+'" data-tip="'+esc(it.d)+'" data-tn="'+esc(it.n)+'" data-tc="'+esc(it.type)+'" data-act="item" data-h="'+h.id+'" data-slot="'+s+'" '+(usable&&!dis?'':'disabled style="opacity:1;'+(usable?'opacity:.35':'cursor:help')+'"')+'><img class="ic" src="'+ICON[id]+'">'+it.n+'</button>'+
-        (mine(h)&&h.alive&&!G.busy?'<button class="btn x" data-tip="Выбросить на землю (0 ОД)" data-act="drop" data-h="'+h.id+'" data-slot="'+s+'">✕</button>':'')+'</span>';}).join('');
+        (mine(h)&&h.alive&&!G.busy&&!isCursed(id)?'<button class="btn x" data-tip="Выбросить на землю (0 ОД)" data-act="drop" data-h="'+h.id+'" data-slot="'+s+'">✕</button>':'')+'</span>';}).join('');
     const here=cellOf(h.c,h.r);
     const takes=h.alive&&mine(h)&&!G.busy&&here&&here.loot?here.loot.map((id,i)=>canUse(h,id)?'<button class="btn" data-act="take" data-h="'+h.id+'" data-i="'+i+'"'+(h.items.length>=3?' disabled data-tip="Нет места"':'')+'>Подобрать: '+ITEMS[id].n+'</button>':'').join(''):'';
     const notes=[];for(let l=2;l<=h.lv;l++){const o=perkOf(h,l);if(o&&!o.ab)notes.push('★ '+o.n);}
@@ -3895,7 +3919,7 @@ function ui(){try{checkAch();}catch(e){}
   if(G.mode)inf.innerHTML='<b>'+G.mode.spec.n+'</b>: выберите цель на карте (Esc — отмена).<br><span style="color:var(--mid)">'+G.mode.spec.d+'</span>';
   else if(!G.hover)inf.innerHTML='<span style="color:var(--mid)">'+(TOUCH?'Касание по гексу — идти, по «?» рядом — открыть, по врагу — атаковать. Долгое касание — метка для команды.':'Наведите на клетку. Клик по гексу — идти, по «?» рядом — открыть, по врагу — атаковать. Правый клик — метка для команды.')+'</span>';
 }
-const statusTxt=u=>{const a=[];if(u.burn)a.push('горит');if(u.bleed)a.push('кровотечение');if(u.poison)a.push('яд');if(u.chill)a.push('холод');if(u.stun)a.push('оглушён');if(u.root)a.push('пригвождён');return a.length?' · <span style="color:#f99">'+a.join(', ')+'</span>':'';};
+const statusTxt=u=>{const a=[];if(u.burn)a.push('горит');if(u.bleed)a.push('кровотечение');if(u.poison)a.push('яд');if(u.chill)a.push('холод');if(u.stun)a.push('оглушён');if(u.root)a.push('пригвождён');if(u.mark&&G.round<=u.mark.until)a.push('помечен: удар другого героя +3');return a.length?' · <span style="color:#f99">'+a.join(', ')+'</span>':'';};
 function describe(cell){
   const inf=$('#info');if(G.mode)return;
   if(!cell){ui();return;}
@@ -3973,7 +3997,7 @@ function runCmd(cmd,who){
         if(d>0){const cost=Math.ceil(d/spd);if(h.ap>=cost){const pre={h:h.id,c:h.c,r:h.r,ap:h.ap,ll:G.log.length};G.undo=pre;doMove(h,cell,cost);
           if(G.log.length!==pre.ll||!h.alive)G.undo=null;ui();}}break;}
       case 'abil':{if(!habils(h).includes(cmd.id))break;runSpec(h,ABIL[cmd.id],{id:cmd.id},cmd);break;}
-      case 'drop':{const id=h.items[cmd.slot];if(!id)break;h.items.splice(cmd.slot,1);fixHp(h);dropLoot(h.c,h.r,id);log(h.d.n+' кладёт на землю: '+ITEMS[id].n+'.');sfx('item');afterAction();break;}
+      case 'drop':{const id=h.items[cmd.slot];if(!id)break;if(isCursed(id)){log('«'+ITEMS[id].n+'» проклят и не снимается. Очистите его на привале.');sfx('trap');break;}h.items.splice(cmd.slot,1);fixHp(h);dropLoot(h.c,h.r,id);log(h.d.n+' кладёт на землю: '+ITEMS[id].n+'.');sfx('item');afterAction();break;}
       case 'take':{const cell=cellOf(h.c,h.r);const id=cell.loot&&cell.loot[cmd.i];if(!id||!canUse(h,id)||h.items.length>=3)break;cell.loot.splice(cmd.i,1);takeItem(h,id);log(h.d.n+' подбирает: '+ITEMS[id].n+'.');afterAction();break;}
       case 'perk':{const g=h.d.lv[cmd.lv];if(!g||!g.pick||cmd.lv>h.lv||perkOf(h,cmd.lv)||!g.pick[cmd.o])break;
         h.perks=h.perks||{};h.perks[cmd.lv]=cmd.o;const o=g.pick[cmd.o];if(o.ap)h.ap+=o.ap;
