@@ -127,3 +127,15 @@ ART.totem=()=>mkArt({parts:[
  {t:'p',pts:[[10,8],[18,1],[26,8]],m:'red'},{t:'p',pts:[[5,10],[12,7],[12,12]],m:'bone'},{t:'p',pts:[[31,10],[24,7],[24,12]],m:'bone'},
  {t:'px',x:18,y:4,c:'#ffd23f'},
 ]});
+ART.gate=()=>mkArt({parts:[
+ {t:'r',x:5,y:6,w:4,h:28,m:'stone'},{t:'r',x:27,y:6,w:4,h:28,m:'stone'},{t:'r',x:4,y:3,w:28,h:4,m:'stone',b:.1},
+ {t:'r',x:10,y:7,w:2,h:26,m:'steelD'},{t:'r',x:15,y:7,w:2,h:26,m:'steelD'},{t:'r',x:20,y:7,w:2,h:26,m:'steelD'},{t:'r',x:24,y:7,w:2,h:26,m:'steelD'},
+ {t:'r',x:9,y:13,w:18,h:2,m:'steel'},{t:'r',x:9,y:24,w:18,h:2,m:'steel'},
+ {t:'p',pts:[[10,33],[11,35],[12,33]],m:'steel'},{t:'p',pts:[[15,33],[16,35],[17,33]],m:'steel'},{t:'p',pts:[[20,33],[21,35],[22,33]],m:'steel'},{t:'p',pts:[[24,33],[25,35],[26,33]],m:'steel'},
+ {t:'e',cx:18,cy:5,rx:2,ry:2,m:'gold'},
+]});
+ART.lever=()=>mkArt({parts:[
+ {t:'e',cx:18,cy:31,rx:9,ry:3,m:'stone',b:-.2},{t:'r',x:11,y:24,w:14,h:7,m:'stone'},{t:'r',x:11,y:24,w:14,h:2,m:'gray',b:.1},
+ {t:'l',x0:18,y0:25,x1:25,y1:10,w:2,m:'wood',k:.6},{t:'e',cx:25.5,cy:9,rx:3,ry:3,m:'red'},
+ {t:'r',x:15,y:26,w:6,h:2,m:'steelD'},
+]});
