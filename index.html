@@ -1307,6 +1307,16 @@ ART.lab=()=>mkArt({parts:[
  {t:'e',cx:25,cy:24,rx:7,ry:1.8,m:'acid'},{t:'e',cx:22,cy:22,rx:1.4,ry:1.4,m:'acid',b:.2},{t:'e',cx:27,cy:20,rx:1.8,ry:1.8,m:'acid',b:.2},{t:'e',cx:25,cy:16,rx:1.2,ry:1.2,m:'acid',b:.2},
  {t:'p',pts:[[21,33],[23,29],[25,33]],m:'orange'},{t:'p',pts:[[26,33],[28,29],[30,33]],m:'orange'},
 ]});
+
+ART.totem=()=>mkArt({parts:[
+ {t:'e',cx:18,cy:33,rx:11,ry:3,m:'stone',b:-.2},
+ {t:'r',x:12,y:8,w:12,h:25,m:'wood'},{t:'r',x:12,y:8,w:2,h:25,m:'wood',b:.15},
+ {t:'r',x:11,y:12,w:14,h:2,m:'bone'},{t:'r',x:11,y:21,w:14,h:2,m:'bone'},
+ {t:'e',cx:15,cy:16.5,rx:1.6,ry:1.6,m:'yellow'},{t:'e',cx:21,cy:16.5,rx:1.6,ry:1.6,m:'yellow'},{t:'r',x:15,y:18,w:6,h:1,m:'dark'},
+ {t:'e',cx:15,cy:26,rx:1.4,ry:1.4,m:'red'},{t:'e',cx:21,cy:26,rx:1.4,ry:1.4,m:'red'},{t:'r',x:14,y:28,w:8,h:1,m:'dark'},
+ {t:'p',pts:[[10,8],[18,1],[26,8]],m:'red'},{t:'p',pts:[[5,10],[12,7],[12,12]],m:'bone'},{t:'p',pts:[[31,10],[24,7],[24,12]],m:'bone'},
+ {t:'px',x:18,y:4,c:'#ffd23f'},
+]});
 /* Покадровая анимация: из готового спрайта получаем кадры деформацией (смещение полос тела, ног, рук, волна подола, сжатие). */
 const ANIMK={stalker:'hum',mimic:'blob',priest:'robe',rogue:'hum',paladin:'hum',toad:'quad',leech:'blob',croc:'quad',bogwitch:'robe',wisp:'float',hydra:'hum',plaguerat:'quad',acidslime:'blob',alchemist:'hum',zombie:'hum',scorpion:'spider',spiderqueen:'spider',tank:'hum',sword:'hum',archer:'hum',mage:'robe',goblin:'hum',wolf:'quad',skel:'hum',spider:'spider',bandit:'hum',slime:'blob',slimelet:'blob',bat:'flap',boar:'quad',shaman:'hum',shroom:'blob',orc:'hum',dknight:'hum',necro:'robe',troll:'hum',ghost:'float',ogre:'hum',wraith:'float',golem:'hum',cultist:'robe',gargoyle:'hum',yeti:'hum',icespirit:'float',frostspider:'spider',icegolem:'hum',icequeen:'robe',whelp:'flap',dragon:'flap'};
 const FACE_LEFT={wolf:1,boar:1};            // спрайт нарисован мордой влево
@@ -1736,9 +1746,9 @@ function giveRelic(id){
 function st(h,k){
   const d=h.d;
   switch(k){
-    case 'atk':return d.atk+lvSum(h,'atk')+itemMods(h,'atk')+(h.rage||0)+(h.atkb||0)+(h.bless>0?2:0)+(hasRelic('whetstone')?1:0)+(hasRelic('crown')?2:0);
+    case 'atk':return d.atk+lvSum(h,'atk')+itemMods(h,'atk')+(h.rage||0)+(h.atkb||0)+(pact('glass')&&!h.npc?1:0)+(h.bless>0?2:0)+(hasRelic('whetstone')?1:0)+(hasRelic('crown')?2:0);
     case 'def':return Math.max(0,d.def+lvSum(h,'def')+itemMods(h,'def')+(guardOn(h)?1:0)+(h.bless>0?1:0)+(G.heroes.some(x=>x!==h&&x.alive&&x.id==='paladin'&&hasPerk(x,'aura')&&dist(h.c,h.r,x.c,x.r)<=1)?1:0)+(hasRelic('ancestor')?1:0)+(hasRelic('banner')&&G.heroes.some(x=>x!==h&&x.alive&&dist(h.c,h.r,x.c,x.r)<=1)?1:0));
-    case 'maxhp':return d.hp+(h.hpb||0)+lvSum(h,'hp')+itemMods(h,'hp')+(hasRelic('ironwill')?4:0);
+    case 'maxhp':{const v=d.hp+(h.hpb||0)+lvSum(h,'hp')+itemMods(h,'hp')+(hasRelic('ironwill')?4:0);return (pact('glass')&&!h.npc)?Math.max(1,Math.floor(v*.8)):v;}
     case 'ap':return Math.max(1,d.ap+lvSum(h,'ap')+itemMods(h,'ap'));
     case 'spd':return Math.max(1,2+(d.spd||0)+itemMods(h,'spd')+(hasRelic('windboots')?1:0));
     case 'rng':return d.rng+lvSum(h,'rng')+itemMods(h,'rng')+(hasRelic('eagle')&&(h.id==='archer'||h.id==='mage')?1:0);
@@ -2011,9 +2021,10 @@ function genArena(){
 function newGame(){
   document.body.classList.remove('lost');
   const _si=G&&G.showInt;
-  G={showInt:_si,relics:[],relicPending:0,diff:NET.diff||'normal',gold:0,camp:null,ready:{},heroes:[],monsters:[],keys:0,loc:0,round:1,log:[],fx:[],hover:null,mode:null,sel:'sword',busy:false,over:false,tele:null,dragon:null,stats:{deaths:0,kills:0}};
+  G={showInt:_si,pacts:NET.daily?[]:(NET.pacts||[]).slice(),relics:[],relicPending:0,diff:NET.diff||'normal',gold:0,camp:null,ready:{},heroes:[],monsters:[],keys:0,loc:0,round:1,log:[],fx:[],hover:null,mode:null,sel:'sword',busy:false,over:false,tele:null,dragon:null,stats:{deaths:0,kills:0}};
   G.endless=!!NET.endless&&!NET.horde;G.horde=NET.horde?{wave:0,cleared:0,state:'prep'}:null;G.depth=1;G.floorClear=false;G.daily=NET.daily||null;if(G.endless)G.keys=KEYS_NEEDED;
   squad().forEach(id=>G.heroes.push({id,d:HDEF[id],lv:1,xp:0,hp:HDEF[id].hp,alive:true,c:0,r:0,ap:HDEF[id].ap,items:[],block:false,guard:false,taunt:false,haste:false,poison:0,reviveUsed:false,xpFlag:false,perks:{}}));
+  G.heroes.forEach(h=>{h.hp=Math.min(h.hp,st(h,'maxhp'));});
   applyGift();META.s.runs++;saveMeta();
   if(G.horde){G.keys=KEYS_NEEDED;startLoc(HORDE_LOC);nextWave();}else startLoc(1);
 }
@@ -2152,6 +2163,7 @@ function showDaily(){
    ========================================================= */
 function gainXP(h,n){
   if(!h.alive||n<=0||h.lv>=5)return;
+  if(pact('haste'))n=Math.ceil(n*1.5);
   h.xp+=n;
   while(h.lv<5&&h.xp>=XPT[h.lv-1]){
     h.lv++;const g=h.d.lv[h.lv];
@@ -2215,7 +2227,7 @@ function killMon(m,killer){
   m.alive=false;G.stats.kills++;META.s.kills++;if(META.s.kills%10===0)saveMeta();ach('first_blood');fxQ({burst:'kill',c:m.c,r:m.r,spr:m.spr,big:!!m.big});
   if(m.leader)objProgress('leader');else if(!m.summoned&&m.xp>0)objProgress('kill');
   log(m.n+' повержен!');sfx('kill');
-  if(m.xp>0&&!m.summoned){const g=Math.max(1,Math.round((m.xp*2+rnd(0,2))*D().gold*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1)));G.gold+=g;pop({c:m.c,r:m.r},'+'+g+' з','#ffd23f');}
+  if(m.xp>0&&!m.summoned){const g=Math.max(1,Math.round((m.xp*2+rnd(0,2))*D().gold*(pact('blood')?1.5:1)*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1)));G.gold+=g;pop({c:m.c,r:m.r},'+'+g+' з','#ffd23f');}
   const vamp=killer&&killer.d?(hasPerk(killer,'bloodlust')?2:0)+itemFx(killer,'vamp'):0;
   if(vamp&&killer.alive&&killer.hp<st(killer,'maxhp')){const b=killer.hp;killer.hp=Math.min(st(killer,'maxhp'),killer.hp+vamp);pop(killer,'+'+(killer.hp-b),'#f66');log('Вампиризм: '+killer.d.n+' +'+(killer.hp-b)+' HP.');}
   if(m.xp>0){G.heroes.forEach(h=>{if(m.hit.has(h.id))gainXP(h,m.xp+(h===killer?1:0)+(hasRelic('warbook')?1:0));});}
@@ -2265,7 +2277,7 @@ function maybeAffix(m){
 }
 function spawnMon(id,c,r){
   const b=MON[id];
-  const hp=Math.max(1,Math.round(b.hp*D().hp*DS().hp*(hasRelic('crown')?1.15:1))),atk=Math.max(1,b.atk+(b.xp?D().atk+DS().atk:0));
+  const hp=Math.max(1,Math.round(b.hp*D().hp*DS().hp*(hasRelic('crown')?1.15:1)*(pact('blood')?1.25:1))),atk=Math.max(1,b.atk+(b.xp?D().atk+DS().atk+(pact('iron')?1:0):0));
   const m={id,n:b.n,hp,max:hp,atk,def:b.def,mv:b.mv,rng:b.rng,xp:b.xp,spr:b.spr,d:b.d,alive:true,c,r,hit:new Set(),stun:false,cd:0};
   G.monsters.push(m);return m;
 }
@@ -2353,7 +2365,7 @@ function reach(h,maxSteps){
 }
 function moveHero(h,c,r,noFree){
   const adj=(noFree||h.id==='rogue')?[]:G.monsters.filter(m=>m.alive&&!m.big&&m.rng===1&&!m.stun&&mdist(h,m)<=1);
-  h.c=c;h.r=r;sfx(noFree?'whoosh':'step');pickupHere(h);enterCell(h,true);scoutTraps(h);npcCheckFree(h);
+  h.c=c;h.r=r;sfx(noFree?'whoosh':'step');pickupHere(h);enterCell(h,true);scoutTraps(h);npcCheckFree(h);holdStart();
   for(const m of adj){
     if(!h.alive)break;
     if(dist(h.c,h.r,m.c,m.r)>1){log(m.n+' бьёт вдогонку!');hitHero(h,m.atk+rnd(0,1),m,{pierce:false});}
@@ -2426,6 +2438,30 @@ function revealToken(h,cell){
 
 
 
+
+
+/* --- Договоры перед забегом: риск ради награды --- */
+const PACTS={
+ blood:{n:'Кровавый договор',d:'Монстры на 25% крепче, но золота в 1,5 раза больше.'},
+ iron:{n:'Железный договор',d:'Монстры бьют на 1 сильнее, но на каждом привале — лишняя реликвия.'},
+ haste:{n:'Договор спешки',d:'С 6-го раунда каждые 3 раунда на локацию прибывает враг, но опыта на 50% больше.'},
+ glass:{n:'Стеклянный договор',d:'У героев на 20% меньше максимального HP, но они бьют на 1 сильнее.'}
+};
+const pact=k=>!!(G.pacts&&G.pacts.includes(k));
+function choosePacts(then){
+  const sel=new Set(NET.pacts||[]);
+  const draw=()=>openModal('<h1>Договоры</h1><p>Можно взять любые договоры — или ни одного. Каждый делает забег опаснее, но и награда больше.</p>'+
+    Object.keys(PACTS).map(k=>'<p>'+(sel.has(k)?'★ ':'— ')+'<b>'+PACTS[k].n+'</b>: '+PACTS[k].d+'</p>').join(''),
+    [...Object.keys(PACTS).map(k=>({t:(sel.has(k)?'★ ':'')+PACTS[k].n,fn:()=>{if(sel.has(k))sel.delete(k);else sel.add(k);draw();}})),
+     {t:'ДАЛЕЕ ▶',fn:()=>{NET.pacts=[...sel];then();}}],true);
+  draw();
+}
+function hasteTick(){
+  if(!pact('haste')||G.loc===ARENA||G.horde||G.round<6||G.round%3)return;
+  const L=LOCS[G.loc];const pool=(L.mon||[]).filter(id=>MON[id]&&MON[id].mv>=1&&!MON[id].split&&MON[id].hp<=16);if(!pool.length)return;
+  const c=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!inRoom(c.c)&&!heroAt(c.c,c.r)&&!monsterAt(c.c,c.r)&&!npcAt(c.c,c.r)&&G.heroes.every(h=>!h.alive||dist(h.c,h.r,c.c,c.r)>=5)))[0];
+  if(!c)return;const m=maybeAffix(spawnMon(pick(pool),c.c,c.r));m.aggro=true;fxQ({burst:'spawn',c:c.c,r:c.r});log('Договор спешки: прибыл ещё один враг — '+m.n+'.');
+}
 
 /* --- Охотник: появляется посреди локации и преследует отряд --- */
 function huntTick(){
@@ -2555,7 +2591,7 @@ function ambushAt(h,n){
   const pool=AMB_POOL[G.loc]||AMB_POOL[4];
   sfx('spawn');for(let i=0;i<n;i++){const f=freeNear(h.c,h.r);if(f){const m=maybeAffix(spawnMon(pick(pool),f[0],f[1]));fxQ({burst:'spawn',c:f[0],r:f[1]});pop(m,'!');}}
 }
-function evGold(g){g=Math.round(g*(G.heroes&&G.heroes.some(h=>h.alive&&h.items.some(id=>ITEMS[id].greed))?1.4:1)*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1));G.gold+=g;return g;}
+function evGold(g){g=Math.round(g*(pact('blood')?1.5:1)*(G.heroes&&G.heroes.some(h=>h.alive&&h.items.some(id=>ITEMS[id].greed))?1.4:1)*(hasRelic('goldtooth')?1.5:1)*(G.endless?1+.06*(G.depth-1):1));G.gold+=g;return g;}
 function openRelicChoice(n,title,intro){
   const ids=pickRelics(n);if(!ids.length){const g=evGold(30);log('Реликвий больше нет — получено '+g+' золота.');ui();return;}
   openModal('<h1>'+title+'</h1><p>'+intro+'</p><div class="shop">'+ids.map(id=>'<div class="item"><div class="ih"><img class="ic" src="'+RICON[id]+'"><div><b>'+RELICS[id].n+'</b><div class="ty">Реликвия</div></div></div><div class="ds">'+RELICS[id].d+'</div></div>').join('')+'</div>',
@@ -2566,11 +2602,12 @@ const OBJ={
  leader:{n:'Убить вожака',d:'На карте засел усиленный Вожак (красное свечение). Убейте его.'},
  hunt:{n:'Охота',d:'Убейте нужное число врагов.'},
  treasure:{n:'Найти сокровище',d:'Одна из фишек «?» скрывает сундук с сокровищами.'},
+ hold:{n:'Оборона',d:'Найдите древний тотем и удержите его: когда герой встанет рядом с ним, начнётся натиск врагов. Каждый раунд, когда хотя бы один герой стоит у тотема, засчитывается.'},
  escort:{n:'Спасти пленника',d:'Найдите пленника (он в клетке), подойдите к нему вплотную, чтобы освободить, и доведите до выхода живым. Враги будут охотиться на него.'},
  alarm:{n:'Тревога',d:'Дойдите до выхода за отведённое число раундов, иначе придёт подкрепление врага.'}
 };
 function rollObjective(){
-  const L=LOCS[G.loc];const t=pick(['leader','hunt','treasure','alarm','escort']);G.npc=null;
+  const L=LOCS[G.loc];const t=pick(['leader','hunt','treasure','alarm','escort','hold']);G.npc=null;
   const o=G.obj={type:t,done:false,fail:false,prog:0,goal:t==='hunt'?rnd(6,9)+(G.endless?Math.floor(G.depth/3):0):1,limit:t==='alarm'?rnd(11,15):0};
   const empty=()=>shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!c.poi&&!c.barrel&&!inRoom(c.c)&&!monsterAt(c.c,c.r)&&dist(c.c,c.r,G.startCells[0][0],G.startCells[0][1])>=7));
   if(t==='leader'){
@@ -2588,10 +2625,38 @@ function rollObjective(){
       for(let i=0;i<2;i++){const f=freeNear(c.c,c.r);if(f){const m=spawnMon(pick(pool),f[0],f[1]);m.n='Стражник: '+m.n;}}
     }else{o.type='hunt';o.goal=7;}
   }
+  else if(t==='hold'){
+    const ok=x=>nb(x.c,x.r).every(([a,b])=>{const q=cellOf(a,b);return q&&!q.block&&!q.zone&&!q.poi;})&&nb(x.c,x.r).length===6;
+    const c=empty().filter(ok)[0];
+    if(c){o.goal=4+Math.min(1,LOC_TIER[G.loc]||0);o.active=false;o.at=[c.c,c.r];
+      [c,...nb(c.c,c.r).map(([a,b])=>cellOf(a,b))].forEach(q=>{q.hold=true;q.token=null;q.terr=null;q.trap=null;});
+      c.block=true;c.deco='totem';
+    }else{o.type='hunt';o.goal=7;}
+  }
+}
+const holdHere=()=>G.heroes.some(h=>h.alive&&!h.temp&&cellOf(h.c,h.r)&&cellOf(h.c,h.r).hold);
+function holdStart(){
+  const o=G.obj;if(!o||o.type!=='hold'||o.active||o.done||!holdHere())return;
+  o.active=true;sfx('roar');log('Тотем пробуждается — враги идут на штурм! Держите точку '+o.goal+' раунда.');showBanner('Оборона!','Держите тотем '+o.goal+' раунда');holdWave();
+}
+function holdTick(){
+  const o=G.obj;if(!o||o.type!=='hold'||o.done||o.fail)return;
+  if(!o.active){holdStart();return;}
+  if(holdHere()){o.prog++;pop({c:o.at[0],r:o.at[1]},'ДЕРЖИМ '+o.prog+'/'+o.goal,'#ffd23f');log('Тотем удержан: '+o.prog+'/'+o.goal+'.');}
+  else log('У тотема никого нет — раунд не засчитан.');
+  if(o.prog>=o.goal){o.prog=o.goal;objDone();return;}
+  holdWave();
+}
+function holdWave(){
+  const o=G.obj,L=LOCS[G.loc];const pool=(L.mon||[]).filter(id=>MON[id]&&MON[id].mv>=1&&!MON[id].split&&MON[id].hp<=16);if(!pool.length)return;
+  const n=2+(D().mon>=2?1:0);
+  const cand=shuffle(G.grid.flat().filter(c=>!c.block&&!c.zone&&!c.token&&!c.hold&&!inRoom(c.c)&&!monsterAt(c.c,c.r)&&!heroAt(c.c,c.r)&&!npcAt(c.c,c.r)&&dist(c.c,c.r,o.at[0],o.at[1])>=6));
+  for(let i=0;i<n&&cand[i];i++){const c=cand[i];const m=maybeAffix(spawnMon(pick(pool),c.c,c.r));m.aggro=true;fxQ({burst:'spawn',c:c.c,r:c.r});}
+  sfx('spawn');
 }
 function objText(){
   const o=G.obj;if(!o)return null;const d=OBJ[o.type];
-  const prog=o.type==='hunt'?o.prog+'/'+o.goal:o.type==='alarm'&&!o.done?'раунд '+G.round+'/'+o.limit:o.type==='escort'&&!o.done&&!o.fail&&G.npc?(G.npc.freed?'HP '+Math.max(0,G.npc.hp)+'/'+G.npc.d.hp:'найти'):'';
+  const prog=o.type==='hunt'?o.prog+'/'+o.goal:o.type==='alarm'&&!o.done?'раунд '+G.round+'/'+o.limit:o.type==='hold'&&!o.done?(o.active?'раунд '+o.prog+'/'+o.goal:'найти тотем'):o.type==='escort'&&!o.done&&!o.fail&&G.npc?(G.npc.freed?'HP '+Math.max(0,G.npc.hp)+'/'+G.npc.d.hp:'найти'):'';
   return {n:d.n,prog,st:o.done?'ok':o.fail?'bad':'',d:d.d+(o.type==='hunt'?' Нужно: '+o.goal+'.':o.type==='alarm'?' Лимит: '+o.limit+' раундов.':'')};
 }
 function objDone(){
@@ -2862,7 +2927,7 @@ function newRound(){
     }
   });
   G.heroes.filter(p=>p.alive&&hasPerk(p,'halo')).forEach(p=>G.heroes.forEach(x=>{if(x.alive&&dist(p.c,p.r,x.c,x.r)<=2&&x.hp<st(x,'maxhp'))healHero(p,x,2);}));
-  alarmTick();huntTick();
+  alarmTick();huntTick();holdTick();hasteTick();
   G.busy=false;
   if(!checkEnd()){log('— Раунд '+G.round+' —');sfx('round');}
   ui();
@@ -3149,7 +3214,7 @@ function goNext(){
     else if(!G.escAsk){G.escAsk=1;openModal('<h1>Пленник отстал</h1><p>Пленник не у выхода. Уйти без него? Цель «Спасти пленника» будет провалена.</p>',[{t:'Уйти без него',fn:()=>{closeModal();escortFail();goNext();}},{t:'Подождать',fn:()=>{closeModal();G.escAsk=0;}}]);return;}
   }
   G.escAsk=0;
-  const go=()=>{ach(({1:'forest',5:'swamp',6:'poison'})[G.loc]||'forest');objProgress('exit');G.relicPending=(G.relicPending||0)+1;const out=campRest();openCamp(out);};
+  const go=()=>{ach(({1:'forest',5:'swamp',6:'poison'})[G.loc]||'forest');objProgress('exit');G.relicPending=(G.relicPending||0)+1+(pact('iron')?1:0);const out=campRest();openCamp(out);};
   if(nextOpts()[0]===ARENA&&G.keys<KEYS_NEEDED){
     const s=KEYS_NEEDED-G.keys;
     openModal('<h1>Печати не сломаны!</h1><p>У вас '+G.keys+' из '+KEYS_NEEDED+' ключей. Дракон сохраняет '+s+' печат'+(s===1?'ь':'и')+': +'+(SEAL_HP*s)+' HP'+(s>=2?' и +'+Math.floor(s/2)+' к урону':'')+'.</p><p>Возврата на прошлую локацию нет. Войти сейчас?</p>',
@@ -3594,6 +3659,7 @@ function renderPixi(){
     if(cell.void)continue;
     const {x,y}=hc(cell.c,cell.r);
     if(cell.room&&!cell.block){hexFill(g,x,y,HS-.5,G.room&&G.room.opened?0x7a3aa8:0x20103a,G.room&&G.room.opened?.10:.5);}
+    if(cell.hold&&G.obj&&G.obj.type==='hold'&&!G.obj.done){hexFill(g,x,y,HS-.5,G.obj.active?0xff5040:0xffd23f,(G.obj.active?.14:.08)+.05*Math.sin(now/280));g.lineStyle(1,G.obj.active?0xff8a7a:0xffd23f,.7);g.drawPolygon(hexPts(x,y,HS-3));g.lineStyle(0);}
     if(cell.rexit){hexFill(g,x,y,HS-.5,0xffd23f,.18+.06*Math.sin(now/300));g.lineStyle(1,0xffd23f);g.drawPolygon(hexPts(x,y,HS-3));g.lineStyle(0);T('НАЗАД',x,y+HS+9,7,'#ffd23f');}
     if(cell.portal&&!G.over){g.lineStyle(2,0xc58bff,.5+.3*Math.sin(now/260));g.drawPolygon(hexPts(x,y,HS-2));g.lineStyle(0);}
     if(cell.terr==='lava'){hexFill(g,x,y,HS-1.5,(255<<16)|(Math.round(90+40*Math.sin(now/300+cell.seed*9))<<8)|20,.55);
@@ -3937,7 +4003,8 @@ function renderTop(){
   const bossPct=G.dragon&&G.dragon.alive?Math.max(0,Math.round(100*G.dragon.hp/G.dragon.max)):0;
   const bossH=G.dragon&&G.dragon.alive?'<span class="boss"><b class="pf" style="font-size:8px">ДРАКОН</b><span class="bbar"><i style="width:'+bossPct+'%"></i></span><span class="pf" style="font-size:7px">'+G.dragon.hp+'/'+G.dragon.max+'</span></span>':'';
   const keysH=G.horde?'<span class="chip" data-tn="Орда" data-tip="Отбивайте волны врагов одну за другой. Каждые 5 волн — босс. Между волнами — привал с торговцем." style="color:#ffb0a0;border-color:#7a2a2a">Волна '+G.horde.wave+' · врагов '+G.monsters.filter(m=>m.alive).length+'</span>':G.endless?'<span class="chip" data-tn="Бесконечное подземелье" data-tip="Каждый этаж сложнее предыдущего. Каждые 5 этажей — босс. Враги: +'+Math.round((DS().hp-1)*100)+'% HP." style="color:#ffb0a0;border-color:#7a2a2a">Этаж '+G.depth+(isBossFloor(G.depth)?' · БОСС':'')+'</span>':'<span class="keys"><span class="lb">КЛЮЧИ</span>'+Array.from({length:KEYS_NEEDED},(_,i)=>'<i class="gem'+(i<G.keys?' on':'')+'"></i>').join('')+'</span>';
-  const relH=(G.relics&&G.relics.length)?'<span class="relics">'+G.relics.map(id=>'<img class="ric" src="'+RICON[id]+'" data-tn="'+esc(RELICS[id].n)+'" data-tc="Реликвия" data-tip="'+esc(RELICS[id].d)+'">').join('')+'</span>':'';
+  const pactH=(G.pacts&&G.pacts.length)?'<span class="chip" style="color:#ff9a8a;border-color:#7a2a2a" data-tn="Договоры" data-tip="'+esc(G.pacts.map(k=>PACTS[k].n+': '+PACTS[k].d).join(' '))+'">✒ '+G.pacts.length+'</span>':'';
+  const relH=pactH+((G.relics&&G.relics.length)?'<span class="relics">'+G.relics.map(id=>'<img class="ric" src="'+RICON[id]+'" data-tn="'+esc(RELICS[id].n)+'" data-tc="Реликвия" data-tip="'+esc(RELICS[id].d)+'">').join('')+'</span>':'');
   const ot=objText();const objH=ot?'<span class="chip obj '+ot.st+'" data-tn="Цель: '+esc(ot.n)+'" data-tip="'+esc(ot.d)+' Награда: золото и реликвия.">'+(ot.st==='ok'?'✓ ':ot.st==='bad'?'✗ ':'◎ ')+esc(ot.n)+(ot.prog?' '+ot.prog:'')+'</span>':'';
   const uh=G.undo&&G.heroes.find(h=>h.id===G.undo.h);const undoH=uh&&uh.alive&&mine(uh)?'<button class="btn" data-act="undo" data-tip="Вернуть героя на прежнее место и вернуть потраченные очки действия. Работает, пока ход ничем не отозвался (бой, находка, ловушка).">↶ Отмена хода</button>':'';
   const roomH=(G.room&&G.room.opened&&!G.room.won)?'<span class="chip" data-tn="'+esc(G.room.n)+'" data-tip="Подземелье справа на карте. Враги внутри: '+G.monsters.filter(m=>m.alive&&inRoom(m.c)).length+'. Героев внутри: '+G.heroes.filter(h=>h.alive&&inRoom(h.c)).length+'." style="color:#d8b0ff;border-color:#5f2d8f">⛏ '+esc(G.room.n)+' · врагов '+G.monsters.filter(m=>m.alive&&inRoom(m.c)).length+'</span>':'';
@@ -4063,6 +4130,7 @@ function describe(cell){
   if(capAt(cell.c,cell.r)){const d=HDEF[G.room.captive.id];inf.innerHTML='<b>Пленник: '+d.n+'</b><br><span style="color:var(--mid)">'+d.role+' Подойдите вплотную, чтобы освободить, — он будет сражаться за отряд (под управлением ИИ) до конца локации.</span>';return;}
   if(npcAt(cell.c,cell.r)){const n=G.npc;inf.innerHTML='<b>Пленник</b> · HP '+n.hp+'/'+n.d.hp+'<br><span style="color:var(--mid)">'+(n.freed?'Идёт за ближайшим героем, а когда кто-то встанет на выход — к выходу. Враги охотятся на него в первую очередь.':'Сидит в клетке. Подойдите вплотную любым героем, чтобы освободить.')+'</span>';return;}
   if(cell.portal){inf.innerHTML='<b>Вход: '+(cell.poi?cell.poi.n:'подземелье')+'</b><br><span style="color:var(--mid)">Встаньте на этот гекс — герой окажется в подземелье справа на карте (остальные продолжают ходить, раунд общий). Внутри сильные враги и щедрая награда.</span>';return;}
+  if(cell.hold&&G.obj&&G.obj.type==='hold'){inf.innerHTML='<b>Древний тотем</b><br><span style="color:var(--mid)">'+(G.obj.done?'Тотем удержан.':G.obj.active?'Стойте на светящихся гексах вокруг тотема: каждый такой раунд засчитывается ('+G.obj.prog+'/'+G.obj.goal+').':'Встаньте на светящийся гекс рядом с тотемом, чтобы начать оборону.')+'</span>';return;}
   if(cell.rexit){inf.innerHTML='<b>Выход из подземелья</b><br><span style="color:var(--mid)">Встаньте сюда, чтобы вернуться на основную карту.</span>';return;}
   if(cell.token){inf.innerHTML='<b>Скрытая фишка'+(cell.poi?' — '+cell.poi.n:'')+'</b><br><span style="color:var(--mid)">Может скрывать монстра, предмет, ключ или событие. Откройте, стоя рядом (1 ОД).</span>';return;}
   if(cell.zone==='exit'){inf.innerHTML='<b>Выход</b><br><span style="color:var(--mid)">Все живые герои должны встать на светлые гексы, затем «Дальше».</span>';return;}
@@ -4141,12 +4209,12 @@ function runCmd(cmd,who){
 function makeSnap(){
   return {
     loc:G.loc,round:G.round,keys:G.keys,busy:G.busy,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,ww:G.ww,wh:G.wh,
-    grid:G.grid.map(row=>row.map(c=>({b:c.block,d:c.deco,s:c.seed,z:c.zone,dr:c.dragon,p:c.poi?{n:c.poi.n,spr:c.poi.spr}:null,t:c.token?1:0,lt:c.loot&&c.loot.length?c.loot:undefined,tr:c.terr||undefined,br:c.barrel?1:undefined,pt:c.portal?1:undefined,vd:c.void?1:undefined,rm:c.room?1:undefined,rx:c.rexit?1:undefined,tp:c.trap&&c.trap.seen?1:undefined}))),
+    grid:G.grid.map(row=>row.map(c=>({b:c.block,d:c.deco,s:c.seed,z:c.zone,dr:c.dragon,p:c.poi?{n:c.poi.n,spr:c.poi.spr}:null,t:c.token?1:0,lt:c.loot&&c.loot.length?c.loot:undefined,tr:c.terr||undefined,br:c.barrel?1:undefined,pt:c.portal?1:undefined,hd:c.hold?1:undefined,vd:c.void?1:undefined,rm:c.room?1:undefined,rx:c.rexit?1:undefined,tp:c.trap&&c.trap.seen?1:undefined}))),
     heroes:G.heroes.map(h=>{const {d,...rest}=h;return rest;}),
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,trackVar:G.trackVar||0,npc:G.npc||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,pacts:G.pacts||[],trackVar:G.trackVar||0,npc:G.npc||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
@@ -4164,7 +4232,7 @@ function applySnap(s){
   const old=G;
   const ng={loc:s.loc,round:s.round,keys:s.keys,busy:s.busy,over:s.over,cols:s.cols,rows:s.rows,ox:s.ox,oy:s.oy,ww:s.ww,wh:s.wh,log:s.log,stats:s.stats,ready:s.ready,
     exitCells:s.exitCells,startCells:s.startCells,fx:old.fx||[],hover:old.hover||null,mode:null,sel:old.sel||'sword',tele:null,monsters:[],dragon:null,hl:null};
-  ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,portal:!!c.pt,void:!!c.vd,room:!!c.rm,rexit:!!c.rx,trap:c.tp?{seen:true}:null})));
+  ng.grid=s.grid.map((row,r)=>row.map((c,x)=>({c:x,r,block:c.b,deco:c.d,seed:c.s,zone:c.z,dragon:c.dr,poi:c.p,token:c.t?{hidden:true}:null,loot:c.lt||null,terr:c.tr||null,barrel:!!c.br,portal:!!c.pt,hold:!!c.hd,void:!!c.vd,room:!!c.rm,rexit:!!c.rx,trap:c.tp?{seen:true}:null})));
   ng.heroes=s.heroes.map(h=>Object.assign(h,{d:HDEF[h.id]}));
   if(!ng.heroes.some(h=>h.id===ng.sel))ng.sel=ng.heroes[0].id;
   ng.monsters=s.monsters.map(m=>Object.assign(m,{hit:new Set()}));
@@ -4184,7 +4252,7 @@ function applySnap(s){
 
 /* --- лобби --- */
 function sendLobby(){
-  bc({t:'lobby',players:NET.players,owners:NET.owners,started:NET.started,code:NET.code,diff:NET.diff||'normal',freeAI:!!NET.freeAI,endless:!!NET.endless,horde:!!NET.horde,squad:squad(),timer:NET.timer||0});
+  bc({t:'lobby',players:NET.players,owners:NET.owners,started:NET.started,code:NET.code,diff:NET.diff||'normal',freeAI:!!NET.freeAI,endless:!!NET.endless,horde:!!NET.horde,squad:squad(),timer:NET.timer||0,pacts:NET.pacts||[]});
   if(NET.lobby)showLobby();
 }
 function claim(hero,who){
@@ -4205,7 +4273,7 @@ function showLobby(){
   const link=location.href.split('#')[0]+'#room='+NET.code;
   let html='<h1>Комната '+(NET.code==='LOCAL'?'(без сервера)':esc(NET.code))+'</h1>';
   if(isHost&&NET.code!=='LOCAL')html+='<p>Ссылка для друзей (игра должна быть выложена в интернет):</p><p><b style="word-break:break-all;user-select:all">'+esc(link)+'</b></p>';
-  html+=(NET.timer?'<p>Таймер раунда: <b>'+NET.timer+' с</b> — когда время выйдет, раунд закроется сам (неготовые игроки пропускают остаток хода).</p>':'')+'<p>Режим: <b>'+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+'</b></p><p>Сложность: <b>'+DIFF[NET.diff||'normal'].n+'</b> — '+DIFF[NET.diff||'normal'].d+'</p>';
+  html+=((NET.pacts||[]).length?'<p>Договоры: <b>'+NET.pacts.map(k=>PACTS[k].n).join(', ')+'</b></p>':'')+(NET.timer?'<p>Таймер раунда: <b>'+NET.timer+' с</b> — когда время выйдет, раунд закроется сам (неготовые игроки пропускают остаток хода).</p>':'')+'<p>Режим: <b>'+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+'</b></p><p>Сложность: <b>'+DIFF[NET.diff||'normal'].n+'</b> — '+DIFF[NET.diff||'normal'].d+'</p>';
   html+='<h2>Игроки</h2><ul>'+Object.keys(NET.players).map(id=>'<li>'+esc(pname(id))+(id===NET.me?' (вы)':'')+(id==='H'?' — хост':'')+(NET.players[id]&&NET.players[id].spec?' — зритель':'')+(NET.players[id]&&NET.players[id].off?' — нет связи':'')+'</li>').join('')+'</ul>';
   html+=NET.spec?'<h2>Вы — зритель</h2><p>Вы видите игру, но героями не управляете. Можно пользоваться фразами и метками.</p>':'<h2>Герои — нажмите, чтобы взять или освободить</h2><p>Свободных героев ведёт: <b>'+(NET.freeAI?'ИИ':'хост')+'</b>.</p>';
   const btns=(NET.spec?[]:squad()).map(id=>{const o=NET.owners[id];const nm=HDEF[id].n;
@@ -4214,6 +4282,7 @@ function showLobby(){
   if(isHost){
     if(NET.code!=='LOCAL')btns.push({t:'Скопировать ссылку',fn:e=>{if(copyLink(link))e.target.textContent='Скопировано ✓';else window.prompt('Скопируйте ссылку (Ctrl+C):',link);}});
     if(!NET.started)btns.push({t:'Отряд: '+squad().map(id=>HDEF[id].n).join(', ')+' ▸',fn:()=>chooseSquad(()=>{NET.owners={};sendLobby();showLobby();})});
+    if(!NET.started)btns.push({t:'Договоры: '+((NET.pacts||[]).length||'нет')+' ▸',fn:()=>choosePacts(()=>{sendLobby();showLobby();})});
     if(!NET.started)btns.push({t:'Режим: '+(NET.horde?'Орда':NET.endless?'Бесконечное подземелье':'Сюжет')+' ▸',fn:()=>{if(NET.horde){NET.horde=false;NET.endless=false;if(squad().length>4){NET.squad=SQUAD0;NET.owners={};}}else if(NET.endless){NET.endless=false;NET.horde=true;}else NET.endless=true;sendLobby();}});
     if(!NET.started)btns.push({t:'Сложность: '+DIFF[NET.diff||'normal'].n+' ▸',fn:()=>{NET.diff=DORDER[(DORDER.indexOf(NET.diff||'normal')+1)%3];sendLobby();}});
     btns.push({t:'Таймер раунда: '+(NET.timer?NET.timer+' с':'выкл')+' ▸',fn:()=>{const o=[0,60,90,120];NET.timer=o[(o.indexOf(NET.timer||0)+1)%o.length];if(NET.started)armTimer();sendLobby();if(NET.started)ui();}});
@@ -4352,7 +4421,7 @@ function hostRoom(n){
 }
 function guestData(m){
   if(m.t==='you')NET.me=m.id;
-  else if(m.t==='lobby'){NET.timer=m.timer||0;NET.squad=m.squad||SQUAD0;NET.diff=m.diff;NET.endless=m.endless;NET.horde=!!m.horde;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
+  else if(m.t==='lobby'){NET.timer=m.timer||0;NET.pacts=m.pacts||[];NET.squad=m.squad||SQUAD0;NET.diff=m.diff;NET.endless=m.endless;NET.horde=!!m.horde;NET.freeAI=m.freeAI;NET.players=m.players;NET.owners=m.owners;NET.started=m.started;NET.code=m.code;if(!m.started||NET.lobby)showLobby();}
   else if(m.t==='snap'){NET.started=true;if(NET.lobby){NET.lobby=false;closeModal();}applySnap(m.s);}
   else if(m.t==='modal'){NET.lobby=false;openModal(m.html+'<p style="color:var(--gold)">Решает хост.</p>',m.labels.map(t=>({t,fn:()=>{}})),true);document.querySelectorAll('#mbox .btn').forEach(b=>b.disabled=true);}
   else if(m.t==='mclose'){NET.lobby=false;closeModal();}
@@ -4551,7 +4620,7 @@ function packG(){
   return {loc:G.loc,round:G.round,keys:G.keys,over:G.over,cols:G.cols,rows:G.rows,ox:G.ox,oy:G.oy,grid:G.grid,
     heroes:G.heroes.map(({d,...r})=>r),monsters:G.monsters.map(({hit,...r})=>r),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,tele:G.tele?[...G.tele.cells]:null,
-    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,npc:G.npc||null,hunt:G.hunt||null,ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
+    exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,log:G.log.slice(-150),sel:G.sel,gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,npc:G.npc||null,hunt:G.hunt||null,pacts:G.pacts||[],ww:G.ww,wh:G.wh,daily:G.daily||null,horde:G.horde||null};
 }
 function unpackG(g){
   const ng=Object.assign({},g,{fx:[],hover:null,mode:null,hl:null,busy:false,ready:{}});
@@ -4632,7 +4701,7 @@ function showMenu(){
    '<h2>Ваше имя</h2><input id="pname" maxlength="14" value="'+esc(nm)+'" placeholder="Игрок">'+
    '<h2>Код комнаты (чтобы присоединиться)</h2>'+(code?'<p>Код подставлен из ссылки — просто нажмите «Войти по коду».</p>':'<p>Чтобы создать свою комнату, код вводить не нужно.</p>')+'<input id="pcode" maxlength="6" value="'+esc(code)+'" placeholder="ABCD">'+
    '<h2>Адрес сервера</h2><input id="psrv" value="'+esc(srv)+'">',
-   [...resumeBtns(),{t:'Играть одному',fn:()=>{saveName();NET.daily=null;chooseMode(()=>chooseDiff(()=>chooseSquad(()=>chooseHeroes(()=>{NET.playing=true;newGame();closeModal();showIntro();}))));}},
+   [...resumeBtns(),{t:'Играть одному',fn:()=>{saveName();NET.daily=null;chooseMode(()=>chooseDiff(()=>choosePacts(()=>chooseSquad(()=>chooseHeroes(()=>{NET.playing=true;newGame();closeModal();showIntro();})))));}},
     {t:'Ежедневный забег',fn:showDaily},
     {t:'Создать комнату',fn:()=>{saveName();saveSrv();NET.daily=null;hostWS();}},
     {t:'Войти по коду',fn:()=>{saveName();saveSrv();NET.spec=false;joinWS($('#pcode').value);}},

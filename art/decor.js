@@ -118,3 +118,12 @@ ART.lab=()=>mkArt({parts:[
  {t:'p',pts:[[21,33],[23,29],[25,33]],m:'orange'},{t:'p',pts:[[26,33],[28,29],[30,33]],m:'orange'},
 ]});
 
+ART.totem=()=>mkArt({parts:[
+ {t:'e',cx:18,cy:33,rx:11,ry:3,m:'stone',b:-.2},
+ {t:'r',x:12,y:8,w:12,h:25,m:'wood'},{t:'r',x:12,y:8,w:2,h:25,m:'wood',b:.15},
+ {t:'r',x:11,y:12,w:14,h:2,m:'bone'},{t:'r',x:11,y:21,w:14,h:2,m:'bone'},
+ {t:'e',cx:15,cy:16.5,rx:1.6,ry:1.6,m:'yellow'},{t:'e',cx:21,cy:16.5,rx:1.6,ry:1.6,m:'yellow'},{t:'r',x:15,y:18,w:6,h:1,m:'dark'},
+ {t:'e',cx:15,cy:26,rx:1.4,ry:1.4,m:'red'},{t:'e',cx:21,cy:26,rx:1.4,ry:1.4,m:'red'},{t:'r',x:14,y:28,w:8,h:1,m:'dark'},
+ {t:'p',pts:[[10,8],[18,1],[26,8]],m:'red'},{t:'p',pts:[[5,10],[12,7],[12,12]],m:'bone'},{t:'p',pts:[[31,10],[24,7],[24,12]],m:'bone'},
+ {t:'px',x:18,y:4,c:'#ffd23f'},
+]});
