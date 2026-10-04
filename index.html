@@ -207,7 +207,7 @@ const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
-const SET=Object.assign({speed:1,big:false,calm:false,cb:false,vol:90,confirm:false},(()=>{try{return JSON.parse(localStorage.getItem('bd_set')||'{}');}catch(e){return {};}})());
+const SET=Object.assign({speed:1,big:false,calm:false,cb:false,vol:90,confirm:false,crisp:true,light:true},(()=>{try{return JSON.parse(localStorage.getItem('bd_set')||'{}');}catch(e){return {};}})());
 function saveSet(){try{localStorage.setItem('bd_set',JSON.stringify(SET));}catch(e){}}
 function applySet(){
   const b=document.body;if(!b)return;
@@ -336,28 +336,79 @@ const TRACKS={
   6:{bpm:90,lead:'square',leadV:.06,drums:1,
     chords:['E2m','F2M','E2m','D#2M','C2M','B1M','A1m','B1M'],bass:[0,null,0,null,12,null,7,null],arp:[0,3,7,3,12,7,3,0],
     mel:'B4 - C5 - B4 - G#4 - | E5 - - - D#5 - B4 . | C5 - D5 - C5 - A4 - | B4 - - - F#4 - . . | B4 - C5 - E5 - D#5 - | C5 - B4 - G4 - E4 - | A4 - C5 - E5 - F5 E5 | D#5 - - - B4 - . .'},
+  camp:{bpm:64,lead:'triangle',leadV:.10,drums:0,
+    chords:['F2M','C2M','D2m','A#1M','F2M','C2M','A#1M','C2M'],bass:[0,null,null,null,7,null,null,null],arp:[0,7,12,15,12,7,3,7],
+    mel:'A4 - - C5 - A4 G4 - | E4 - - - G4 - - . | F4 - A4 - D5 - C5 A4 | A#4 - - - - - . . | A4 - - C5 F5 - E5 D5 | C5 - - - G4 - - . | D5 - C5 A#4 A4 - G4 F4 | E4 - - - - - . .'},
+  horde:{bpm:140,lead:'square',leadV:.07,drums:2,always:1,
+    chords:['D2m','D2m','A#1M','C2M','D2m','D2m','G1m','A1M'],bass:[0,0,12,0,7,0,12,0],arp:[0,7,12,7,0,7,12,15],
+    mel:'D5 - D5 F5 E5 - D5 C5 | D5 - A4 - - - . . | A#4 - C5 D5 C5 - A#4 A4 | C5 - - - E5 - . . | F5 - E5 D5 E5 - F5 G5 | A5 - - - D5 - . . | G5 - F5 E5 D5 - C5 A#4 | A4 - C#5 - E5 - A5 -'},
+  boss:{bpm:132,lead:'square',leadV:.07,drums:2,always:1,
+    chords:['C2m','C2m','G#1M','G1M','C2m','C2m','F1m','G1M'],bass:[0,12,0,12,0,12,7,12],arp:[0,3,7,12,7,3,0,3],
+    mel:'C5 - D#5 - G5 - F5 D#5 | D5 - - - B4 - . . | C5 - D#5 - G#5 - G5 F5 | G5 - - - D5 - . . | D#5 - D5 C5 D5 - D#5 F5 | G5 - - - C6 - . . | G#5 - G5 F5 D#5 - D5 C5 | B4 - D5 - G5 - - .'},
+  '1b':{bpm:100,lead:'square',leadV:.07,drums:1,
+    chords:['E2m','C2M','G2M','D2M','E2m','C2M','A1m','B1M'],bass:[0,null,7,null,0,null,7,null],arp:[0,7,12,15,12,7,3,7],
+    mel:'E5 - G5 - F#5 - E5 D5 | B4 - - - G4 - . . | C5 - E5 - G5 - F#5 E5 | D5 - - - A4 - . . | E5 - B4 - E5 - G5 F#5 | E5 - C5 - E5 - G5 - | A5 - G5 F#5 E5 - D5 C5 | B4 - D#5 - F#5 - . .'},
+  '2b':{bpm:76,lead:'triangle',leadV:.12,drums:1,
+    chords:['A1m','F1M','G1M','E1M','A1m','F1M','D2m','E1M'],bass:[0,null,null,null,0,null,7,null],arp:[0,3,7,12,7,3,0,7],
+    mel:'A4 - - B4 C5 - B4 A4 | F4 - - - A4 - . . | G4 - B4 - D5 - C5 B4 | G#4 - - - E4 - . . | A4 - C5 - E5 - D5 C5 | A4 - F4 - A4 - C5 - | D5 - E5 F5 E5 - D5 C5 | B4 - - - G#4 - . .'},
+  '3b':{bpm:84,lead:'triangle',leadV:.11,drums:1,
+    chords:['D2m','A#1M','F2M','C2M','D2m','A#1M','G1m','A1M'],bass:[0,null,7,null,12,null,7,null],arp:[0,7,12,15,19,15,12,7],
+    mel:'A5 - - F5 E5 - D5 - | F5 - - - A#4 - . . | C5 - F5 - A5 - G5 F5 | E5 - - - C5 - . . | D5 - F5 - A5 - D6 C6 | A#5 - A5 - F5 - D5 - | G5 - A#5 - A5 - G5 F5 | E5 - C#5 - A4 - . .'},
+  '5b':{bpm:72,lead:'triangle',leadV:.12,drums:1,
+    chords:['F2m','C#2M','G#1M','D#2M','F2m','C#2M','A#1m','C2M'],bass:[0,null,null,null,7,null,null,null],arp:[0,3,7,12,7,3,0,3],
+    mel:'C5 - - F5 G#5 - G5 F5 | F5 - - - C#5 - . . | C5 - D#5 - G#5 - G5 F5 | G5 - - - D#5 - . . | F5 - G#5 - C6 - A#5 G#5 | G5 - F5 - D#5 - C#5 - | C5 - D#5 - F5 - G5 - | E5 - - - C5 - . .'},
+  '6b':{bpm:96,lead:'square',leadV:.06,drums:1,
+    chords:['B1m','G1M','B1m','F#1M','E2m','C2M','F#1M','F#1M'],bass:[0,null,0,null,12,null,7,null],arp:[0,3,7,3,12,7,3,0],
+    mel:'F#5 - G5 - F#5 - D5 - | B4 - - - D5 - . . | F#5 - G5 - A5 - G5 F#5 | E5 - - - A#4 - . . | B4 - D5 - F#5 - E5 D5 | C5 - E5 - G5 - - . | F#5 - E5 D5 C#5 - A#4 - | F#4 - A#4 - C#5 - . .'},
+  win:{bpm:120,lead:'square',leadV:.08,drums:0,once:1,
+    chords:['C2M','F2M','G2M','C2M'],bass:[0,null,7,null,0,null,7,null],arp:[0,7,12,15,12,7,3,7],
+    mel:'C5 E5 G5 C6 - - G5 - | A5 - F5 - A5 C6 - - | B5 - G5 - D6 - B5 - | C6 - - - - - . .'},
+  lose:{bpm:70,lead:'triangle',leadV:.12,drums:0,once:1,
+    chords:['A1m','F1M','D2m','E1M'],bass:[0,null,null,null,7,null,null,null],arp:[0,3,7,12,7,3,0,7],
+    mel:'E5 - D5 - C5 - B4 - | A4 - - - F4 - . . | D4 - F4 - A4 - G#4 - | A4 - - - - - . .'},
   4:{bpm:148,lead:'square',leadV:.07,drums:2,
     chords:['E2m','C2M','A1m','B1M','E2m','C2M','A1m','B1M'],bass:[0,0,12,0,0,12,0,7],arp:[0,7,12,7,0,7,12,7],
     mel:'E5 - B4 - E5 F5 G5 F5 | E5 - C5 - E5 - G5 - | A5 - G5 F5 E5 - D5 E5 | D#5 - - - B4 - F#5 - | G5 F#5 E5 - B4 - E5 - | C5 - E5 G5 A5 - G5 E5 | F5 - E5 D5 C5 - B4 A4 | B4 - D#5 - F#5 - B5 -'}
 };
-TRACKS[7]=TRACKS[4];
 for(const k in TRACKS){const t=TRACKS[k];
   t.ch=t.chords.map(c=>{const m=c.match(/^([A-G]#?)(\d)(m|M)$/);return {root:NOTE(m[1]+m[2]),third:m[3]==='m'?3:4};});
   t.notes=t.mel.replace(/\|/g,' ').trim().split(/\s+/);
 }
 const MUS={cur:null,bus:null,step:0,next:0,timer:0};
+function musicHot(){
+  if(!G.monsters||!G.heroes)return false;
+  return G.monsters.some(m=>m.alive&&!((m.lair||(MON[m.id]&&MON[m.id].lair))&&!m.aggro)&&G.heroes.some(h=>h.alive&&mdist(h,m)<=5));
+}
 function musicWant(){
-  if(!MUSIC||G.over)return null;
+  if(!MUSIC)return null;
   if(!NET.started&&!(NET.role==='solo'&&NET.playing))return 'menu';
-  return TRACKS[G.loc]?String(G.loc):null;
+  if(G.over)return G.heroes&&G.heroes.some(h=>h.alive)&&!G.endless&&!G.horde?'win':'lose';
+  if(G.camp)return 'camp';
+  if(G.horde)return 'horde';
+  if(G.loc!==ARENA&&G.monsters&&G.monsters.some(m=>m.alive&&m.elite&&MON[m.id]&&MON[m.id].key&&m.aggro&&G.heroes.some(h=>h.alive&&dist(h.c,h.r,m.c,m.r)<=7)))return 'boss';
+  const v=String(G.loc)+(G.trackVar?'b':'');
+  return TRACKS[v]?v:TRACKS[G.loc]?String(G.loc):null;
+}
+function musicFx(){
+  if(MUS.lp||!AC)return;
+  MUS.lp=AC.createBiquadFilter();MUS.lp.type='lowpass';MUS.lp.frequency.value=14000;MUS.lp.Q.value=.5;MUS.lp.connect(A_MUS);
+  // реверберация: импульс из затухающего шума
+  const len=Math.floor(AC.sampleRate*2.2),ir=AC.createBuffer(2,len,AC.sampleRate);
+  for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.6);}
+  MUS.rev=AC.createConvolver();MUS.rev.buffer=ir;MUS.wet=AC.createGain();MUS.wet.gain.value=.26;
+  MUS.lp.connect(MUS.rev);MUS.rev.connect(MUS.wet);MUS.wet.connect(A_MUS);
 }
 function musicTick(){
   const want=musicWant();
+  const hot=musicHot();
+  if(AC&&MUS.lp&&hot!==MUS.hot){MUS.hot=hot;const t=TRACKS[MUS.cur];MUS.lp.frequency.setTargetAtTime(hot||(t&&t.always)||!t||!t.drums?14000:2600,AC.currentTime,.8);}
   if(want===MUS.cur)return;
   if(!AC){if(want)return;} else if(MUS.bus){const b=MUS.bus;b.gain.setTargetAtTime(0,AC.currentTime,0.25);setTimeout(()=>{try{b.disconnect();}catch(e){}},1500);MUS.bus=null;}
   MUS.cur=want;clearInterval(MUS.timer);MUS.timer=0;
   if(!want||!audioInit())return;
-  MUS.bus=AC.createGain();MUS.bus.gain.setValueAtTime(0,AC.currentTime);MUS.bus.gain.setTargetAtTime(1,AC.currentTime,0.4);MUS.bus.connect(A_MUS);
+  musicFx();
+  MUS.bus=AC.createGain();MUS.bus.gain.setValueAtTime(0,AC.currentTime);MUS.bus.gain.setTargetAtTime(1,AC.currentTime,0.4);MUS.bus.connect(MUS.lp||A_MUS);
+  {const tt=TRACKS[want];MUS.hot=musicHot();if(MUS.lp)MUS.lp.frequency.setTargetAtTime(MUS.hot||!tt||tt.always||!tt.drums?14000:2600,AC.currentTime,.3);}
   MUS.step=0;MUS.next=AC.currentTime+0.1;
   MUS.timer=setInterval(musicSched,25);
 }
@@ -366,6 +417,9 @@ function musicSched(){
   const e=60/t.bpm/2; // длительность восьмой
   while(MUS.next<AC.currentTime+0.15){
     const s=MUS.step,at=MUS.next,bar=Math.floor(s/8)%t.ch.length,i=s%8,c=t.ch[bar],out=MUS.bus;
+    if(t.once&&s>=t.notes.length){const b=MUS.bus;b.gain.setTargetAtTime(0,AC.currentTime+.5,.6);clearInterval(MUS.timer);MUS.timer=0;return;}
+    // пэд: мягкий аккорд на весь такт
+    if(i===0){[0,c.third,7].forEach((n,k)=>aTone(MF(c.root+12+n),e*8*.98,k?'sine':'triangle',.045,{at,att:.35},out));}
     const tone=n=>n===3?c.third:n===15?c.third+12:n; // 3/15 в шаблонах = терция аккорда
     // бас
     const b=t.bass[i];if(b!=null)aTone(MF(c.root+b),e*0.9,'triangle',.5,{at},out);
@@ -374,13 +428,16 @@ function musicSched(){
     // мелодия
     const tok=t.notes[s%t.notes.length];
     if(tok!=='.'&&tok!=='-'){let len=1;while(t.notes[(s+len)%t.notes.length]==='-')len++;
-      aTone(MF(NOTE(tok)),e*len*0.95,t.lead,t.leadV*3,{at,att:.01,vib:len>2?5:0},out);}
+      aTone(MF(NOTE(tok)),e*len*0.95,t.lead,t.leadV*3,{at,att:.01,vib:len>2?5:0},out);
+      aTone(MF(NOTE(tok))*1.006,e*len*0.95,'triangle',t.leadV*1.2,{at,att:.02},out);}
     // ударные
-    if(t.drums){
+    const dl=!t.drums?0:(t.always?t.drums:(MUS.hot?2:0));
+    if(t.drums&&!dl&&i===0)aTone(110,.18,'sine',.45,{at,to:40},out);
+    if(dl){
       if(i%4===0)aTone(120,.14,'sine',.9,{at,to:40},out);
-      if(i%4===2)aNoise(.12,t.drums>1?.5:.25,'bandpass',1800,{at},out);
-      if(t.drums>1||i%2===1)aNoise(.03,.18,'highpass',7000,{at},out);
-      if(t.drums>1&&i===7)aTone(120,.14,'sine',.7,{at,to:40},out);
+      if(i%4===2)aNoise(.12,dl>1?.5:.25,'bandpass',1800,{at},out);
+      if(dl>1||i%2===1)aNoise(.03,.18,'highpass',7000,{at},out);
+      if(dl>1&&i===7)aTone(120,.14,'sine',.7,{at,to:40},out);
     }
     MUS.step++;MUS.next+=e;
   }
@@ -1962,7 +2019,7 @@ function newGame(){
 }
 function startLoc(n){
   if(G.heroes&&G.heroes.some(h=>h.temp)){G.heroes.filter(h=>h.temp).forEach(h=>{delete NET.owners[h.id];log(h.d.n+' прощается с отрядом и уходит своей дорогой.');});G.heroes=G.heroes.filter(h=>!h.temp);}
-  G.loc=n;G.undo=null;G.room=null;G.npc=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
+  G.loc=n;G.trackVar=Math.random()<.5?1:0;G.undo=null;G.room=null;G.npc=null;G.monsters=[];G.dragon=null;G.tele=null;G.round=1;G.mode=null;
   const build=()=>{if(n===HORDE_LOC)genHorde();else if(n!==ARENA)genField(n);else genArena();G.obj=null;if(n!==ARENA&&LOCS[n].mon)rollObjective();
     G.hunt=(n!==ARENA&&n!==HORDE_LOC&&Math.random()<(G.endless?.7:.6))?{at:rnd(5,8),warned:false,spawned:false}:null;};
   if(G.daily)withSeed(G.daily+'|'+G.depth,build);else build();
@@ -3127,11 +3184,13 @@ function showSettings(){
   const oo=v=>v?'вкл':'выкл';
   openModal('<h1>Настройки</h1><p style="color:var(--mid)">Сохраняются в этом браузере и действуют только у вас.</p>'+
     '<h2>Громкость: <span id="volv">'+SET.vol+'%</span></h2><input type="range" id="vol" min="0" max="100" step="5" value="'+SET.vol+'">'+
-    '<p>Скорость анимаций — ходы врагов и ИИ быстрее. Крупный интерфейс — увеличенные шрифты. Меньше эффектов — без тряски экрана, вспышек и частиц. Палитра для дальтоников — полоски здоровья синие/оранжевые/пурпурные. Подтверждение — спрашивать, если у героя остались очки действия.</p>',
+    '<p>Скорость анимаций — ходы врагов и ИИ быстрее. Крупный интерфейс — увеличенные шрифты. Меньше эффектов — без тряски экрана, вспышек и частиц. Палитра для дальтоников — полоски здоровья синие/оранжевые/пурпурные. Подтверждение — спрашивать, если у героя остались очки действия. Чёткие пиксели — все пиксели одинакового размера при любом масштабе. Свет и туман — освещение локаций (на слабом телефоне можно выключить).</p>',
     [{t:'Скорость: '+sp[cur][1],fn:()=>{SET.speed=sp[(cur+1)%sp.length][0];saveSet();showSettings();}},
      {t:'Крупный интерфейс: '+oo(SET.big),fn:()=>{SET.big=!SET.big;saveSet();applySet();fit();showSettings();}},
      {t:'Меньше эффектов: '+oo(SET.calm),fn:()=>{SET.calm=!SET.calm;saveSet();applySet();showSettings();}},
      {t:'Палитра для дальтоников: '+oo(SET.cb),fn:()=>{SET.cb=!SET.cb;saveSet();applySet();ui();showSettings();}},
+     {t:'Чёткие пиксели: '+oo(SET.crisp!==false),fn:()=>{SET.crisp=!(SET.crisp!==false);saveSet();showSettings();}},
+     {t:'Свет и туман: '+oo(SET.light!==false),fn:()=>{SET.light=!(SET.light!==false);saveSet();showSettings();}},
      {t:'Подтверждать конец раунда: '+oo(SET.confirm),fn:()=>{SET.confirm=!SET.confirm;saveSet();showSettings();}},
      {t:'Готово',fn:closeModal}],true);
   const v=$('#vol');if(v)v.oninput=()=>{SET.vol=+v.value;$('#volv').textContent=SET.vol+'%';saveSet();applySet();};
@@ -3312,9 +3371,16 @@ function initPixi(){
     PIXI.settings.ROUND_PIXELS=true;
     PIXI.BaseTexture.defaultOptions.scaleMode=PIXI.SCALE_MODES.NEAREST;
     const app=new PIXI.Application({width:Math.max(200,st.clientWidth),height:Math.max(150,st.clientHeight),backgroundColor:0x05030a,antialias:false,
-      resolution:Math.min(2,window.devicePixelRatio||1),autoDensity:true,autoStart:false,powerPreference:'high-performance'});
+      resolution:Math.min(3,window.devicePixelRatio||1),autoDensity:true,autoStart:false,powerPreference:'high-performance'});
     if(!app.renderer||!app.view)return null;
-    const world=new PIXI.Container();app.stage.addChild(world);
+    const world=new PIXI.Container();
+    // чёткие пиксели: мир рисуется в текстуру с целым масштабом, затем плавно подгоняется под экран
+    const rtS=new PIXI.Sprite(PIXI.Texture.EMPTY);app.stage.addChild(rtS);
+    try{const CMF=PIXI.ColorMatrixFilter||(PIXI.filters&&PIXI.filters.ColorMatrixFilter);if(CMF){const cf=new CMF();cf.saturate(.12,true);cf.contrast(.06,true);rtS.filters=[cf];}}catch(e){}
+    // освещение: карта света умножается на картинку
+    const lightC=new PIXI.Container(),lightBg=new PIXI.Graphics(),lightL=new PIXI.Container();lightC.addChild(lightBg,lightL);
+    const lightS=new PIXI.Sprite(PIXI.Texture.EMPTY);lightS.blendMode=PIXI.BLEND_MODES.MULTIPLY;app.stage.addChild(lightS);
+    const fogC=new PIXI.Container();app.stage.addChild(fogC);
     const gStatic=new PIXI.Graphics(),cStatic=new PIXI.Container(),gDyn=new PIXI.Graphics();
     const lGlow=new PIXI.Container(),l1=new PIXI.Container(),l2=new PIXI.Container(),gFg=new PIXI.Graphics(),lTxt=new PIXI.Container();
     world.addChild(gStatic,cStatic,gDyn,lGlow,l1,l2,gFg,lTxt);
@@ -3322,19 +3388,20 @@ function initPixi(){
     const glowTex=radialTex(64,[[0,'rgba(255,255,255,1)'],[1,'rgba(255,255,255,0)']]);
     st.insertBefore(app.view,st.firstChild);cv.style.display='none';
     $('#zoombtns').style.display='flex';
-    const o={app,world,gStatic,cStatic,gDyn,gFg,lTxt,vig,glowTex,sig:'',gid:new WeakMap(),gidn:0,
+    const o={app,world,rtS,rt:null,lightC,lightBg,lightS,lrt:null,fogC,fog:[],gStatic,cStatic,gDyn,gFg,lTxt,vig,glowTex,sig:'',gid:new WeakMap(),gidn:0,pLight:new SprPool(lightL,PIXI.BLEND_MODES.ADD),pFog:new SprPool(fogC),
       pGlow:new SprPool(lGlow,PIXI.BLEND_MODES.ADD),p1:new SprPool(l1),p2:new SprPool(l2),tp:{}};
     return o;
   }catch(e){console.warn('PixiJS недоступен, используется canvas:',e);return null;}
 }
 /* --- камера --- */
 function applyCam(){
-  const vw=CAM.vw,vh=CAM.vh;CAM.s0=Math.min(vw/W,vh/H);const S=CAM.s0*CAM.z;CAM.S=S;
+  const vw=CAM.vw,vh=CAM.vh;CAM.s0=Math.min(vw/W,vh/H);let S=CAM.s0*CAM.z;
+  if(PX&&SET.crisp!==false){const res=PX.app.renderer.resolution;const D=S*res;if(D>=1.5)S=Math.round(D)/res;}
+  CAM.S=S;
   if(W*S<=vw)CAM.cx=W/2;else{const mn=vw/2/S,mx=W-vw/2/S;CAM.cx=Math.min(mx,Math.max(mn,CAM.cx));}
   if(H*S<=vh)CAM.cy=H/2;else{const mn=vh/2/S,mx=H-vh/2/S;CAM.cy=Math.min(mx,Math.max(mn,CAM.cy));}
   CAM.tx=vw/2-CAM.cx*S;CAM.ty=vh/2-CAM.cy*S;
-  if(PX){const sh=CAM.shake>0.1?(Math.random()-.5)*CAM.shake:0,sv=CAM.shake>0.1?(Math.random()-.5)*CAM.shake:0;
-    PX.world.scale.set(S);PX.world.position.set(Math.round(CAM.tx+sh),Math.round(CAM.ty+sv));}
+
 }
 function evWorld(e){
   const rc=(PX?PX.app.view:cv).getBoundingClientRect();const sx=e.clientX-rc.left,sy=e.clientY-rc.top;
@@ -3691,7 +3758,70 @@ function renderPixi(){
   PX.pGlow.end();PX.p1.end();PX.p2.end();
   for(const k in PX.tp){const pl=PX.tp[k];for(let i=pl.n;i<pl.a.length;i++)pl.a[i].visible=false;}
   PX.vig.width=CAM.vw;PX.vig.height=CAM.vh;
-  PX.app.renderer.render(PX.app.stage);
+  composeFrame(th,now,dt);
+}
+/* --- финальная сборка кадра: чёткие пиксели, свет, туман --- */
+const LIGHT_AMB={1:[.82,.88,.80],2:[.68,.64,.78],3:[.78,.86,.98],4:[.86,.68,.62],5:[.68,.80,.70],6:[.62,.70,.58],7:[.84,.84,.92]};
+function lightsList(){
+  const L=[];
+  for(const h of G.heroes)if(h.alive)L.push([h.c,h.r,h.id===G.sel?110:90,0xfff0d0,.55]);
+  for(const row of G.grid)for(const c of row){
+    if(c.void)continue;
+    if(c.terr==='lava')L.push([c.c,c.r,55,0xff7a20,.5]);else if(c.terr==='acid')L.push([c.c,c.r,45,0x60ff40,.32]);
+    if(c.zone==='exit'&&hasExit())L.push([c.c,c.r,40,0xffd23f,.28]);
+    if(c.portal||c.rexit)L.push([c.c,c.r,52,0xc58bff,.42]);
+  }
+  for(const m of G.monsters){if(!m.alive)continue;
+    if(m.id==='dragon')L.push([m.c,m.r,160,0xff5030,.6]);
+    else if(m.burn>0||m.affix==='fire'||m.id==='wisp')L.push([m.c,m.r,55,0xff8a20,.5]);
+    else if(m.id==='icespirit'||m.id==='icequeen'||m.affix==='frost')L.push([m.c,m.r,48,0x99ddff,.38]);
+    else if(m.elite)L.push([m.c,m.r,60,0x88ddff,.3]);}
+  if(G.npc&&G.npc.alive)L.push([G.npc.c,G.npc.r,60,0x9fe0ff,.35]);
+  if(G.tele)G.tele.cells.forEach(k=>{const [c,r]=k.split(',').map(Number);L.push([c,r,40,0xff5a14,.45]);});
+  return L;
+}
+function composeFrame(th,now,dt){
+  const R=PX.app.renderer,res=R.resolution;
+  const crisp=SET.crisp!==false;
+  const sh=CAM.shake>0.1?(Math.random()-.5)*CAM.shake:0,sv=CAM.shake>0.1?(Math.random()-.5)*CAM.shake:0;
+  const Dd=CAM.S*res,direct=crisp&&Math.abs(Dd-Math.round(Dd))<.01;
+  if(crisp&&!direct){
+    const D=CAM.S*res,k=Math.max(1,Math.floor(D+0.02)),f=k/D;
+    const rw=Math.max(1,Math.ceil(CAM.vw*res*f)),rh=Math.max(1,Math.ceil(CAM.vh*res*f));
+    if(!PX.rt||PX.rt.width!==rw||PX.rt.height!==rh){if(PX.rt)PX.rt.destroy(true);PX.rt=PIXI.RenderTexture.create({width:rw,height:rh,scaleMode:PIXI.SCALE_MODES.LINEAR,resolution:1});PX.rtS.texture=PX.rt;}
+    PX.world.scale.set(k);PX.world.position.set(Math.round((CAM.tx+sh)*k/CAM.S),Math.round((CAM.ty+sv)*k/CAM.S));
+    R.render(PX.world,{renderTexture:PX.rt,clear:true});
+    PX.rtS.visible=true;PX.rtS.position.set(0,0);PX.rtS.width=CAM.vw;PX.rtS.height=CAM.vh;
+  }else{
+    PX.rtS.visible=false;if(PX.rtS.filters&&!PX.wf){PX.wf=1;PX.world.filters=null;}PX.world.scale.set(CAM.S);PX.world.position.set(Math.round(CAM.tx+sh),Math.round(CAM.ty+sv));
+    R.render(PX.world,{clear:true});
+  }
+  // свет
+  const amb=SET.light===false?null:(LIGHT_AMB[G.loc]||null);
+  if(amb){
+    const lw=Math.max(1,Math.ceil(CAM.vw/2)),lh=Math.max(1,Math.ceil(CAM.vh/2));
+    if(!PX.lrt||PX.lrt.width!==lw||PX.lrt.height!==lh){if(PX.lrt)PX.lrt.destroy(true);PX.lrt=PIXI.RenderTexture.create({width:lw,height:lh,scaleMode:PIXI.SCALE_MODES.LINEAR,resolution:1});PX.lightS.texture=PX.lrt;}
+    const col=(Math.round(amb[0]*255)<<16)|(Math.round(amb[1]*255)<<8)|Math.round(amb[2]*255);
+    PX.lightBg.clear();PX.lightBg.beginFill(col);PX.lightBg.drawRect(0,0,lw,lh);PX.lightBg.endFill();
+    PX.pLight.begin();
+    const fl=SET.calm?0:1;
+    for(const [c,r,rad,tint,a] of lightsList()){const p=hc(c,r);const x=(p.x*CAM.S+CAM.tx)/2,y=(p.y*CAM.S+CAM.ty)/2;
+      const rr2=rad*CAM.S/2;if(x<-rr2||y<-rr2||x>lw+rr2||y>lh+rr2)continue;
+      const sp=PX.pLight.get(PX.glowTex);sp.position.set(x,y);sp.scale.set(rr2/32);sp.tint=tint;sp.alpha=a*(1+fl*.06*Math.sin(now/180+c*3+r));}
+    PX.pLight.end();
+    R.render(PX.lightC,{renderTexture:PX.lrt,clear:true});
+    PX.lightS.visible=true;PX.lightS.width=CAM.vw;PX.lightS.height=CAM.vh;
+  }else PX.lightS.visible=false;
+  // туман над топями и катакомбами
+  PX.pFog.begin();
+  if(SET.light!==false&&!SET.calm&&(G.loc===5||G.loc===6)){
+    if(PX.fog.length!==10||PX.fogLoc!==G.loc){PX.fogLoc=G.loc;PX.fog=Array.from({length:10},()=>({x:Math.random()*W,y:Math.random()*H,v:6+Math.random()*10,s:4+Math.random()*4,ph:Math.random()*6}));}
+    const tint=G.loc===5?0xc8f0d0:0xb8ff90;
+    for(const b of PX.fog){b.x+=b.v*dt;if(b.x>W+120)b.x=-120;const sp=PX.pFog.get(PX.glowTex);
+      sp.position.set(b.x*CAM.S+CAM.tx,(b.y+Math.sin(now/2400+b.ph)*10)*CAM.S+CAM.ty);sp.scale.set(b.s*CAM.S);sp.tint=tint;sp.alpha=G.loc===5?.09:.07;}
+  }
+  PX.pFog.end();
+  R.render(PX.app.stage,{clear:crisp&&!direct});
 }
 
 function renderCanvas(){
@@ -4016,7 +4146,7 @@ function makeSnap(){
     monsters:G.monsters.map(m=>{const {hit,...rest}=m;return rest;}),
     dragon:G.dragon?G.monsters.indexOf(G.dragon):-1,
     tele:G.tele?[...G.tele.cells]:null,exitCells:G.exitCells,startCells:G.startCells,stats:G.stats,
-    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,npc:G.npc||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
+    log:G.log.slice(-80),ready:G.ready||{},owners:NET.owners,players:NET.players,ext:{gold:G.gold,diff:G.diff,camp:G.camp,relics:G.relics,relicPending:G.relicPending,obj:G.obj,endless:G.endless,depth:G.depth,floorClear:G.floorClear,room:G.room||null,undo:G.undo?{h:G.undo.h}:null,daily:G.daily||null,horde:G.horde||null,trackVar:G.trackVar||0,npc:G.npc||null,tleft:G.deadline?Math.max(0,Math.round((G.deadline-Date.now())/1000)):0,timer:NET.timer||0},freeAI:!!NET.freeAI
   };
 }
 function sendSnap(to){
